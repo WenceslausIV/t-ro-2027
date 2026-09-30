@@ -100,21 +100,20 @@ of North Carolina at Charlotte, Charlotte, NC 28223, USA.}}
 \begin{abstract}
 Closest-point control barrier functions (CBFs) can lose differentiability when minimizing points
 switch between features of non-convex bodies. We certify collision avoidance through a condition
-on the continuous boundary. Each body's signed distance field is a B-spline
-whose certified level places the ground-truth boundary strictly inside its sublevel region.
-A first-contact argument establishes safety from initially separated configurations. Native
-spline patches covering the certified level set yield finite Bernstein and vertex constraints
-on a lifted barrier, affine in the inputs, without closest-point optimization. Optional subdivision
-tightens enforcement without changing the continuous safe set. The construction applies to planar
-and spatial, rigid and articulated bodies, with one field per body. In simulations with subdivided
-covers, it docked where bounding circles could not. In 30 Franka Panda trials whose unfiltered
-motions collide, saved-state mesh-distance lower bounds remained positive (minimum
-1.1~mm); 17 trials reached the goal. Sphere and surface-sample barriers collided in 13 and 15 trials
-without margins; with
-1-cm margins, both avoided detected collisions and reached more goals. A closest-point baseline
-collided in 5. Coarse native patches reduced computation but sometimes
-failed to certify feasible controls. The guarantee requires feasible continuous-time enforcement;
-saved-state audits do not certify between-step motion.
+on the continuous boundary. Each body's signed distance field is a B-spline whose certified level
+places the ground-truth boundary strictly inside its sublevel region, and a first-contact argument
+reduces safety to this level set. Native spline patches covering it yield Bernstein
+constraints on a Lagrangian of the surface condition, affine in the inputs and in per-patch
+multipliers, without closest-point optimization; optimized multipliers make the enforcement loss
+quadratic in the patch size. A tightening that vanishes at rest, with a zero-input fallback,
+certifies the sampled-data controller between samples without feasibility assumptions. The
+construction applies to planar and spatial, rigid and articulated bodies, with one field per body.
+It docked where bounding circles could not. In 30 Franka Panda trials whose
+unfiltered motions collide, the certified sampled-data controller with native 6-mm patches reached
+@6R@ goals at a high computational cost; subdivided covers without that certificate reached 17.
+Without margins, sphere and surface-sample barriers collided in 13 and 15 trials and a
+closest-point baseline in 5; with 1-cm margins, the primitives avoided detected collisions and
+reached more goals.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -153,7 +152,8 @@ needed. This condition on the continuous certified boundary is our safe set, whi
 barrier, which adds the body's own SDF, yields finitely many constraints affine in the inputs that
 suffice at every point of the box (Fig.~\ref{fig:patch-pipeline}). The boxes enter only the constraints on
 the inputs, never the safe set. The default uses one box per retained SDF patch, with no separate
-cover resolution or online subdivision; optional subdivision can reduce the enforcement loss. The construction
+cover resolution or online subdivision; optimized multipliers make the enforcement loss quadratic
+in the patch size, and a sampled-data tightening certifies the implemented controller between samples. The construction
 needs one field per body, not one per pair of bodies or a field over their relative pose, so a new
 obstacle only needs its own field and level, and it applies unchanged to planar and spatial bodies
 and to articulated robots.
@@ -191,17 +191,19 @@ lemma for compact bodies in $\R^n$, and certified levels of fitted SDFs that pla
 boundaries strictly inside their sublevel regions, for polygons, triangle meshes, and exact SDFs
 (resolves L3).
 \item \emph{Surface-cover barriers} (Sec.~\ref{sec:cover}): a safe set defined on the continuous level
-set of each body's SDF, enforced through Bernstein and vertex constraints on a lifted barrier over a
-Bernstein cover of that level set, with certified Taylor remainders from third-derivative bounds;
-the constraints are affine in the inputs of planar robots and in the joint velocities of
-manipulators. The cover leaves the continuous safe set unchanged, while its finite certificate
-restricts the admissible inputs and may affect feasibility. Arbitrary subdivision certifies every
-strictly feasible input (Proposition~\ref{prop:complete}); no closest points or auxiliary geometric
-optimization are needed (resolves L1 and L2).
+set of each body's SDF, enforced through Bernstein constraints on a Lagrangian of the surface
+condition over a Bernstein cover of that level set, with certified Taylor remainders; the
+constraints are affine in the inputs and in per-patch multipliers, need no closest points, and
+restrict only the admissible inputs (resolves L1 and L2). Optimized multipliers make the enforcement
+loss quadratic in the patch size (Proposition~\ref{prop:second}), and subdivision certifies every
+strictly feasible input (Proposition~\ref{prop:complete}).
+\item \emph{Sampled-data certificate} (Sec.~\ref{sec:filter}): a curvature tightening that vanishes
+at rest certifies the held-input controller between samples; with a zero-input fallback, collision
+avoidance needs no feasibility or existence assumption (Corollary~\ref{cor:sampled}).
 \item \emph{Evaluation} (Sec.~\ref{sec:exp}): planar docking, multi-robot, and static-obstacle
 experiments against closest-point and bounding-circle barriers, a 7-DOF Franka Panda among
 non-convex obstacles against sphere, surface-sample, and closest-point barriers, and two Pandas in a
-shared workspace.
+shared workspace, with the certified sampled-data controller on native patches.
 \end{enumerate}
 
 \subsection{Relation to Prior Work}\label{sec:relation}
@@ -356,13 +358,12 @@ between them. The fit affects the resulting level, while the enclosure inequalit
 the certificate, so the training targets may be approximate. We set $\mathcal B_i=\{\phi_i\le l_i\}$ and write
 $\mathcal S_i=\{\phi_i=l_i\}$ for the \emph{certified surface}.
 
-For a union of primitives, the minimum of their exact SDFs is 1-Lipschitz and exact outside
-the union, which suffices for box exclusion; an exterior point $\mathbf p$ at distance $d>0$
-supplies the lower bound $\phi_i(\mathbf p)-\norm{\nabla\phi_i(\mathbf p)}d-\kappa_i(\mathbf p)d^2/2$
-at a true nearest boundary point, whereas zero values on internal seams are not boundary
-evaluations. If a work limit leaves unresolved pieces, adding their maximum upper bound to the
-maximum preserves strict inclusion without the tightness claim. The historical implicit-obstacle
-levels used numerical projections; they establish the enclosure but not the tightness.
+For a union of primitives, the minimum of their exact SDFs is 1-Lipschitz and exact outside the
+union, which suffices for box exclusion; exterior points supply Taylor-deflated lower bounds at true
+boundary points, whereas zero values on internal seams are not boundary evaluations. If a work limit
+leaves unresolved pieces, including their largest upper bound preserves strict inclusion without the
+tightness claim; the historical implicit-obstacle levels, from numerical projections, likewise
+establish the enclosure but not the tightness.
 
 % -----------------------------------------------------------------------------
 \section{Surface-Cover Barriers}\label{sec:cover}
@@ -619,15 +620,12 @@ $\phi_A-l_A$ over the cluster's boxes is certified offline; remaining boxes are 
 $\phi_B(\mathbf y_{\mathbf c})-\norm{\nabla\phi_B(\mathbf y_{\mathbf c})}r-\frac12\kappa_B(\mathbf y_{\mathbf c})r^2-l_B+\min_{\mathcal Q}(\phi_A-l_A)\ge\eta$.
 If $r>\Delta_B$, the Hessian majorant uses the same radius-dependent window construction as $M_B$.
 
-\emph{Domain-boundary pruning.} A box whose enclosing ball is not contained in $\Omega_B$
-cannot use that Taylor model. If $r_{\max}$ bounds the half-diagonal of every cover box paired
-with $B$, certify offline that $\phi_B-l_B\ge\delta_B>0$ on the inner domain collar of width
-$2r_{\max}$. Bernstein coefficients of all cells meeting the collar give such a bound.
-Every point of a box omitted by the radius-$r$ containment test either lies in this collar or
-outside the domain, where the clipped extension has the same positive bound. Thus $h\ge\delta_B$
-on its surface portion, which is all Theorem~\ref{thm:invariance} requires of an omitted box.
-Domain padding alone is not a certificate: if the collar bound fails, the box needs an
-alternative certified treatment. Clusters that leave the domain are checked box by box.
+\emph{Domain-boundary pruning.} A box whose enclosing ball leaves $\Omega_B$ cannot use that Taylor
+model. With $r_{\max}$ bounding the half-diagonals of the boxes paired with $B$, Bernstein
+coefficients certify offline that $\phi_B-l_B\ge\delta_B>0$ on the inner domain collar of width
+$2r_{\max}$; every point of an omitted box lies in this collar or outside the domain, where the
+clipped extension has the same bound, so $h\ge\delta_B$ on its surface portion, as
+Theorem~\ref{thm:invariance} requires. Clusters that leave the domain are checked box by box.
 
 \emph{Optional refinement.} The default performs no online refinement. Where the field varies
 rapidly, $\frac12M_Br^2$ can exceed $\norm{\nabla\phi_B}$, so the bound no longer resolves the
@@ -772,11 +770,11 @@ only exact arithmetic.
 \section{Experiments}\label{sec:exp}
 
 The default certificate uses native SDF patches with $s=\Delta_A$ and no online refinement.
-Section~\ref{sec:native} evaluates this setting with unchanged fields and levels.
-The remaining experiments report the separately identified, subdivided implementation; their
-clearances, success rates, and timings are not attributed to the native-patch default.
-Spatial and crowded planar runs include filter times above the 10-ms simulation step;
-the reported timing distributions do not establish a hard 100-Hz real-time guarantee.
+Sections~\ref{sec:exp-dock}--\ref{sec:exp-dual} report the separately identified subdivided
+implementation, with unit lifts and rows enforced at the 10-ms samples; its results are not
+attributed to the default. Section~\ref{sec:native} evaluates native patches with optimized
+multipliers and the sampled-data certificate. Spatial and crowded planar runs include filter times
+above the 10-ms step, so the timings do not establish a hard 100-Hz real-time guarantee.
 
 \subsection{Planar Setup}
 Unless stated otherwise, control uses $SE(2)$ single integrators with $\gamma=5$,
@@ -798,46 +796,6 @@ GPU), minus a margin $m=2$~cm, with the derivative at one closest pair; it uses 
 fits but keeps the single-closest-point structure of~\cite{jo2026geometry}. The \emph{circle}
 barrier~\cite{wang2017safety} uses the minimum enclosing circle of each fitted body, with body-frame
 center, and the same margin.
-
-\subsection{Native-Patch Default}\label{sec:native}
-We retain native patches with $s=\Delta_A$ and disable online refinement, keeping the fields,
-certified levels, nominal controllers, and initial conditions unchanged. These measurements use
-one CPU thread per process; the Franka trials run in concurrent batches, with other background
-activity not excluded. The timings are separate from the isolated timings
-of the subdivided implementation.
-
-In the docking scene of Sec.~\ref{sec:exp-dock}, the vehicle's 772 native 10-mm patches seat the
-nose to 0.691~m over the same 9~s, with a minimum polygon gap of 9.1~mm, no slack, at most 768
-constraints, and 3.08/3.67~ms median/p95 filter time; the subdivided 5-mm version seats to 0.698~m
-with a 1.7-mm gap (Table~\ref{tab:dock-base}).
-
-In a two-robot crossing with the 4-cm fields of Fig.~\ref{fig:overview}, 87 native patches and
-718 boxes of 5~mm both avoid collision without slack over 12~s (rigid-motion audits confirm positive
-gaps between steps), and both deadlock; minimum gaps are 21.4 and 4.5~mm, maximum constraint counts
-32 and 628, and median filter times 1.81 and 3.31~ms.
-
-On the same 30 Franka trials of Sec.~\ref{sec:exp-franka}, native 12-mm patches give 6847 boxes,
-against 26{,}636 initial boxes in the subdivided implementation. Only 6 trials reach the goal
-within 10~s, against 17 with subdivision. Two trials require slack (1497 steps in total), so the
-hard CBF conditions are not maintained in those runs. Nevertheless, the saved-state mesh-distance
-lower bounds, including final states, remain positive: the minimum is 15.3~mm and the median of
-trial minima is 26.5~mm. These audits do not certify between-step motion. At most 258 boxes produce
-2064 constraints; pooled median/p95 filter time is 10.5/16.7~ms under the non-isolated conditions
-above. Thus removing the cover-size and refinement choices substantially reduces row counts, but
-can sacrifice progress and feasibility of the finite certificate at this field resolution.
-
-\emph{Finer native SDF patches.} To distinguish coarse field resolution from the use of native
-patches, we refit all eight link fields with 6-mm cells and use those cells directly as the cover,
-without subdivision or online refinement. We select the first trial in the saved ordering that
-reached with the historical subdivided method but stalled with 12-mm native patches (trial index 2,
-zero-based). The obstacle fields and controller are unchanged. The refitted fields have levels of
-0.95--1.66~mm and 26{,}182 cover patches; the arm reaches in 5.13~s with zero slack, at most 191 active
-patches (1528 constraints), and a saved-state mesh-distance lower bound of 29.7~mm. Median/p95 filter
-time is 5.88/17.17~ms, including kinematics, constraint assembly, and the QP; 26.9\% of steps exceed
-10~ms, so this run does not establish a 100-Hz real-time guarantee. Background activity was not
-excluded. This selected trial demonstrates that finer native patches can restore progress without
-a separate cover resolution; it is not a 30-trial success estimate, and refitting also changes the
-fields and certified levels.
 
 \subsection{Docking into a Tapered Receptacle}\label{sec:exp-dock}
 A fixed module carries two panel arrays and, in its front face, a tapered receptacle; a vehicle
@@ -976,19 +934,15 @@ each with a smooth wiggle, joined by semicircular hairpins of radius 1.1~m, with
 sections of equal length, 1.14~m. The two wall regions
 are the frame minus this passage, combined through a smooth maximum of signed distances so that all
 corners are rounded; their ground truth consists of cubic spans, sampled into polygons with a
-certified chord deviation below 0.1~mm. One bivariate field with 1.25-cm cells ($791\times791$,
-fitted in 40~s) encodes both walls, with a tightest level of 0.66~mm certified on the cubic spans in
-0.5~s (Proposition~\ref{prop:level}, with the chord bound added to the piece radius), and the rocket's
-field (1-cm cells, level 1.43~mm) is covered by 383 boxes of 5~mm. The nominal controller moves
-toward eight waypoints using constant-speed pursuit with $v_{\max}=0.8$~m/s and
-$\omega_{\max}=1.4$~rad/s. Their straight connections cut into the walls by up to 10~cm, so the barriers
-keep the rocket off the walls: they modify the nominal input in 41\% of the 3242 steps while the
-rocket slides along the walls to the exit in 32.4~s (path length 23.5~m), with up to 126 active boxes
-(504 constraints). The ground-truth distance at the steps is at least 4.69~mm, and a conservative audit
-that subtracts half of each step's motion verifies at least 0.59~mm between steps; the certified lower
-bound of $\tilde h$ on the active boxes stays above 2.7~mm. The online cost is
-1.9~ms per step (median; 95th percentile 3.7~ms), measured on one CPU thread with background
-activity not excluded.
+certified chord deviation below 0.1~mm. One bivariate field with 1.25-cm cells ($791\times791$, fitted in 40~s) encodes both walls, with a
+tightest level of 0.66~mm certified on the cubic spans in 0.5~s (Proposition~\ref{prop:level}, the
+chord bound added to the piece radius); the rocket's field (1-cm cells, level 1.43~mm) is covered by
+383 boxes of 5~mm. The nominal controller pursues eight waypoints at $v_{\max}=0.8$~m/s and
+$\omega_{\max}=1.4$~rad/s along straight connections that cut into the walls by up to 10~cm, so the
+barriers modify the nominal input in 41\% of the 3242 steps while the rocket slides along the walls to
+the exit in 32.4~s (path 23.5~m), with at most 504 constraints. The ground-truth distance is at least
+4.69~mm at the steps and, by a conservative motion audit, 0.59~mm between them; the certified lower
+bound of $\tilde h$ stays above 2.7~mm, and the filter needs 1.9/3.7~ms (median/p95).
 
 \begin{figure}[t]
 \centering
@@ -1146,6 +1100,55 @@ field cell meeting $\{\norm{\mathbf y}\ge R_B+0.06\,\mathrm m+\eta\}$, and the c
 handles points outside the field. This selected-state audit does not bound all saved states or the
 motion between them.
 
+\subsection{Native Patches, Optimized Multipliers, and Sampled Data}\label{sec:native}
+We now use native patches ($s=\Delta_A$) without online refinement, keeping the obstacle fields,
+nominal controllers, and initial conditions. Filter times use one CPU thread per process, with
+concurrent processes and background activity not excluded.
+
+In the docking scene, the vehicle's 772 native 10-mm patches seat the nose to 0.691~m over the same
+9~s, with a minimum polygon gap of 9.1~mm, no slack, at most 768 constraints, and 3.08/3.67~ms
+median/p95 filter time, against 0.698~m and 1.7~mm with 5-mm boxes (Table~\ref{tab:dock-base}).
+In a two-robot crossing with the 4-cm fields of Fig.~\ref{fig:overview}, 87 native patches and 718
+boxes of 5~mm both avoid collision without slack over 12~s (rigid-motion audits confirm positive gaps
+between steps) and both deadlock, with minimum gaps of 21.4 and 4.5~mm, at most 32 and 628
+constraints, and median filter times of 1.81 and 3.31~ms.
+
+\begin{table}[t]
+\caption{Native Patches on the 30 Franka Trials}
+\label{tab:native}
+\centering\footnotesize
+\setlength{\tabcolsep}{2.2pt}
+\begin{tabular}{llcccc}
+\toprule
+link fields & certificate & reached & infeasible & min.\ [mm] & rows, max.\\
+\midrule
+12~mm & unit lift, slack & 6 & 1497 (2) & 15.3 & 2064\\
+12~mm & optimized $w$, slack & 8 & 0 & 12.5 & 9045\\
+12~mm & opt.\ $w$, sampled, $\mathbf u{=}\mathbf 0$ & 7 & 0 & 12.3 & 16{,}857\\
+6~mm & opt.\ $w$, sampled, $\mathbf u{=}\mathbf 0$ & @6R@ & @6Z@ & @6G@ & @6ROWS@\\
+\bottomrule
+\end{tabular}
+\\[3pt]
+\parbox{\columnwidth}{\footnotesize Native patches, no refinement; obstacle fields, controller, and
+trials as in Table~\ref{tab:franka}. Infeasible: steps with slack or zero input (trials). Min.:
+saved-state mesh-distance lower bound, final states included. The last two rows are certified between
+samples (Corollary~\ref{cor:sampled}). 6~mm: refitted link fields with 26{,}182 native patches.}
+\end{table}
+
+On the 30 Franka trials (Table~\ref{tab:native}), native 12-mm patches with unit lifts reach the goal
+in only 6 trials, and two trials need slack (1497 steps): in trial~18, the unit-lift bound of one
+box is negative at the initial pose, so not even stopping is certified. Optimized multipliers
+(Proposition~\ref{prop:second}; $w\in[0,1.02]$ was selected) remove every slack step and reach 8 goals,
+trial~18 in 5.0~s. Adding the rows of Theorem~\ref{thm:sampled} with the zero-input fallback certifies
+the executed held-input controller between samples (Corollary~\ref{cor:sampled}); it reaches 7 goals,
+and the QP was feasible at every step, so the fallback never acted. On trials 0--4, rerun on one
+machine, median/p95 filter time grows from 8.2/14.4~ms with unit lifts to 13.0/42.5~ms with optimized
+multipliers and 12.5/42.7~ms with sampled data. Refitting the link fields at 6~mm (levels
+0.95--1.66~mm) and using their cells as the cover, without a separate cover resolution, the certified
+controller reaches @6R@ of 30 goals, against 17 for the subdivided covers of Table~\ref{tab:franka},
+which lack the between-sample certificate; its median/p95 filter time of @6T@~ms, however, is far
+above the 10-ms step.
+
 % -----------------------------------------------------------------------------
 \subsection{Comparison of Finite Certificates}\label{sec:cert-comparison}
 We compare the vertex reduction (V) and the joint Bernstein certificate (B) while keeping
@@ -1191,14 +1194,10 @@ the joint coefficient condition provides a direct alternative when the additiona
 acceptable. Fixed multipliers cannot follow the input; optimized multipliers
 (Proposition~\ref{prop:second}) are evaluated with native patches in Sec.~\ref{sec:native}.
 
-We also compare the two unit-weight certificates on six saved Franka trials, selected as three
-that reached and three that stalled in the original experiment. With the same distance-independent
-refinement, both variants reach in four of six trials and require zero slack in all six.
-For the newly successful trial, the joint certificate reduces arrival time from 7.38 to 6.63~s
-and $D$ from 4.243 to 3.533; its median/p95 filter time increases from 46/116 to 73/250~ms.
-In the most expensive trial neither variant reaches within 10~s, while median filter time rises
-from 115 to 253~ms and maximum row count from 41{,}776 to 146{,}691. These selected trials
-show a cost--performance tradeoff, not a new estimate of the 30-trial success rate.
+On six saved Franka trials (three that reached and three that stalled originally), both unit-weight
+certificates with the same refinement reach in four and need no slack; the joint one shortens one
+arrival from 7.38 to 6.63~s but raises median filter time by up to $2.2\times$ and the maximum row
+count from 41{,}776 to 146{,}691, a cost--performance tradeoff rather than a success-rate estimate.
 
 \section{Limitations}\label{sec:limits}
 \emph{Certificates.} The certificates exclude first contacts, so they protect trajectories that
@@ -1213,15 +1212,11 @@ tightening of Theorem~\ref{thm:sampled} and use a slack when infeasible; their g
 continuous-time Corollary~\ref{cor:closed}, whose existence of solutions under hard activation and
 refinement we do not establish, and their saved-state audits do not certify motion between samples.
 
-\emph{Conservatism, feasibility, and cost.} The safe set is defined by the continuous spline level
-surfaces. Its finite enforcement is conservative: Taylor remainders and Bernstein bounds restrict
-the admissible inputs. Proposition~\ref{prop:tight} bounds the constant-term loss, which is first
-order in box size where the two field gradients do not cancel; it does not give a general physical
-clearance penalty. The constraints can slow motion where the fields vary quickly and certify
-stopping only when their constant terms are nonnegative. Finer boxes reduce these losses at the
-price of more constraints. Their number,
-$2^n$ per active box and thousands in tight spatial scenes, sets the cost per step and its
-variation.
+\emph{Conservatism and cost.} The safe set is the continuous spline level surface; Taylor
+remainders, Bernstein bounds, and the sampled-data tightening restrict only the admissible inputs,
+with losses of first order in the box size for unit lifts and second order for optimized
+multipliers, which can still slow motion where the fields vary quickly. Finer boxes reduce the losses,
+but thousands of rows in tight spatial scenes set the cost per step and its variation.
 
 \emph{Online geometry.} The robot's fields, levels, and covers are prepared once; a new obstacle needs
 only its own field, certified level, and Bernstein derivative and collar bounds, which took
@@ -1236,16 +1231,16 @@ baselines, and all experiments are in simulation.
 \section{Conclusion}\label{sec:concl}
 Collision avoidance between non-convex rigid bodies reduces, through a first-contact lemma, to
 keeping each body's SDF above a certified level on the boundary of the other. We took this condition
-on the continuous level set as the safe set and enforced it through Bernstein bounds of a lifted
-barrier on a cover of that level set, so that the finite certificate restricts only the inputs, for
-planar and spatial, rigid and articulated bodies, with one field per body. Native SDF patches form
-the default cover, without an independent cover resolution or online refinement. The construction computes
-no closest points and certifies the required strict inclusion of the true boundaries. With optional subdivision, it never collided in planar
-experiments, unlike a closest-point barrier, docked where bounding circles cannot, kept a Franka
-Panda's saved-state mesh-distance bounds positive within millimeters, and produced positive
-distance bounds at the audited two-Panda states. Sampled-data
-guarantees, faster enforcement near contact, deadlock resolution, and hardware validation are the
-next steps.
+on the continuous level set as the safe set and enforced it through Bernstein bounds of a Lagrangian
+of the surface condition on the native SDF patches that cover the level set, so that the finite
+certificate restricts only the inputs, for planar and spatial, rigid and articulated bodies, with
+one field per body. Optimized multipliers make the enforcement loss quadratic in the patch size, and
+a curvature tightening that vanishes at rest, together with a zero-input fallback, certifies the
+executed sampled-data controller without feasibility assumptions. The construction never collided in
+the planar experiments, unlike a closest-point barrier, docked where bounding circles cannot, and
+certified a Franka Panda's motion between samples while reaching @6R@ of 30 goals with native 6-mm
+patches. Faster enforcement near contact, deadlock resolution, and hardware validation are the next
+steps.
 
 \bibliographystyle{IEEEtran}
 \bibliography{references}

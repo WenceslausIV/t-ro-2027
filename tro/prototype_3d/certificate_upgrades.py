@@ -97,6 +97,7 @@ def main():
     p.add_argument('--variant', choices=('unit', 'free', 'sampled'), required=True)
     p.add_argument('--fallback', choices=('slack', 'zero'), default='slack')
     p.add_argument('--trials', nargs=2, type=int, default=[0, 30])
+    p.add_argument('--reverse', action='store_true', help='run the trial range in descending order')
     p.add_argument('--field', choices=('12mm', '6mm'), default='12mm',
                    help='link SDF cells; 6mm uses the refitted fields of results/fine_native_6mm_trial')
     a = p.parse_args()
@@ -112,7 +113,7 @@ def main():
     if a.variant == 'sampled':
         SD.prepare(links, obst)
     trials = json.loads((Path(F.HERE) / 'franka_trials.json').read_text())
-    for i in range(*a.trials):
+    for i in (range(a.trials[1] - 1, a.trials[0] - 1, -1) if a.reverse else range(*a.trials)):
         path = out / f'franka_{i:02d}.json'
         if path.exists():
             continue
