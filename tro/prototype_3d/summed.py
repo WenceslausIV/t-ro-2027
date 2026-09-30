@@ -397,27 +397,60 @@ def rows(bodyA, idx, RbA, yc, fB, lB, M3B, Jc, W, Sb, eta, umax, auxmax, gamma=G
 
 
 QP_SOLVER = os.environ.get('SUMMED_QP', 'nnls')  # 'nnls': dense least-distance program; 'clarabel': sparse IPM
-QP_MARGIN = 1e-7                  # rows are tightened by this much for the sparse solver (conservative only)
+QP_MARGIN = 1e-7                  # rows and input bounds are tightened by this much (conservative only)
 QP_SPARSE_MIN_ROWS = int(os.environ.get('SUMMED_QP_MIN_ROWS', 2000))   # smaller QPs stay with the dense solver
-QP_STATS = dict(sparse=0, fallback=0, infeasible=0)
+QP_STATS = dict(sparse=0, fallback=0, infeasible=0, rejected=0, rescued=0)
 
 
 def _dense(X):
     return X.toarray() if sp.issparse(X) else X
 
 
+def violation(u, z, A, T, C, E, G_in, h_in, Wc=None):
+    """Exact check of an input to be applied: with a = |E u| (the smallest admissible epigraph values) and the
+    multipliers of z clipped to [0, W_MAX], returns max(0, -min row, -min input-bound row) in double precision."""
+    m, k = len(u), len(E)
+    a = np.abs(E @ u)
+    r = A @ u + T @ a + C
+    if Wc is not None and Wc.shape[1]:
+        w = np.clip(1 + z[m + k:m + k + Wc.shape[1]] / np.sqrt(EPS_W), 0., W_MAX)
+        r = r + Wc @ w
+    v = max(0., -float(np.min(r))) if len(r) else 0.
+    if len(G_in):
+        v = max(v, -float(np.min(G_in @ u - h_in)))
+    return v
+
+
 def solve(u_nom, A, T, C, E, G_in, h_in, z_prev=None, Wc=None):
     """min |u - u_nom|^2 + EPS_T |a|^2 (+ EPS_W |w - 1|^2)  s.t.  A u + T a (+ Wc w) + C >= 0,  a >= |E u|,
     G_in u >= h_in (and 0 <= w <= W_MAX for 'free' multipliers, one per column of Wc).
     The feasible set in u equals that of A u + T |E u| + C >= 0 (T <= 0). Returns u, slack, z (warm start).
-    With QP_SOLVER = 'clarabel', the sparse solution is accepted only if, after setting a = |E u| and clipping w,
-    every row holds exactly in double precision; otherwise the dense solver below decides."""
+    No solver is trusted: the returned slack is the exact violation of the returned input (function violation),
+    zero only if every row and input bound holds in double precision. A rejected solution of the dense
+    least-distance solver (its NNLS can return an infeasible point without notice) is retried with the sparse
+    interior-point solver. With QP_SOLVER = 'clarabel', large QPs go to the sparse solvers first."""
+    tried_sparse = False
     if QP_SOLVER == 'clarabel' and len(C) >= QP_SPARSE_MIN_ROWS:
         res = _solve_working_set(u_nom, A, T, C, E, G_in, h_in, Wc, z_prev)   # warm start first
         if res is None:
-            res = _solve_sparse(u_nom, A, T, C, E, G_in, h_in, Wc)
-        if res is not None:
+            res, tried_sparse = _solve_sparse(u_nom, A, T, C, E, G_in, h_in, Wc), True
+        if res is not None and violation(res[0], res[2], A, T, C, E, G_in, h_in, Wc) == 0.:
             return res
+    u, s, z = _solve_dense(u_nom, A, T, C, E, G_in, h_in, z_prev, Wc)
+    v = violation(u, z, A, T, C, E, G_in, h_in, Wc)
+    if v == 0.:
+        return u, 0., z
+    if s == 0.:
+        QP_STATS['rejected'] += 1
+    if not tried_sparse:
+        res = _solve_sparse(u_nom, A, T, C, E, G_in, h_in, Wc)
+        if res is not None and violation(res[0], res[2], A, T, C, E, G_in, h_in, Wc) == 0.:
+            QP_STATS['rescued'] += 1
+            return res
+    return u, max(v, s), z
+
+
+def _solve_dense(u_nom, A, T, C, E, G_in, h_in, z_prev=None, Wc=None):
     T, Wc = _dense(T), (None if Wc is None else _dense(Wc))
     from sdf_cbf_utils import solve_ldp_qp
     m, k = len(u_nom), len(E)
@@ -427,7 +460,7 @@ def solve(u_nom, A, T, C, E, G_in, h_in, z_prev=None, Wc=None):
     pad = lambda X, c: np.c_[X, np.zeros((len(X), c))]
     G = np.vstack([np.c_[A, T / se] if nw == 0 else np.c_[A, T / se, Wc / sw],
                    pad(np.c_[-E, I / se], nw), pad(np.c_[E, I / se], nw), pad(G_in, k + nw)])
-    h = np.r_[-C if nw == 0 else -C - Wc.sum(axis=1), np.zeros(2 * k), h_in]
+    h = np.r_[(-C if nw == 0 else -C - Wc.sum(axis=1)) + QP_MARGIN, np.zeros(2 * k), h_in + QP_MARGIN]
     if nw:                                  # scaled variable sw (w - 1): w >= 0 and w <= W_MAX
         Iw = np.eye(nw)
         G = np.vstack([G, np.c_[np.zeros((nw, m + k)), Iw], np.c_[np.zeros((nw, m + k)), -Iw]])
@@ -453,7 +486,8 @@ def _scaled_sparse(u_nom, A, T, C, E, G_in, h_in, Wc):
              sp.hstack([sp.csr_matrix(-E), Ik] + ([Z(k, nw)] if nw else [])),
              sp.hstack([sp.csr_matrix(E), Ik] + ([Z(k, nw)] if nw else [])),
              sp.hstack([sp.csr_matrix(G_in), Z(len(G_in), k + nw)])]
-    h = [-C - (np.asarray(sp.csr_matrix(Wc).sum(axis=1)).ravel() if nw else 0.), np.zeros(2 * k), h_in]
+    h = [-C - (np.asarray(sp.csr_matrix(Wc).sum(axis=1)).ravel() if nw else 0.) + QP_MARGIN, np.zeros(2 * k),
+         h_in + QP_MARGIN]
     if nw:
         Iw = sp.identity(nw, format='csr')
         rows_ += [sp.hstack([Z(nw, m + k), Iw]), sp.hstack([Z(nw, m + k), -Iw])]

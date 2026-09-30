@@ -8,6 +8,7 @@ and caps 1.a_V <= V, 1.a_Omega <= Om, |u|_1 <= nu (enforced in the QP, adapted f
 bound affine in the QP variables (summed.sampled_tightening). Rows then certify e' + gamma e >= dt/2 sup|e''|,
 and with gamma dt <= 1, e >= 0 on the whole step (Theorem sampled of the paper). Skipped boxes need h >= G travel:
 the activation threshold becomes max(eta, G travel), and the domain collar bound must exceed G travel.
+Both travel bounds need the caps, so they are enforced for every link at every step.
 """
 import numpy as np
 
@@ -87,7 +88,21 @@ def caps_for(q, L, u_prev):
     return dict(dt=F.DT, V=V, Om=Om, nu=nu, c2=c2, travel=F.DT * speed)
 
 
+def _cap_block(q, L, sd):
+    """Caps of a link without active boxes: 1.a_V <= V, 1.a_Omega <= Om, 1.s <= nu with a >= |E u|, s >= |u|."""
+    E = np.r_[_link_twist_map(q, L), np.eye(F.DOF)]
+    Tc = np.zeros((3, len(E)))
+    Tc[0, :3], Tc[1, 3:6], Tc[2, 6:] = -1., -1., -1.
+    out = (np.zeros((3, F.DOF)), Tc, np.array([sd['V'], sd['Om'], sd['nu']]), 0, np.inf, E)
+    if S.MULT_MODE == 'free':
+        import scipy.sparse as sp
+        out = out + (sp.csr_matrix((3, 0)),)
+    return out
+
+
 def franka_rows(q, links, obst, state, eta=F.ACT):
+    """The travel bounds behind the skip threshold and the domain collar hold only under the caps, so every
+    link gets its caps at every step, also when none of its boxes is active."""
     T, Z, O = F.fk(q)
     res, caps = [], {}
     for L in links:
@@ -95,11 +110,16 @@ def franka_rows(q, links, obst, state, eta=F.ACT):
         sd = caps_for(q, L, state.u)
         caps[L['frame']] = (sd['V'], sd['Om'], sd['nu'], sd['travel'])
         eta_L = max(eta, CONST['G'] * sd['travel'])
+        capped = False
         for o in obst.values():
             if np.any(p + L['rad'] < o['dlo']) or np.any(p - L['rad'] > o['dhi']):
                 continue
-            res.append(S3.pair_rows(L, R, p, o, S3.I3, np.zeros(3), [(Z, O, L['n_joints'], 1., 0)], eta_L,
-                                    S3.UMAX7, sd=sd))
+            r = S3.pair_rows(L, R, p, o, S3.I3, np.zeros(3), [(Z, O, L['n_joints'], 1., 0)], eta_L,
+                             S3.UMAX7, sd=sd)
+            capped |= r is not None             # pair rows carry the caps of L
+            res.append(r)
+        if not capped:
+            res.append(_cap_block(q, L, sd))
     state.caps = caps
     out = S3.stack(res, F.DOF)
     if len(out) == 6:                    # no active pair: keep the 'free' signature

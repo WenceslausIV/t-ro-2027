@@ -54,10 +54,17 @@ def polygon_sdf(P, A, B):
     return sign * dist, sign[..., None] * diff / dist.clamp_min(1e-9)[..., None]
 
 
-def _ldp(z0, G, h):
+LDP_STATS = dict(nnls_rejected=0)
+
+
+def _ldp(z0, G, h, tol=1e-9):
     """
     min ||z - z0||^2  s.t.  G z >= h   (least-distance programming via NNLS,
     Lawson & Hanson ch. 23). Returns None if infeasible.
+    SciPy's NNLS can return a wrong solution without notice (seen with SciPy 1.17), which yields an
+    infeasible z or a false infeasibility claim. Such a result is rejected by checking G z >= h, and the
+    problem is re-solved by an interior-point method (Clarabel), with bounded-variable least squares as
+    the last resort.
     """
     f = h - G @ z0
     if np.all(f <= 0):                                                    # z0 already feasible
@@ -67,6 +74,44 @@ def _ldp(z0, G, h):
     e = np.zeros(n + 1)
     e[-1] = 1.0
     lam, _ = nnls(E, e, maxiter=50 * (n + 1))
+    z = _ldp_point(z0, E, e, lam)
+    ok = lambda z: np.all(G @ z - h >= -tol * np.maximum(1.0, np.abs(h)))
+    if z is not None and ok(z):
+        return z
+    LDP_STATS['nnls_rejected'] += 1
+    z, status = _ldp_ipm(z0, G, h, tol)
+    if z is not None and ok(z):
+        return z
+    if status == 'infeasible':
+        return None
+    from scipy.optimize import lsq_linear
+    lam = lsq_linear(E, e, bounds=(0.0, np.inf), method='bvls', tol=1e-12).x
+    return _ldp_point(z0, E, e, lam)
+
+
+def _ldp_ipm(z0, G, h, tol):
+    """The same least-distance program by Clarabel, rows tightened by tol (relative) so that the callers'
+    feasibility checks pass. Returns (z, 'solved'), (None, 'infeasible'), or (None, 'failed')."""
+    try:
+        import clarabel
+        import scipy.sparse as sp
+    except ImportError:
+        return None, 'failed'
+    n = z0.size
+    st = clarabel.DefaultSettings()
+    st.verbose = False
+    hh = h + tol * np.maximum(1.0, np.abs(h))
+    sol = clarabel.DefaultSolver(sp.identity(n, format='csc') * 2.0, -2.0 * z0, sp.csc_matrix(-G), -hh,
+                                 [clarabel.NonnegativeConeT(len(h))], st).solve()
+    status = str(sol.status)
+    if 'Almost' not in status and 'Solved' in status:
+        return np.asarray(sol.x), 'solved'
+    if 'Almost' not in status and 'PrimalInfeasible' in status:
+        return None, 'infeasible'
+    return None, 'failed'
+
+
+def _ldp_point(z0, E, e, lam):
     r = E @ lam - e
     if abs(r[-1]) < 1e-9:
         return None
