@@ -1,0 +1,101 @@
+{
+ "unit (historical, 12 mm)": {
+  "trials": 30,
+  "reached": 6,
+  "reached_trials": [
+   4,
+   9,
+   13,
+   14,
+   26,
+   28
+  ],
+  "slack_trials": 2,
+  "slack_steps": 1497,
+  "zero_input_trials": 0,
+  "zero_input_steps": 0,
+  "min_gap_bound_mm": 15.327212670076344,
+  "median_trial_min_gap_mm": 26.547159880070403,
+  "nonpositive_gap_states": 0,
+  "median_of_trial_median_ms": 10.665274981874973,
+  "max_trial_p95_ms": 20.62830001814291,
+  "rows_max": 2064,
+  "boxes_max": 258,
+  "mean_arrival_s": 6.8500000000000005
+ },
+ "free": {
+  "trials": 11,
+  "reached": 2,
+  "reached_trials": [
+   4,
+   9
+  ],
+  "slack_trials": 0,
+  "slack_steps": 0,
+  "zero_input_trials": 0,
+  "zero_input_steps": 0,
+  "min_gap_bound_mm": 14.155026424275492,
+  "median_trial_min_gap_mm": 17.476500217093804,
+  "nonpositive_gap_states": 0,
+  "median_of_trial_median_ms": 11.270324999713921,
+  "max_trial_p95_ms": 83.13836400000122,
+  "rows_max": 7047,
+  "boxes_max": 261,
+  "mean_arrival_s": 6.03
+ },
+ "sampled_zero": {
+  "trials": 7,
+  "reached": 1,
+  "reached_trials": [
+   4
+  ],
+  "slack_trials": 0,
+  "slack_steps": 0,
+  "zero_input_trials": 0,
+  "zero_input_steps": 0,
+  "min_gap_bound_mm": 15.264892788376072,
+  "median_trial_min_gap_mm": 18.639730672659223,
+  "nonpositive_gap_states": 0,
+  "median_of_trial_median_ms": 11.86868000013419,
+  "max_trial_p95_ms": 136.32514530049775,
+  "rows_max": 13242,
+  "boxes_max": 490,
+  "mean_arrival_s": 7.8100000000000005
+ },
+ "sampled_zero_6mm": {
+  "trials": 1,
+  "reached": 0,
+  "reached_trials": [],
+  "slack_trials": 0,
+  "slack_steps": 0,
+  "zero_input_trials": 0,
+  "zero_input_steps": 0,
+  "min_gap_bound_mm": 7.048685643617008,
+  "median_trial_min_gap_mm": 7.048685643617008,
+  "nonpositive_gap_states": 0,
+  "median_of_trial_median_ms": 81.20706350018736,
+  "max_trial_p95_ms": 170.26757600065133,
+  "rows_max": 20715,
+  "boxes_max": 767,
+  "mean_arrival_s": null
+ },
+ "unit": {
+  "trials": 5,
+  "reached": 1,
+  "reached_trials": [
+   4
+  ],
+  "slack_trials": 0,
+  "slack_steps": 0,
+  "zero_input_trials": 0,
+  "zero_input_steps": 0,
+  "min_gap_bound_mm": 18.310590259063876,
+  "median_trial_min_gap_mm": 28.194266276285415,
+  "nonpositive_gap_states": 0,
+  "median_of_trial_median_ms": 8.081178000111322,
+  "max_trial_p95_ms": 22.266195150268686,
+  "rows_max": 2064,
+  "boxes_max": 258,
+  "mean_arrival_s": 8.32
+ }
+}

@@ -162,15 +162,12 @@ and to articulated robots.
 \centering
 \includegraphics[width=\textwidth]{patch_pipeline.png}
 \caption{From irregular geometry to finite control constraints. (a) Exact signed distance to the
-ground-truth polygon $\mathcal G_i$. (b) Fitted B-spline field $\phi_i$. Both fields use the same
-1.2-m-square domain and uniformly spaced, unlabeled contours (4-cm spacing).
-The 4.8-cm boundary detail compares ground truth (black), the fitted zero
-level (dashed teal), and the certified level set $\mathcal S_i=\{\phi_i=l_i\}$ (blue).
-(c) All native patches remain visible in gray; green marks the 86 patches whose Bernstein
-coefficient intervals contain $l_i=2.0$~mm. Patch size is 4~cm, without subdivision.
-(d) Four affine inequalities per planar patch suffice for the CBF condition at every surface
-point in that patch. $L_{kj}$ is the left side of~\eqref{eq:coef}, with its auxiliary
-absolute-value bounds enforced; no surface samples define the safe set.}
+ground-truth polygon $\mathcal G_i$ and (b) fitted B-spline field $\phi_i$ (1.2-m domain, 4-cm
+contour spacing); the 4.8-cm detail shows ground truth (black), fitted zero level (dashed teal),
+and certified level set $\mathcal S_i=\{\phi_i=l_i\}$ (blue). (c) Native 4-cm patches (gray); green:
+the 86 whose Bernstein coefficient intervals contain $l_i=2.0$~mm. (d) Four affine inequalities per
+planar patch, $L_{kj}$ being the left side of~\eqref{eq:coef}, suffice at every surface point in
+the patch; no samples define the safe set.}
 \label{fig:patch-pipeline}
 \end{figure*}
 
@@ -178,16 +175,12 @@ absolute-value bounds enforced; no surface samples define the safe set.}
 \centering
 \includegraphics[width=\columnwidth]{overview.png}
 \caption{The construction for two planar bodies. (a) Every first contact occurs at a
-configuration $\mathbf t=b(\tau)-\Rot(\theta)a(\sigma)$ that joins boundary points of both bodies
-(Lemma~\ref{lem:contact}). (b) Surface cover (Sec.~\ref{sec:cover}), with $\mathcal B_i$ 3~cm before
-contact: the safe set requires $\mathcal B_j$'s SDF to stay above its certified level on
-every point of the continuous certified curve $\mathcal S_i$ (thick blue); the native 4-cm SDF patches that cover
-$\mathcal S_i$ (uniform green fill) only partition it to generate the
-constraints on the inputs. Pale blue and amber fills show ground truth, with darker boundaries
-of the same hue for the certified curves of $\mathcal B_i$ and $\mathcal B_j$, respectively.
-Each retained SDF patch is one cover box, without subdivision.
-The illustrated fields use 4-cm cells (690 and 650 patches for $\mathcal B_i$ and $\mathcal B_j$)
-and certified levels of 2.8 and 1.9~mm.}
+configuration $\mathbf t=b(\tau)-\Rot(\theta)a(\sigma)$ joining boundary points of both bodies
+(Lemma~\ref{lem:contact}). (b) Surface cover with $\mathcal B_i$ 3~cm before contact: the safe set
+requires $\mathcal B_j$'s SDF to stay above its level on the whole certified curve $\mathcal S_i$
+(thick blue); the native 4-cm patches covering it (green) only generate the input constraints.
+Pale fills: ground truth; darker outlines of the same hue: certified curves (fields with 690 and
+650 patches, levels 2.8 and 1.9~mm).}
 \label{fig:overview}
 \end{figure}
 
@@ -515,6 +508,10 @@ For fixed $w$, its constraints are affine in $(\mathbf u,\mathbf a)$, and $w$ ma
 boxes and change over time. The unit choice $w=1$ recovers the lifted barrier~\eqref{eq:lift}. In
 general, $F+\gamma wg_A$ is a Lagrangian of the surface condition: $w$ is an equality multiplier,
 not a new barrier to be differentiated, and it changes neither the surface nor~\eqref{eq:safe}.
+Since $g_A$ does not depend on the input, the coefficients are affine in $w$ as well, so the filter
+can treat one multiplier $w_{\mathcal Q}\in[0,\bar w]$ per active box as a decision variable. The
+rows remain affine in $(\mathbf u,\mathbf a,w_{\mathcal Q})$, and the admissible inputs contain those
+of every fixed choice, including $w=1$.
 
 \emph{Vertex reduction.} The implementation used in the main experiments reduces
 the number of rows by bounding the value and velocity terms separately:
@@ -568,7 +565,32 @@ $w=\lambda$ in~\eqref{eq:joint-model}. Away from $\mathbf x^\ast$, $\mathbf b$ a
 variation of $h$ along $\mathcal S_A$, which the surface condition itself has. A first-order ball
 bound on $\phi_B$ alone subtracts $\norm{\nabla\phi_B}r$ even at $\mathbf x^\ast$. The proposition
 concerns the constant terms at rest; the velocity terms of~\eqref{eq:coef} add their own,
-input-dependent loss.
+input-dependent loss. Optimized multipliers remove the first-order part of both:
+\begin{proposition}[Second-order accuracy]\label{prop:second}
+Let $\norm{\nabla\phi_A}\ge\mu>0$ near $\mathcal S_A$, and let the cellwise bounds on the derivatives
+of $\phi_A$ and $\phi_B$ up to third order be uniformly bounded. Fix a pose and an input $\mathbf u$, and let
+$F^\ast=\min_{\mathcal S_A}F(\cdot,\mathbf u)$. There are $s_0,C_0,C_1$, independent of the box side
+$s$, such that if $s\le s_0$ and $F^\ast\ge(C_0+C_1\norm{\mathbf u})s^2$, every retained box
+satisfies~\eqref{eq:joint-coef} for some $w=O(1+\norm{\mathbf u})$.
+\end{proposition}
+\begin{proof}
+At the center, $\nabla p_w=\nabla F+\gamma w\nabla g_A$; choose $w$ to cancel its component along
+$\nabla g_A$, leaving the tangential part $\mathbf t$. As in Proposition~\ref{prop:tight}, every
+coefficient is at least $p_w(\mathbf c)-\frac s2\norm{\mathbf t}_1-O(s^2)$, and
+$E_w=O((1+\norm{\mathbf u})s^2)$. Bernstein ranges exceed true ranges by $O(s^2)$, so a retained box
+lies within $O(s)$ of some $\bar{\mathbf x}\in\mathcal S_A$, where
+$p_w(\mathbf c)=F(\bar{\mathbf x})-\mathbf t^\top(\bar{\mathbf x}-\mathbf c)+O(s^2)$ and
+$\norm{\mathbf t}\le\norm{\nabla_{\mathcal S}F(\bar{\mathbf x})}+O(s)$, $\nabla_{\mathcal S}$ denoting
+the gradient along $\mathcal S_A$. Following $\mathcal S_A$ from $\bar{\mathbf x}$ for a length $cs$
+against $\nabla_{\mathcal S}F$ reaches a point where
+$F^\ast\le F\le F(\bar{\mathbf x})-cs\norm{\nabla_{\mathcal S}F(\bar{\mathbf x})}+O(s^2)$. Hence every
+coefficient minus $E_w$ is at least $F^\ast-O((1+\norm{\mathbf u})s^2)$; the constants are affine in
+$\norm{\mathbf u}$ because $F$ is.
+\end{proof}
+With $w=1$, the normal part of $\nabla F+\gamma\nabla g_A$ remains, a first-order loss that grows
+with the mismatch of the gradient norms and with the speed. At rest, optimized multipliers certify stopping wherever
+$\min_{\mathcal S_A}h\ge C_0s^2/\gamma$; for native patches, $s=\Delta_A$, so the enforcement loss is
+quadratic in the field resolution.
 
 \subsection{Derivatives and Pruning}\label{sec:cover-der}
 For planar $SE(2)$ single integrators, a point of $A$ at world position $\mathbf w$ moves in $B$'s frame
@@ -667,7 +689,8 @@ Collecting the constraints~\eqref{eq:coef} (or~\eqref{eq:joint-coef}) of the act
 \end{aligned}
 \end{equation}
 with $\mathbf u$ the stacked planar velocities or the joint velocities, $\mathbf a$ the epigraph
-variables of all active pairs, and $\varepsilon_a=10^{-3}$. With
+variables of all active pairs, and $\varepsilon_a=10^{-3}$; optimized multipliers $w_{\mathcal Q}$
+enter as further variables with the weight $\varepsilon_a$ on $(w_{\mathcal Q}-1)^2$. With
 polytopic input bounds, \eqref{eq:qp} is a QP, which we reformulate as a least-distance program and solve numerically by
 non-negative least squares~\cite{lawson1995solving}, warm-started by constraint generation.
 \begin{proposition}[Feasibility]\label{prop:feas}
@@ -699,8 +722,53 @@ Feasibility does not imply progress: exact non-convex geometry can hook and bloc
 bodies~\cite{reis2020undesirable}, and we do not resolve such deadlocks. For driftless dynamics,
 applying $\mathbf u=\mathbf 0$ whenever~\eqref{eq:qp} is infeasible keeps every pose, and hence
 every $h$, constant; by Theorem~\ref{thm:invariance}, this fallback removes the feasibility
-hypothesis from Corollary~\ref{cor:closed} at the cost of progress. The experiments instead add a
-slack variable only if~\eqref{eq:qp} is infeasible and report every step that used it.
+hypothesis from Corollary~\ref{cor:closed} at the cost of progress. Unless stated otherwise, the
+experiments instead add a slack variable only if~\eqref{eq:qp} is infeasible and report every step
+that used it.
+
+\emph{Sampled data.} Implementations hold each input for a step $\Delta t$ and assemble the rows only
+at sampling instants $t_k$; as in sampled-data CBFs~\cite{breeden2022sampled}, the intersample
+evolution must be accounted for. For $\mathbf x\in\mathcal S_A$, $e(\tau)=h_{\mathbf x}(t_k+\tau)$ is then
+twice differentiable on each step, and it suffices to tighten the rows by a bound on its curvature.
+\begin{theorem}[Sampled-data enforcement]\label{thm:sampled}
+Let the dynamics be driftless and the inputs be held on $[t_k,t_{k+1})$, with
+$t_{k+1}-t_k\le\Delta t$ and $\gamma\Delta t\le1$. For each box $\mathcal Q$, let
+$\nu_{\mathcal Q}\ge\frac{\Delta t}2|\ddot e|$ for its points during the step, and let $\bar v$ bound
+their speed. Suppose that at every $t_k$, either $\mathbf u_k=\mathbf 0$, or each box has a
+certificate $h\ge G\bar v\Delta t$ on its surface portion, $G$ bounding $\norm{\nabla\phi_B}$, or
+satisfies~\eqref{eq:coef} or~\eqref{eq:joint-coef} with $\nu_{\mathcal Q}$ subtracted from its left
+side. If $h\ge0$ on $\mathcal S_A$ at $t_0$, then $h\ge0$ on $\mathcal S_A$ for all $t\ge t_0$.
+\end{theorem}
+\begin{proof}
+Fix $\mathbf x$ and $k$. On an active box, $\dot e(0)\ge-\gamma e(0)+\nu_{\mathcal Q}$ and
+$|\ddot e|\le2\nu_{\mathcal Q}/\Delta t$ give
+$e(\tau)\ge e(0)(1-\gamma\tau)+\nu_{\mathcal Q}\tau(1-\tau/\Delta t)\ge0$ for $\tau\in[0,\Delta t]$
+whenever $e(0)\ge0$. On a skipped box, $e(\tau)\ge e(0)-G\bar v\tau\ge0$; for $\mathbf u_k=\mathbf 0$,
+$e$ is constant. Induction over $k$ concludes.
+\end{proof}
+A bound $\nu_{\mathcal Q}$ that keeps the filter a QP follows from
+$|\ddot e|\le\norm{\nabla^2\phi_B}\norm{\dot{\mathbf y}}^2+\norm{\nabla\phi_B}\norm{\ddot{\mathbf y}}$.
+For a revolute chain with held joint velocities and a static $B$, differentiating
+$\dot{\mathbf y}=\sum_ju_j\mathbf z_j\times(\mathbf y-\mathbf o_j)$ with
+$\norm{\dot{\mathbf z}_j}\le\sum_{i<j}|u_i|$ gives $\norm{\ddot{\mathbf y}}\le\frac32D\norm{\mathbf u}_1^2$,
+where $D$ bounds the distances between the link's points and the joint origins of its chain, and
+$\norm{\dot{\mathbf y}}\le\sigma=\mathbf1^\top\mathbf a_V+\bar r\mathbf1^\top\mathbf a_\Omega
++\frac32D\Delta t\bar\nu\mathbf1^\top\mathbf s$ with $\mathbf s\ge|\mathbf u|$. Caps
+$\mathbf1^\top\mathbf a_V\le\bar V$, $\mathbf1^\top\mathbf a_\Omega\le\bar\Omega$, and
+$\mathbf1^\top\mathbf s\le\bar\nu$, enforced in the QP and adapted to the previous input, give
+$\sigma\le\bar\sigma$, hence $\norm{\dot{\mathbf y}}^2\le\bar\sigma\sigma$ and
+$\norm{\ddot{\mathbf y}}\le\frac32D\bar\nu\mathbf1^\top\mathbf s$, both affine. The Hessian and
+gradient bounds come from Bernstein coefficients on the swept ball of radius $r+\bar\sigma\Delta t$.
+The tightening vanishes at rest, so Proposition~\ref{prop:feas} and the zero-input fallback are
+unaffected. Skipped boxes use the threshold $\max(\eta,G\bar\sigma\Delta t)$, which the domain collar
+bound must also exceed.
+\begin{corollary}\label{cor:sampled}
+For driftless kinematics, a filter that holds its inputs, uses the rows of
+Theorem~\ref{thm:sampled}, and applies $\mathbf u=\mathbf 0$ whenever~\eqref{eq:qp} is infeasible
+keeps the ground truths of every pair disjoint at all times, between samples included, from initial
+conditions satisfying Theorem~\ref{thm:cover}. It needs no feasibility or existence assumption,
+only exact arithmetic.
+\end{corollary}
 
 % -----------------------------------------------------------------------------
 \section{Experiments}\label{sec:exp}
@@ -747,13 +815,10 @@ of 9.1~mm and no slack. At most 192 boxes contribute 768 constraints; median/p95
 (Table~\ref{tab:dock-base}). Thus the native-patch default docks with fewer constraints but leaves
 more clearance in this scene.
 
-A separate two-robot crossing uses the fields of Fig.~\ref{fig:overview}, with 4-cm cells,
-and compares 87 native cover patches against 718 boxes of 5~mm, both without online refinement.
-Over 12~s, both runs avoid collision and use no slack, but neither reaches both goals.
-Minimum saved-state polygon gaps are 21.4 and 4.5~mm; maximum constraint counts are 32 and 628,
-and median filter times are 1.81 and 3.31~ms, respectively. A rigid-motion audit also verifies
-positive gaps along the interpolated steps. This single scene illustrates the tradeoff;
-subdivision does not resolve its deadlock.
+In a two-robot crossing with the 4-cm fields of Fig.~\ref{fig:overview}, 87 native patches and
+718 boxes of 5~mm both avoid collision without slack over 12~s (rigid-motion audits confirm positive
+gaps between steps), and both deadlock; minimum gaps are 21.4 and 4.5~mm, maximum constraint counts
+32 and 628, and median filter times 1.81 and 3.31~ms.
 
 On the same 30 Franka trials of Sec.~\ref{sec:exp-franka}, native 12-mm patches give 6847 boxes,
 against 26{,}636 initial boxes in the subdivided implementation. Only 6 trials reach the goal
@@ -949,20 +1014,18 @@ links 1--7) are constrained against three non-convex obstacles made of rounded b
 inverted J, and a plate carrying a 2.4-cm rod on a leg, i.e., 24
 link--obstacle pairs. Each link SDF is a cubic B-spline with 12-mm cells, fitted to approximate
 signed distances of its mesh; its tightest level (1.8--3.8~mm) is certified on the mesh by
-Proposition~\ref{prop:level} in 0.3--2~s, and its certified surface is covered by 1440--4420 boxes of
+Proposition~\ref{prop:level} in 0.3--2~s, and its certified surface is covered by 1440--4416 boxes of
 side 6~mm ($r=5.2$~mm). The obstacle fields have 2-cm cells, tightest levels of 1.9--2.9~mm, and
 domains extending 15~cm beyond the obstacles. The joints are velocity-controlled ($|\dot q_j|\le1$~rad/s) with a proportional
 joint-space nominal controller, $\gamma=5$, a 10-ms step, and activation threshold $\eta=3$~cm.
 
 Start and goal configurations are drawn uniformly within 80\% of the joint ranges with the hand
 above 0.1~m and a clearance of at least 3~cm, and we keep the first 30 pairs whose unfiltered motion
-collides. At saved states, the link meshes are subdivided to edges below 4~mm
-(same surface). The minimum of the obstacle's primitive SDFs is 1-Lipschitz and equals distance
-outside their union; its value at each triangle centroid minus the triangle radius bounds it
-over that entire triangle. A positive bound certifies separation. A negative bound alone does
-not prove collision: we require a negative value at an actual mesh point and adaptively subdivide
-triangles to resolve inconclusive bounds. All audited saved-state trials are resolved as having
-a collision witness or positive separation bounds. As baselines, we use the 54
+collides. At saved states, the link meshes are subdivided to edges below 4~mm; the obstacle's
+1-Lipschitz primitive-SDF minimum at each triangle centroid minus the triangle radius bounds the
+distance over that triangle. A positive bound certifies separation; a collision requires a
+negative value at an actual mesh point, and inconclusive triangles are subdivided adaptively, which
+resolved every audited trial. As baselines, we use the 54
 collision spheres of the Franka model in~\cite{li2024representing} and about 256 surface samples per
 link, as in the collision-avoidance experiments of~\cite{li2024representing}, each with one barrier
 per primitive and obstacle, the same primitive-SDF minimum, and a 1-cm margin.
@@ -1006,12 +1069,9 @@ constraints, max. & 34{,}992 & 21 & 188 & 5\\
 (optional online halving adds children),
 spheres, surface samples, and closest-point pairs. Spheres and samples: primitive-SDF minimum with a
 1-cm margin unless stated; KKT: the certified fields and levels of ours. Distances: certified lower
-bounds between the link meshes and the obstacles at saved states; they do not bound between-step motion.
-Every trial without a collision witness has positive separation bounds at its evaluated states.
-Minimum field bounds use the margin-free sphere/sample runs and KKT. Negative values bound
-the minimum-of-primitives defining field and are not penetration depths.
-The continuous-surface certificate assumes exact arithmetic and feasible continuous-time enforcement.
-Time per step: median and 95th percentile over all steps of the 30 trials, one CPU thread
+bounds between the link meshes and the obstacles at saved states. Every trial without a collision
+witness has positive separation bounds at its evaluated states. Minimum field bounds use the
+margin-free sphere/sample runs and KKT; negative values are not penetration depths. Time per step: median and 95th percentile over all steps of the 30 trials, one CPU thread
 (Python, AMD Ryzen~9 3900X).}
 \end{table}
 
@@ -1026,9 +1086,7 @@ bound $\phi_O$ alone kept 8.4~mm in the same trials. Within the 10-s horizon, th
 23 with those corner barriers: close to an obstacle, the remainders of~\eqref{eq:coef} slow the links
 that slide along it, and in the other trials the arm stops in front of an obstacle. The filter needs
 \timeFrankaMed~ms per step (median; 95th percentile \timeFrankaPninetyfive~ms) with up to 4374 active
-boxes (34{,}992 constraints). Both timing statistics exceed the 10-ms simulation step, so these
-runs do not establish a 100-Hz real-time implementation.
-Restricting to the 70\% of steps with at least one active box gives median/p95 times of
+boxes (34{,}992 constraints), both above the 10-ms step. Restricting to the 70\% of steps with at least one active box gives median/p95 times of
 17.3/57.5~ms; the maximum over all steps is 237.6~ms.
 
 With a 1-cm margin, both baselines have positive saved-state mesh-distance lower bounds
@@ -1057,20 +1115,15 @@ analytic distance function; its fitted field has 1.5-cm cells and a certified le
 The arm starts beside the tube and a damped-least-squares IK moves the hand to the home pose,
 which puts the forearm through the hole. The unfiltered motion intersects the wall.
 With the filter, the hand reaches the 1-cm goal tolerance after 3.99~s of simulated time.
-Over the 15-s run, all 1501 saved states have a mesh-distance lower bound of at least 1.00~mm
-(the audit's bound-reuse threshold),
-and no step needs slack. This audit covers every modeled link triangle using 4-mm subdivisions,
-the analytic distance function, and geometric bounding-box pruning. A previous link bound can
-be transferred to a new pose by subtracting
-$\norm{\mathbf t-\mathbf t_0}+\norm{\Rot-\Rot_0}r_L$, where $r_L$ bounds the norm of every
-point in the link's frame; otherwise its triangles are evaluated again. It uses no fitted-field
-cutoff and does not certify the motion between saved states.
+Over the 15-s run, no step needs slack, and all 1501 saved states have a mesh-distance lower bound
+of at least 1.00~mm (the audit's bound-reuse threshold). The audit evaluates every link triangle
+(4-mm subdivisions) with the analytic distance function, reusing a previous link bound at a new
+pose after subtracting $\norm{\mathbf t-\mathbf t_0}+\norm{\Rot-\Rot_0}r_L$, with $r_L$ bounding the
+link's points in its frame.
 Rounding alone does not remove the stall: with refinement restricted
 to boxes whose lifted lower bound is below 1~cm, the arm still fails to reach within 15~s.
 Allowing every active box whose remainder exceeds $\vartheta$ to be refined yields the successful
 run, with up to 3961 boxes (31{,}688 constraints) and 77/103~ms median/95th-percentile filter time.
-These computation times exceed the 10-ms simulation step; this experiment does not demonstrate
-a 100-Hz real-time implementation.
 
 \subsection{Two Franka Pandas in a Shared Workspace}\label{sec:exp-dual}
 \begin{figure*}[t]
@@ -1084,58 +1137,41 @@ all 64 link pairs, arm~1 (gray) and arm~2 (blue) slide past each other and both 
 \end{figure*}
 Two Franka Pandas face each other with bases 0.9~m apart. For each of the 64 pairs of a link of arm~1
 and a link of arm~2, the certified surface of the first is bounded against the SDF of the second;
-both links move, so each constraint is affine in the velocities of all 14 joints (the
-derivative in Sec.~\ref{sec:cover} with the Jacobians of both arms), and one direction per pair
-suffices by Theorem~\ref{thm:cover}. Starts and goals of both arms are drawn as before, with an
-initial clearance of 5~cm, and we keep the first 20 of 143 sampled pairs whose unfiltered motion
-reduces the sampled mesh distance below 2~mm. This proximity threshold selects challenging
-trials; it does not by itself establish intersection. The distance between the arms is
-bounded from below with exact point-to-triangle distances from the subdivided triangles of arm~1 to
-the meshes of arm~2, at up to 20 steps per trial whose sampled distances lie within 5~mm of the
-sampled minimum. A mesh-to-sample cover bound of at most 6.84~mm validates sample-based pruning;
-all omitted terms retain a 20-mm lower bound. All these
-audited states have positive lower bounds and all 20 trials use zero slack
-(Fig.~\ref{fig:dual} shows one); the barriers are active
-($\min h<5$~mm) in 8 trials, the
-sampled mesh distances fall below 3~cm in 16, and the minimum certified lower bound over the
-audited states is 1.6~mm, below the
-sum of the two levels of a pair of links for the same reason (corner barriers on $\phi_B$ alone kept
-10.3~mm). Both arms reach their
-goals in 15 trials (17 with the corner barriers). The filter needs \timeDualMed~ms per step (median;
-95th percentile \timeDualPninetyfive~ms) with up to 6730 active boxes (53{,}840 constraints) over the
-64 link pairs. Over the 48\% of steps with at least one active box, median/p95 time is
-31.2/104.6~ms; the maximum over all steps is 447.5~ms.
-For broad-phase pruning, spheres of radii $R_A,R_B$ enclose all cover boxes. Pairs with
-$\norm{\mathbf p_A-\mathbf p_B}>R_A+R_B+0.06\,\mathrm m+\eta$ are omitted; Bernstein bounds
-on every field cell intersecting $\{\norm{\mathbf y}\ge R_B+0.06\,\mathrm m+\eta\}$ certify
-$\phi_B-l_B\ge86.5$~mm there. The domain-collar certificate handles points outside the field.
-This selected-state audit does not certify the minimum over all saved states or
-between them.
+each constraint is affine in all 14 joint velocities, and one direction per pair suffices by
+Theorem~\ref{thm:cover}. Starts and goals are drawn as before with a 5-cm initial clearance, and we
+keep the first 20 of 143 sampled pairs whose unfiltered motion brings the sampled mesh distance
+below 2~mm (a proximity criterion, not a proof of intersection). At up to 20 steps per trial whose
+sampled distances lie within 5~mm of the sampled minimum, exact point-to-triangle distances from the
+subdivided triangles of arm~1 to the meshes of arm~2 bound the distance from below; a mesh-to-sample
+cover bound of 6.84~mm keeps every pruned term above 20~mm. All audited states have positive bounds
+(minimum 1.6~mm, below the sum of two link levels for the same reason; corner barriers on $\phi_B$
+alone kept 10.3~mm), and all 20 trials use zero slack (Fig.~\ref{fig:dual}). The barriers are active
+($\min h<5$~mm) in 8 trials, and both arms reach their goals in 15 (17 with corner barriers). The
+filter needs \timeDualMed/\timeDualPninetyfive~ms per step (median/p95) with up to 6730 active boxes
+(53{,}840 constraints); over the 48\% of steps with an active box, median/p95 time is
+31.2/104.6~ms. Pairs with $\norm{\mathbf p_A-\mathbf p_B}>R_A+R_B+0.06\,\mathrm m+\eta$, the radii
+enclosing all cover boxes, are skipped: Bernstein bounds certify $\phi_B-l_B\ge86.5$~mm on every
+field cell meeting $\{\norm{\mathbf y}\ge R_B+0.06\,\mathrm m+\eta\}$, and the collar certificate
+handles points outside the field. This selected-state audit does not bound all saved states or the
+motion between them.
 
 % -----------------------------------------------------------------------------
 \subsection{Comparison of Finite Certificates}\label{sec:cert-comparison}
 We compare the vertex reduction (V) and the joint Bernstein certificate (B) while keeping
 the spline fields, certified levels, and initial covers identical. All variants use
 distance-independent refinement with $\vartheta=0.1$ and at most two halvings; screening
-uses the unit lift. In addition to $w=1$, we test fixed multipliers with
-$\boldsymbol\nu_A=\nabla\phi_A(\mathbf c)$, $\boldsymbol\nu_B=\Rot^\top\nabla\phi_B(\mathbf y_{\mathbf c})$,
-\begin{equation}
-w_{\rm N}=\sqrt{\frac{\norm{\boldsymbol\nu_B}^2+\delta}{\norm{\boldsymbol\nu_A}^2+\delta}},\qquad
-w_{\rm P}=-\frac{\boldsymbol\nu_A^\top\boldsymbol\nu_B}{\norm{\boldsymbol\nu_A}^2+\delta},\quad\delta=10^{-12}.
-\end{equation}
-The regularizer keeps the weights continuous at zero gradient. Negative projection weights
-are permitted, with the absolute value in the remainder of~\eqref{eq:joint-model}.
-At an external tangency, both equal the multiplier $\lambda$ discussed after
-Proposition~\ref{prop:tight}; neither depends on the input, so neither cancels the
-input-dependent normal derivative of the CBF condition.
-
-Table~\ref{tab:cert-comparison} uses fixed horizons of 9~s for docking and 6~s for the rounded
-tube. The input modification is $D=\int\norm{\mathbf u-\mathbf u^{\rm nom}}\,dt$, compared
-only within each scene. All twelve runs require zero slack. Docking has positive polygon-distance
-bounds; the independent tube audit covers all 601 saved states per variant and every modeled mesh
-triangle, using the analytic obstacle field and a 1-mm bound-reuse threshold, without fitted-field
-pruning. All six tube lower bounds remain above 1~mm. The docking runs seat the vehicle; the nominal target is intentionally
-10~cm beyond full seating, so reaching that infeasible target is not the docking success criterion.
+uses the unit lift. Table~\ref{tab:cert-comparison} uses fixed horizons of 9~s for docking and
+6~s for the rounded tube; the input modification $D=\int\norm{\mathbf u-\mathbf u^{\rm nom}}\,dt$ is
+compared only within each scene. All runs require zero slack, the docking runs seat the vehicle,
+and the tube audit, covering all 601 saved states and every mesh triangle with the analytic
+obstacle field, keeps every lower bound above 1~mm. We also tested the fixed multipliers
+$w=\norm{\boldsymbol\nu_B}/\norm{\boldsymbol\nu_A}$ and
+$w=-\boldsymbol\nu_A^\top\boldsymbol\nu_B/\norm{\boldsymbol\nu_A}^2$ (regularized), with
+$\boldsymbol\nu_A=\nabla\phi_A(\mathbf c)$ and $\boldsymbol\nu_B=\Rot^\top\nabla\phi_B(\mathbf y_{\mathbf c})$;
+both equal the multiplier $\lambda$ discussed after Proposition~\ref{prop:tight} at an external
+tangency. In either certificate, they changed docking $D$ by at most 0.001, tube $D$ by at most
+1.4\%, and tube arrival by at most 0.02~s, as expected when both fitted fields have gradient norms
+close to one, so that $\lambda\approx1$; neither follows the input.
 
 \begin{table}[t]
 \caption{Certificate Comparison with Fixed Geometry}
@@ -1148,10 +1184,6 @@ Certificate & Dock $D$ & Tube $t_g$ [s] & Tube $D$ & Tube time [ms]\\
 \midrule
 V, $w=1$       & 0.656 & 3.99 & 1.948 & 34.6/83.7\\
 B, $w=1$       & 0.653 & 3.93 & 1.870 & 52.2/165.7\\
-V, $w_{\rm N}$ & 0.655 & 3.99 & 1.951 & 33.9/85.3\\
-B, $w_{\rm N}$ & 0.653 & 3.92 & 1.857 & 52.2/165.6\\
-V, $w_{\rm P}$ & 0.655 & 4.00 & 1.965 & 34.7/83.3\\
-B, $w_{\rm P}$ & 0.653 & 3.95 & 1.896 & 51.0/166.5\\
 \bottomrule
 \end{tabular}
 \\[3pt]
@@ -1162,13 +1194,11 @@ activity not excluded, rather than the isolated timings of Table~\ref{tab:franka
 \end{table}
 
 The joint unit-weight certificate reduces tube input modification by about 4\%, at the cost
-of increasing the maximum row count from 26{,}440 to 89{,}424. The fixed multipliers do not
-improve the vertex variant's tube arrival time or input modification, as expected when both
-fitted fields have gradient norms close to one, so that $\lambda\approx1$. These cases therefore
+of increasing the maximum row count from 26{,}440 to 89{,}424. These cases therefore
 support retaining the unit-weight vertex reduction as the economical implementation, while
 the joint coefficient condition provides a direct alternative when the additional cost is
-acceptable. The multiplier tests establish neither a general improvement nor a second-order
-conservatism result.
+acceptable. Fixed multipliers cannot follow the input; optimized multipliers
+(Proposition~\ref{prop:second}) are evaluated with native patches in Sec.~\ref{sec:native}.
 
 We also compare the two unit-weight certificates on six saved Franka trials, selected as three
 that reached and three that stalled in the original experiment. With the same distance-independent
@@ -1185,17 +1215,12 @@ start collision-free, and they certify non-intersection, not a prescribed cleara
 by enclosing dilated ground truths). They assume exact arithmetic; our implementation uses double
 precision without outward rounding.
 
-\emph{Closed-loop solutions.} The corollary assumes an absolutely continuous closed-loop solution;
-with the zero-input fallback of Sec.~\ref{sec:filter}, it needs no feasibility assumption. It does
-not establish existence or uniqueness for the QP feedback with hard activation and optional refinement, or
-admissibility of every Filippov selection. A positive activation threshold alone does not make
-entering constraints redundant. Enforcing rows only at simulation steps does not meet the
-almost-everywhere hypothesis between those steps.
-
-\emph{Discrete time.} The guarantees hold in continuous time. The simulations use 10-ms steps;
-distance checks at saved states do not certify the motion between them. Sampled-data CBF
-conditions account for the held input and intersample evolution~\cite{breeden2022sampled};
-adapting such a tightening is needed for a guarantee of the implemented controller.
+\emph{Closed loop and sampling.} Corollary~\ref{cor:sampled} covers the held-input controller
+without feasibility or existence assumptions, but we evaluate it only on the native-patch Franka
+trials (Sec.~\ref{sec:native}). The other experiments assemble rows at 10-ms samples without the
+tightening of Theorem~\ref{thm:sampled} and use a slack when infeasible; their guarantee is the
+continuous-time Corollary~\ref{cor:closed}, whose existence of solutions under hard activation and
+refinement we do not establish, and their saved-state audits do not certify motion between samples.
 
 \emph{Conservatism, feasibility, and cost.} The safe set is defined by the continuous spline level
 surfaces. Its finite enforcement is conservative: Taylor remainders and Bernstein bounds restrict
@@ -1208,9 +1233,9 @@ $2^n$ per active box and thousands in tight spatial scenes, sets the cost per st
 variation.
 
 \emph{Online geometry.} The robot's fields, levels, and covers are prepared once; a new obstacle needs
-only its own field and certified level, which took 0.1--0.2~s and 2--13~s, respectively, for the
-Franka obstacles in our Python implementation: enough for occasional updates, not for every sensor
-frame. For perceived obstacles, the certificate holds for the reconstructed geometry.
+only its own field, certified level, and Bernstein derivative and collar bounds, which took
+0.1--0.2~s, 2--13~s, and about 1~s, respectively, for the Franka obstacles in our Python
+implementation: enough for occasional updates, not for every sensor frame. For perceived obstacles, the certificate holds for the reconstructed geometry.
 
 \emph{Scope.} Deadlocks are not resolved, and exact geometry makes them more frequent than round
 surrogates. The manipulator studies omit self-collision within an arm, the fingers, and polytopic
