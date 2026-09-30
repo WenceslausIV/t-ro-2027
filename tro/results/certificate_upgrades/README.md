@@ -53,3 +53,28 @@ and 12.5/42.7 ms (sampled, 12 mm). Trial 18, which needed slack at all 1000 step
 4.99 s with optimized multipliers.
 Planned before rerunning: a sparse QP solver, multipliers shared per cluster, and local instead of global
 gradient bounds in the activation threshold.
+
+## QP solver (2026-09-30, after the evaluation above)
+
+Profiling showed 92--100% of the 6-mm filter time in the dense NNLS least-distance QP. `SUMMED_QP=clarabel`
+(runner option `--qp clarabel`) now handles QPs with at least 2000 rows in three stages: the dense path's
+warm-started constraint generation on sparse rows with at most 3000 working rows; if it does not converge,
+Clarabel on the sparse QP, accepted only if every row and input bound holds exactly in double precision with
+a = |E u| and clipped multipliers; otherwise the dense solver. Smaller QPs use the dense solver unchanged.
+Multiplier columns and, with optimized multipliers, the stacked twist-bound matrix are now sparse.
+
+Two of the heaviest 6-mm sampled-data trials, same trajectories (max |dq| <= 1.6e-7) and bounds in all runs:
+
+| Trial | Solver | Total filter time | Median | p95 | Max |
+|---|---|---:|---:|---:|---:|
+| 3 | dense (runs above) | 969 s | 115.6 ms | 4707 ms | 118.4 s |
+| 3 | Clarabel only (`sampled_zero_6mm_clarabel`) | 316 s | 148.7 ms | 875 ms | 3.7 s |
+| 3 | staged (`sampled_zero_6mm_hybrid`) | 167 s | 54.0 ms | 775 ms | 4.0 s |
+| 8 | dense | 522 s | 71.8 ms | 483 ms | 176.8 s |
+| 8 | Clarabel only | 345 s | 423.3 ms | 577 ms | 5.1 s |
+| 8 | staged | 115 s | 31.5 ms | 471 ms | 5.1 s |
+
+No step fell back to the dense solver. Single-step replay (`qp_solver_benchmark.json`): 38,892--51,822 rows took
+19.8--115.5 s dense and 1.9--3.8 s with Clarabel. Row assembly alone takes up to about 70 ms at these steps, and
+the row count jumps between about 1e3 and 5e4 from step to step as the speed-dependent activation threshold
+(up to 8 cm with the global gradient bound 2.68) grows and shrinks; reducing the rows is the next step.
