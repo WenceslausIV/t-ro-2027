@@ -1,0 +1,51 @@
+{
+ "trial": 12,
+ "variant": "sampled",
+ "fallback": "zero",
+ "metrics": {
+  "steps": 1000,
+  "reached_s": null,
+  "slack_steps": 0,
+  "zero_steps": 0,
+  "min_gap_bound_mm": 8.379673178027547,
+  "nonpositive_gap_states": 0,
+  "min_h_mm": -8.68801429655064,
+  "t_median_ms": 260.57190399978936,
+  "t_p95_ms": 2254.1832324500547,
+  "active_t_median_ms": 264.1664430000219,
+  "active_t_p95_ms": 2260.577805849971,
+  "rows_max": 32814,
+  "boxes_max": 1215,
+  "w_range": [
+   -4.2543746303636e-13,
+   1.0
+  ]
+ },
+ "cover": "native SDF patches (6mm), no refinement",
+ "dt_s": 0.01,
+ "gamma": 5.0,
+ "eta_m": 0.03,
+ "sampled": {
+  "grow": 1.5,
+  "floors": [
+   0.05,
+   0.1,
+   0.3
+  ],
+  "speed_max_m_s": 3.0,
+  "G_max": 2.679290841938035,
+  "collar_bound_m": 0.12663228241470154,
+  "travel_max_m": 0.03,
+  "lever_bounds_m": {
+   "1": 0.20937974869045778,
+   "2": 0.21117135114891014,
+   "3": 0.4840314232453114,
+   "4": 0.5939356055333943,
+   "5": 1.0651683983358478,
+   "6": 0.9424354598092598,
+   "7": 1.0187892592849543,
+   "8": 1.084493238575255
+  }
+ },
+ "note": "Saved-state mesh lower bounds include the final state. One thread; this machine."
+}
