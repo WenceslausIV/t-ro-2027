@@ -261,24 +261,21 @@ variables on tensor-product fields.
 % -----------------------------------------------------------------------------
 \section{Preliminaries and Problem Statement}\label{sec:prelim}
 
-\emph{CBFs.} Consider $\dot{\mathbf z}=f(\mathbf z)+g(\mathbf z)\mathbf u$ with $f,g$ locally
-Lipschitz, $\mathbf u\in\mathcal U$, and a $C^1$ function $h$ with
-$\mathcal H=\{\mathbf z\mid h(\mathbf z)\ge0\}$.
-\begin{lemma}[\cite{ames2019cbf}]\label{lem:cbf}
-If a locally Lipschitz feedback $\mathbf k(\mathbf z)\in\mathcal U$ satisfies
-$L_fh+L_gh\,\mathbf k\ge-\gamma h$ with $\gamma>0$ on an open set containing $\mathcal H$, then
-$\mathcal H$ is forward invariant.
-\end{lemma}
+\emph{CBFs.} For $\dot{\mathbf z}=f(\mathbf z)+g(\mathbf z)\mathbf u$, $\mathbf u\in\mathcal U$, and a
+$C^1$ function $h$, enforcing $\dot h\ge-\gamma h$ with $\gamma>0$ keeps
+$\mathcal H=\{\mathbf z\mid h(\mathbf z)\ge0\}$ forward invariant; the classical statement assumes a
+locally Lipschitz feedback~\cite{ames2019cbf}. Theorem~\ref{thm:invariance} gives the version used
+here, which needs neither a Lipschitz feedback nor a single differentiable barrier.
 
 \emph{Bernstein form.} The cubic Bernstein basis $B_r(\xi)=\binom3r\xi^r(1-\xi)^{3-r}$ is
 nonnegative and sums to one, so $p=\sum_r\beta_rB_r$ satisfies $\min_r\beta_r\le p\le\max_r\beta_r$
-on $[0,1]$ (convex-hull property), also for tensor products. With $M_B$ mapping Bernstein to power
-coefficients and $T_{jr}=\binom rj\xi_0^{r-j}\Delta^j$ ($j\le r$), the coefficients of $p$ restricted
-to $[\xi_0,\xi_0+\Delta]$ and reparametrized to $[0,1]$ are
+on $[0,1]$ (convex-hull property), also for tensor products. With $\Lambda$ mapping Bernstein to power
+coefficients and $T_{jr}=\binom rj\xi_0^{r-j}(\xi_1-\xi_0)^j$ ($j\le r$), the coefficients of $p$
+restricted to $[\xi_0,\xi_1]$ and reparametrized to $[0,1]$ are
 \begin{equation}\label{eq:subdiv}
-\boldsymbol\beta'=S(\xi_0,\xi_0+\Delta)\,\boldsymbol\beta,\qquad S=M_B^{-1}T(\xi_0,\Delta)M_B,
+\boldsymbol\beta'=S(\xi_0,\xi_1)\,\boldsymbol\beta,\qquad S=\Lambda^{-1}T(\xi_0,\xi_1)\Lambda,
 \end{equation}
-applied along each axis; they converge to the values of $p$ as $\Delta\to0$. On each span, a uniform
+applied along each axis; they converge to the values of $p$ as $\xi_1-\xi_0\to0$. On each span, a uniform
 cubic B-spline with control values $\mathbf P_c,\dots,\mathbf P_{c+3}$ has Bernstein coefficients
 \begin{equation}\label{eq:b2b}
 \boldsymbol\beta_c=Q\,[\mathbf P_{c},\dots,\mathbf P_{c+3}]^{\top},\quad
@@ -298,17 +295,17 @@ bodies ever intersect, with constraints whose correctness is certified rather th
 
 \subsection{First Contact}
 \begin{lemma}[First contact]\label{lem:contact}
-Let $\mathcal K_A(s),\mathcal K_B(s)\subset\R^n$, $s\in[0,T]$, be images of compact sets under rigid
-motions that are continuous in $s$, disjoint at $s=0$ and intersecting at $s=T$. Then at
-$s^\star=\inf\{s\mid\mathcal K_A(s)\cap\mathcal K_B(s)\neq\emptyset\}>0$, some point lies on both
-boundaries, $\partial\mathcal K_A(s^\star)\cap\partial\mathcal K_B(s^\star)\neq\emptyset$.
+Let $\mathcal K_A(t),\mathcal K_B(t)\subset\R^n$, $t\in[0,T]$, be images of compact sets under rigid
+motions that are continuous in $t$, disjoint at $t=0$ and intersecting at $t=T$. Then at
+$t^\star=\inf\{t\mid\mathcal K_A(t)\cap\mathcal K_B(t)\neq\emptyset\}>0$, some point lies on both
+boundaries, $\partial\mathcal K_A(t^\star)\cap\partial\mathcal K_B(t^\star)\neq\emptyset$.
 \end{lemma}
 \begin{proof}
-The set of intersecting parameters is closed, so the bodies intersect at $s^\star>0$; pick $\mathbf z$
-in both. If $\mathbf z$ were interior to $\mathcal K_B(s^\star)$, the point of $\mathcal K_A$ that
-is at $\mathbf z$ at $s^\star$ would, by continuity, lie in $\mathcal K_B(s)$ for $s<s^\star$ close
-to $s^\star$, a contradiction. Symmetrically, $\mathbf z$ is not interior to $\mathcal K_A(s^\star)$,
-since the point of $\mathcal K_B$ at $\mathbf z$ would lie in $\mathcal K_A$ before $s^\star$.
+The set of intersecting times is closed, so the bodies intersect at $t^\star>0$; pick $\mathbf z$
+in both. If $\mathbf z$ were interior to $\mathcal K_B(t^\star)$, the point of $\mathcal K_A$ that
+is at $\mathbf z$ at $t^\star$ would, by continuity, lie in $\mathcal K_B(t)$ for $t<t^\star$ close
+to $t^\star$, a contradiction. Symmetrically, $\mathbf z$ is not interior to $\mathcal K_A(t^\star)$,
+since the point of $\mathcal K_B$ at $\mathbf z$ would lie in $\mathcal K_A$ before $t^\star$.
 \end{proof}
 The lemma requires neither convexity nor smoothness. It reduces collision avoidance to excluding
 coincident boundary points, provided that the trajectory starts collision-free.
@@ -316,16 +313,15 @@ coincident boundary points, provided that the trajectory starts collision-free.
 \subsection{Certified Regions}\label{sec:cert-body}
 For each body we construct a sublevel region $\mathcal B_i$ of a fitted SDF and certify
 $\partial\mathcal G_i\subset\{\phi_i<l_i\}$. This boundary certificate suffices for the
-first-contact argument below. It does not by itself establish $\mathcal G_i\subseteq\mathcal B_i$:
-an unconstrained fitted field can have an interior positive bump. We do not assume full-solid
-enclosure without an additional interior certificate.
+first-contact argument below; full-solid enclosure $\mathcal G_i\subseteq\mathcal B_i$, which an
+interior positive bump of a fitted field can violate, is neither established nor needed.
 
 \emph{Level sets of SDFs.} Let $\phi_i$ be a tensor-product cubic B-spline fitted to (approximate)
-signed distances of $\mathcal G_i$ on a box $\Omega_i$, and let $\kappa_i(\mathbf c)$ be a certified
-bound on $\norm{\nabla^2\phi_i}$ over the ball of radius $\rho\le h$ (the cell size) around $\mathbf c$: a
-cubic B-spline whose control value $m$ is the maximum of the cellwise bounds from the Bernstein
-coefficients of the second derivatives over cells $m-4,\dots,m+1$ per axis, which is $C^2$ and, its
-weights being a partition of unity, bounds every cell adjacent to that of $\mathbf c$. The smallest level that encloses the boundary is
+signed distances of $\mathcal G_i$ on a box $\Omega_i$ with cell size $\Delta_i$, and let
+$\kappa_i(\mathbf c)$ bound $\norm{\nabla^2\phi_i}$ on the cells adjacent to that of $\mathbf c$, which
+contain the ball of radius $\rho\le\Delta_i$ around $\mathbf c$. We use a cubic B-spline whose control
+value $m$ is the maximum of the cellwise Bernstein bounds of the second derivatives over cells
+$m-4,\dots,m+1$ per axis; by the partition of unity, it bounds all these cells. The smallest level that encloses the boundary is
 $\bar l_i=\max_{\partial\mathcal G_i}\phi_i$, and we certify it by branch-and-bound over pieces of the
 boundary: triangles for a mesh, edges for a polygon, and, for a body given by an exact SDF, boxes of an
 octree that may contain boundary points. Initial pieces are split until their radii are at most
@@ -368,15 +364,12 @@ the certificate, so the training targets may be approximate. We set $\mathcal B_
 $\mathcal S_i=\{\phi_i=l_i\}$ for the \emph{certified surface}.
 
 For a union of primitives, the minimum of their exact SDFs is 1-Lipschitz and exact outside
-the union, but need not be the exact interior distance. It still supports conservative box
-exclusion. An exterior point $\mathbf p$ with distance $d>0$ supplies the lower bound
-$\phi_i(\mathbf p)-\norm{\nabla\phi_i(\mathbf p)}d-\kappa_i(\mathbf p)d^2/2$ at a true nearest
-boundary point, when the majorant covers that ball. Zero values on internal seams are not
-boundary evaluations. If a work limit leaves unresolved pieces, returning the larger of
-$\ell+\epsilon$ and their maximum upper bound plus $\epsilon$ preserves strict boundary
-inclusion; tightness to $\epsilon$ is then not claimed. The historical implicit-obstacle
-levels used numerical projections and completed their upper-bound queues, establishing
-the boundary enclosure but not the projection oracle required for the tightness statement.
+the union, which suffices for box exclusion; an exterior point $\mathbf p$ at distance $d>0$
+supplies the lower bound $\phi_i(\mathbf p)-\norm{\nabla\phi_i(\mathbf p)}d-\kappa_i(\mathbf p)d^2/2$
+at a true nearest boundary point, whereas zero values on internal seams are not boundary
+evaluations. If a work limit leaves unresolved pieces, adding their maximum upper bound to the
+maximum preserves strict inclusion without the tightness claim. The historical implicit-obstacle
+levels used numerical projections; they establish the enclosure but not the tightness.
 
 % -----------------------------------------------------------------------------
 \section{Surface-Cover Barriers}\label{sec:cover}
@@ -401,7 +394,13 @@ The safe set is the first-contact condition on every point of the certified surf
 \mathcal H_{AB}=\big\{\text{poses}\ \big|\ h(\mathbf x)=\phi_B(\mathbf y(\mathbf x))-l_B\ge0\ \ \forall\mathbf x\in\mathcal S_A\big\};
 \end{equation}
 no box, sample, or bound enters its definition. We preserve this continuous spline-defined set
-and construct finite Bernstein certificates for its admissible controls. Surface separation alone
+and construct finite Bernstein certificates for its admissible controls. Equivalently,
+$\mathcal H_{AB}=\{h_{\min}\ge0\}$ with $h_{\min}=\min_{\mathbf x\in\mathcal S_A}h(\mathbf x)$, a
+Lipschitz but generally nonsmooth function of the pose. By Danskin's theorem~\cite{danskin1966theory},
+its directional derivative along a motion is the minimum of $\dot h(\mathbf x)$ over the minimizers.
+A closest-point barrier constrains $\dot h$ at one selected minimizer, which suffices only while
+the minimizer is unique (L1, L2); imposing the condition at every $\mathbf x\in\mathcal S_A$ covers
+all minimizers without selecting one. Surface separation alone
 does not exclude pre-existing containment of one body inside the other; collision avoidance uses
 the initialization in the following theorem.
 \begin{theorem}\label{thm:cover}
@@ -409,7 +408,8 @@ Suppose $\{\phi_A\le l_A\}$ and $\{\phi_B\le l_B\}$ are compact subsets of the i
 the strict boundary certificates of Proposition~\ref{prop:level} hold. Suppose initially
 $\mathcal G_A\cap\mathcal G_B=\emptyset$ and
 $\{\phi_A\le l_A\}\cap\{\phi_B<l_B\}=\emptyset$.
-If a continuous trajectory stays in $\mathcal H_{AB}$, then $\mathcal G_A$ and $\mathcal G_B$
+If a continuous trajectory stays in $\mathcal H_{AB}$, then
+$\{\phi_A\le l_A\}\cap\{\phi_B<l_B\}=\emptyset$ throughout, and $\mathcal G_A$ and $\mathcal G_B$
 never intersect. All set intersections are understood in a common spatial frame.
 \end{theorem}
 \begin{proof}
@@ -419,13 +419,16 @@ $h\ge0$ on $\mathcal S_A$. Hence $\{\phi_A\le l_A\}\cap\{\phi_B<l_B\}=\emptyset$
 contact of $\mathcal G_A$ and $\mathcal G_B$ would lie on $\partial\mathcal G_A\cap\partial\mathcal G_B$
 (Lemma~\ref{lem:contact}), where $\phi_A<l_A$ and $\phi_B<l_B$ by Proposition~\ref{prop:level}.
 \end{proof}
+Conversely, this disjointness implies $h\ge0$ on $\mathcal S_A$, so along continuous motions from
+such poses, $\mathcal H_{AB}$ is exactly this certified non-overlap condition; interior fitting
+errors, such as a positive bump inside a body, do not affect soundness.
 
 \subsection{Certified Cover and Lifted Barrier}
 On each cell of $\phi_A$, the Bernstein coefficients of $\phi_A-l_A$ follow from~\eqref{eq:b2b}. If
 they all have one strict sign on a box, the box contains no point of $\mathcal S_A$ by the
 convex-hull property. The converse need not hold: a retained box may contain no surface point.
 The default retains each native SDF cell whose coefficient interval contains zero, without
-subdividing it. These patches are the boxes $\{\mathcal Q_k\}$, with side $s=h_A$ fixed by the SDF
+subdividing it. These patches are the boxes $\{\mathcal Q_k\}$, with side $s=\Delta_A$ fixed by the SDF
 grid, centers $\mathbf c_k$, and half-diagonal $r=\sqrt n\,s/2$; their union contains all of
 $\mathcal S_A$. There is no independent cover-size parameter. Optionally, retained patches can be
 halved using~\eqref{eq:subdiv}, discarding children whose coefficient intervals exclude zero.
@@ -461,17 +464,17 @@ piecewise-polynomial third
 derivatives, so its Hessian is Lipschitz with these bounds on any region they cover, which is what the
 third-order Taylor remainders below require. On each (fixed) box of $A$, $M_A$ is their maximum over
 all cells meeting the bounding cube of half-width $r$ around its center, including for a full
-native patch. For $\phi_B$, the bound must vary continuously with the pose:
-$M_B$ is piecewise multilinear on a grid of spacing $h/2$, with node values the maxima over the cells meeting
-the cube of half-width $h/2+r$ around the node; interpolation is a convex combination of nodes whose
+native patch. For $\phi_B$, whose box centers move, we let the bound vary continuously with the pose (Theorem~\ref{thm:invariance} needs only its pointwise validity):
+$M_B$ is piecewise multilinear on a grid of spacing $\Delta_B/2$, with node values the maxima over the cells meeting
+the cube of half-width $\Delta_B/2+r$ around the node; interpolation is a convex combination of nodes whose
 cubes all contain the ball of radius $r$ around $\mathbf y_{\mathbf c}$, so $M_B$ bounds the tensor on
 that ball and is Lipschitz. Let $q_A$ and $q_B$ be the second-order Taylor polynomials of
 $\phi_A$ at $\mathbf c$ and of $\phi_B$ at $\mathbf y_{\mathbf c}$. Taylor's theorem gives, on a box,
 $\phi_A\ge q_A-\tfrac16M_Ar^3$, $\phi_B\ge q_B-\tfrac16M_Br^3$, and
 $\norm{\nabla\phi_B-\nabla q_B}\le\tfrac12M_Br^2$. The box points move relative to $B$ with the twist
 $(\mathbf V,\boldsymbol\Omega)$ of $A$ relative to $B$ at $A$'s origin $\mathbf p_A$, linear in $\mathbf u$,
-so $\norm{\dot{\mathbf y}(\mathbf x)}\le\norm{\mathbf V}_1+\rho\norm{\boldsymbol\Omega}_1$ with
-$\rho=\norm{\mathbf c}+r$, since $\mathbf c$ is expressed in $A$'s body frame.
+so $\norm{\dot{\mathbf y}(\mathbf x)}\le\norm{\mathbf V}_1+\bar r\norm{\boldsymbol\Omega}_1$ with
+$\bar r=\norm{\mathbf c}+r$, since $\mathbf c$ is expressed in $A$'s body frame.
 With $\mathbf d=\mathbf y-\mathbf y_{\mathbf c}$, $\norm{\mathbf d}\le r$,
 $\mathbf g=\nabla\phi_B(\mathbf y_{\mathbf c})$, $\mathbf H=\nabla^2\phi_B(\mathbf y_{\mathbf c})$, and
 $\dot{\mathbf y}_{\mathbf c}=\mathbf J\mathbf u$, the models give on the box
@@ -480,7 +483,7 @@ $\dot{\mathbf y}_{\mathbf c}=\mathbf J\mathbf u$, the models give on the box
 \Psi\ge{}&\mathbf g^\top\dot{\mathbf y}_{\mathbf c}+\mathbf d^\top\mathbf H\dot{\mathbf y}_{\mathbf c}
 +\mathbf g^\top\mathbf W\mathbf d-r^2\norm{\mathbf H}\norm{\boldsymbol\Omega}\\
 &+\gamma\big(q_A-l_A+q_B-l_B-\tfrac16(M_A+M_B)r^3\big)\\
-&-\tfrac12M_Br^2\big(\norm{\mathbf V}_1+\rho\norm{\boldsymbol\Omega}_1\big),
+&-\tfrac12M_Br^2\big(\norm{\mathbf V}_1+\bar r\norm{\boldsymbol\Omega}_1\big),
 \end{aligned}
 \end{equation}
 where $\Psi(\mathbf x,\mathbf u)=\nabla\phi_B(\mathbf y)^\top\dot{\mathbf y}(\mathbf x)+\gamma\tilde h(\mathbf x)$;
@@ -497,7 +500,7 @@ p_w={}&(\mathbf g+\mathbf H\mathbf d)^\top
  &+\gamma\big(w(q_A-l_A)+q_B-l_B\big),\\
 E_w={}&\tfrac\gamma6(|w|M_A+M_B)r^3\\
  &+\tfrac12M_Br^2(\mathbf1^\top\mathbf a_V+
-                       \rho\mathbf1^\top\mathbf a_\Omega).
+                       \bar r\mathbf1^\top\mathbf a_\Omega).
 \end{aligned}
 \end{equation}
 The two-sided Taylor bounds give $F+\gamma w g_A\ge p_w-E_w$.
@@ -508,10 +511,10 @@ b_k(p_w)\ge E_w\quad\text{for every }k,\qquad
 \end{equation}
 then the CBF condition holds on $\mathcal S_A\cap\mathcal Q$. This certificate keeps
 the value and velocity terms in the same polynomial, preserving their cancellation.
-For fixed $w$, its constraints are affine in $(\mathbf u,\mathbf a)$.
-The unit choice $w=1$ recovers the summed-field residual. Other choices are equality
-multipliers for the surface condition, not new barriers to be differentiated;
-they change neither the surface nor~\eqref{eq:safe}.
+For fixed $w$, its constraints are affine in $(\mathbf u,\mathbf a)$, and $w$ may differ between
+boxes and change over time. The unit choice $w=1$ recovers the lifted barrier~\eqref{eq:lift}. In
+general, $F+\gamma wg_A$ is a Lagrangian of the surface condition: $w$ is an equality multiplier,
+not a new barrier to be differentiated, and it changes neither the surface nor~\eqref{eq:safe}.
 
 \emph{Vertex reduction.} The implementation used in the main experiments reduces
 the number of rows by bounding the value and velocity terms separately:
@@ -519,7 +522,7 @@ the number of rows by bounding the value and velocity terms separately:
 Let $\beta_k$, $k=1,\dots,3^n$, be the Bernstein coefficients of degree two per coordinate of
 $q_A-l_A+q_B(\mathbf y(\cdot))-l_B$ on a box $\mathcal Q$, let $\mathbf d_j$, $j=1,\dots,2^n$, be the
 vertices of $\mathcal Q$ relative to its center in $B$'s frame, and let
-$\sigma_V=\frac12M_Br^2$ and $\sigma_\Omega=\frac12\rho M_Br^2+r^2\norm{\mathbf H}$. If, for all $j$,
+$\sigma_V=\frac12M_Br^2$ and $\sigma_\Omega=\frac12\bar rM_Br^2+r^2\norm{\mathbf H}$. If, for all $j$,
 \begin{equation}\label{eq:coef}
 \begin{aligned}
 &(\mathbf g+\mathbf H\mathbf d_j)^\top\mathbf J\mathbf u+\mathbf g^\top\mathbf W(\mathbf u)\mathbf d_j
@@ -546,9 +549,9 @@ evaluated at box centers; the Taylor data of $\phi_A$ are computed offline. At r
 constraints is bounded as follows:
 \begin{proposition}\label{prop:tight}
 With $\mathbf b=\nabla\phi_A(\mathbf c)+\Rot^\top\nabla\phi_B(\mathbf y_{\mathbf c})$ and
-$\mathbf Q=\nabla^2\phi_A(\mathbf c)+\Rot^\top\nabla^2\phi_B(\mathbf y_{\mathbf c})\Rot$, where
+$\mathbf N=\nabla^2\phi_A(\mathbf c)+\Rot^\top\nabla^2\phi_B(\mathbf y_{\mathbf c})\Rot$, where
 $\Rot$ maps $A$'s frame to $B$'s, the constant terms of~\eqref{eq:coef} are at least
-$\gamma\big(\tilde h(\mathbf c)-\tfrac s2\norm{\mathbf b}_1-\tfrac{s^2}8\sum_{ij}|Q_{ij}|
+$\gamma\big(\tilde h(\mathbf c)-\tfrac s2\norm{\mathbf b}_1-\tfrac{s^2}8\sum_{ij}|N_{ij}|
 -\tfrac16(M_A+M_B)r^3\big)$.
 \end{proposition}
 \begin{proof}
@@ -556,18 +559,22 @@ With $\mathbf x=\mathbf c+s\boldsymbol\tau$, $\boldsymbol\tau\in[-\frac12,\frac1
 coefficients of $\tau_i$, $\tau_i\tau_j$, and $\tau_i^2$ lie in $[-\frac12,\frac12]$,
 $[-\frac14,\frac14]$, and $[-\frac14,\frac14]$.
 \end{proof}
-The first-order term vanishes only where the two gradients cancel, $\nabla\phi_A=-\Rot^\top\nabla\phi_B$:
-exact SDFs satisfy this at a smooth external tangency where both gradients exist; fitted fields
-need not satisfy it, since
-their gradients may differ in norm and in direction. A first-order ball bound on $\phi_B$ alone
-subtracts $\norm{\nabla\phi_B}r$ even there. The proposition concerns the constant terms at rest; the velocity
-terms of~\eqref{eq:coef} add their own, input-dependent loss.
+The first-order term vanishes where the two gradients cancel. Where the level sets touch
+externally, at a minimizer $\mathbf x^\ast$ of $h$ on a regular $\mathcal S_A$, the Lagrange condition
+gives $\Rot^\top\nabla\phi_B=-\lambda\nabla\phi_A$ with $\lambda=\norm{\nabla\phi_B}/\norm{\nabla\phi_A}$,
+also for fitted fields: the gradients are antiparallel, and $\mathbf b=(1-\lambda)\nabla\phi_A$ keeps
+only the mismatch of their norms, which vanishes for exact SDFs and is removed by the multiplier
+$w=\lambda$ in~\eqref{eq:joint-model}. Away from $\mathbf x^\ast$, $\mathbf b$ also carries the
+variation of $h$ along $\mathcal S_A$, which the surface condition itself has. A first-order ball
+bound on $\phi_B$ alone subtracts $\norm{\nabla\phi_B}r$ even at $\mathbf x^\ast$. The proposition
+concerns the constant terms at rest; the velocity terms of~\eqref{eq:coef} add their own,
+input-dependent loss.
 
 \subsection{Derivatives and Pruning}\label{sec:cover-der}
 For planar $SE(2)$ single integrators, a point of $A$ at world position $\mathbf w$ moves in $B$'s frame
-with $\Rot(\theta_B)^{\!\top}\big(\mathbf v_A+\omega_AJ(\mathbf w-\mathbf p_A)-\mathbf v_B-\omega_BJ(\mathbf w-\mathbf p_B)\big)$,
-$J=\left[\begin{smallmatrix}0&-1\\1&0\end{smallmatrix}\right]$, and
-$\mathbf W=(\omega_A-\omega_B)J$. For a link $A$ of an articulated robot, a revolute joint $j$ before
+with $\Rot(\theta_B)^{\!\top}\big(\mathbf v_A+\omega_A\mathbf E(\mathbf w-\mathbf p_A)-\mathbf v_B-\omega_B\mathbf E(\mathbf w-\mathbf p_B)\big)$,
+$\mathbf E=\Rot(\frac\pi2)$, and
+$\mathbf W=(\omega_A-\omega_B)\mathbf E$. For a link $A$ of an articulated robot, a revolute joint $j$ before
 the link contributes the column $\mathbf z_j\times(\mathbf w-\mathbf o_j)$ and the angular velocity
 $\mathbf z_j\dot q_j$; for two moving arms, the joints of $B$'s arm enter with the opposite sign. In
 every case, $\mathbf J$ and $\mathbf W$ are linear in the inputs and are obtained directly from
@@ -582,12 +589,13 @@ use these world-frame twist coordinates throughout.
 
 \emph{Pruning.} A box needs no constraint if the constant terms of~\eqref{eq:coef}, divided by
 $\gamma$, are at least an activation threshold $\eta>0$: then $h\ge\eta$ on its part of the surface.
-We group the boxes of each body into clusters with center $\bar{\mathbf c}$ and radius $R$ (covering
+Theorem~\ref{thm:invariance} needs only $h\ge0$ on skipped boxes; the positive $\eta$ is a
+buffer for the motion between filter updates. We group the boxes of each body into clusters with center $\bar{\mathbf c}$ and radius $R$ (covering
 the boxes' balls) and skip a cluster if $\phi_B(\mathbf y(\bar{\mathbf c}))-GR-l_B+\min(\phi_A-l_A)\ge\eta$,
 where $G$ bounds $\norm{\nabla\phi_B}$ on the cells the cluster can reach and the minimum of
 $\phi_A-l_A$ over the cluster's boxes is certified offline; remaining boxes are first screened with
 $\phi_B(\mathbf y_{\mathbf c})-\norm{\nabla\phi_B(\mathbf y_{\mathbf c})}r-\frac12\kappa_B(\mathbf y_{\mathbf c})r^2-l_B+\min_{\mathcal Q}(\phi_A-l_A)\ge\eta$.
-If $r>h_B$, the Hessian majorant uses the same radius-dependent window construction as $M_B$.
+If $r>\Delta_B$, the Hessian majorant uses the same radius-dependent window construction as $M_B$.
 
 \emph{Domain-boundary pruning.} A box whose enclosing ball is not contained in $\Omega_B$
 cannot use that Taylor model. If $r_{\max}$ bounds the half-diagonal of every cover box paired
@@ -595,9 +603,8 @@ with $B$, certify offline that $\phi_B-l_B\ge\delta_B>0$ on the inner domain col
 $2r_{\max}$. Bernstein coefficients of all cells meeting the collar give such a bound.
 Every point of a box omitted by the radius-$r$ containment test either lies in this collar or
 outside the domain, where the clipped extension has the same positive bound. Thus $h\ge\delta_B$
-on its surface portion. The comparison proof uses the effective threshold
-$\eta_0=\min(\eta,\delta_B)$; the implementation may still activate in-domain boxes at the larger
-$\eta$. Domain padding alone is not a certificate: if the collar bound fails, the box needs an
+on its surface portion, which is all Theorem~\ref{thm:invariance} requires of an omitted box.
+Domain padding alone is not a certificate: if the collar bound fails, the box needs an
 alternative certified treatment. Clusters that leave the domain are checked box by box.
 
 \emph{Optional refinement.} The default uses native patches and performs no online refinement.
@@ -612,22 +619,25 @@ The original experiments additionally limit refinement to boxes whose lower boun
 is below 1~cm, except for the tube scene; the common distance-independent rule is evaluated
 in the certificate comparison below.
 \begin{theorem}\label{thm:invariance}
-Consider an absolutely continuous pose trajectory with measurable inputs satisfying the
-kinematic dynamics almost everywhere, initially in $\mathcal H_{AB}$. Suppose that for almost
-every time, each cover box (or its retained refined children) either has a certificate
-$h\ge\eta_0>0$ on its surface portion, or satisfies~\eqref{eq:coef} or~\eqref{eq:joint-coef}
-with the applied input and valid auxiliary bounds. Then the trajectory remains in $\mathcal H_{AB}$.
+Consider an absolutely continuous pose trajectory with measurable, essentially bounded inputs
+satisfying the kinematic dynamics almost everywhere, initially in $\mathcal H_{AB}$. Suppose that
+at almost every time, either the dynamics are driftless and the applied input is zero, or each
+cover box (or its retained refined children) either has a certificate $h\ge0$ on its surface
+portion or satisfies~\eqref{eq:coef} or~\eqref{eq:joint-coef} with the applied input and valid
+auxiliary bounds. Then the trajectory remains in $\mathcal H_{AB}$.
 \end{theorem}
 \begin{proof}
-Fix $\mathbf x\in\mathcal S_A$ and write $h_{\mathbf x}(t)=h(\mathbf x,t)$, which is absolutely
-continuous. Where $h_{\mathbf x}<\eta_0$, no box containing $\mathbf x$ can be excluded by a
-positive surface bound. The finite certificate and the chain rule therefore give
-$\dot h_{\mathbf x}\ge-\gamma h_{\mathbf x}$ almost everywhere there. If $h_{\mathbf x}(t_1)<0$,
-continuity gives a last zero $t_0<t_1$, with $h_{\mathbf x}<0$ on $(t_0,t_1]$.
-The absolutely continuous function $e^{\gamma t}h_{\mathbf x}(t)$ has nonnegative derivative
-almost everywhere on that interval, contradicting $h_{\mathbf x}(t_1)<0$. This argument applies
-separately to every fixed surface point; no common exceptional time set over all points is needed.
+Fix $\mathbf x\in\mathcal S_A$; $h_{\mathbf x}(t)=h(\mathbf x,t)$ is absolutely continuous.
+Suppose $h_{\mathbf x}(t_1)<0$, and let $t_0<t_1$ be the last zero before $t_1$, so that
+$h_{\mathbf x}<0$ on $(t_0,t_1]$ and $\mathbf y(\mathbf x)$ lies where $\phi_B$ is $C^2$. At almost
+every such time, the input is zero and $\dot h_{\mathbf x}=0$, or no box containing $\mathbf x$ can
+carry a certificate $h\ge0$, so that Proposition~\ref{prop:coef} (or the joint certificate) and
+the chain rule give $\dot h_{\mathbf x}\ge-\gamma h_{\mathbf x}>0$. Hence $h_{\mathbf x}$ is
+nondecreasing on $[t_0,t_1]$, contradicting $h_{\mathbf x}(t_1)<0=h_{\mathbf x}(t_0)$. The argument
+applies separately to every fixed surface point; no common exceptional time set is needed.
 \end{proof}
+The proof uses only $\dot h_{\mathbf x}\ge0$ while $h_{\mathbf x}<0$; the rate condition limits
+the decrease of a positive $h$, which matters once inputs are held between samples (Sec.~\ref{sec:limits}).
 
 \begin{proposition}[Certification of strictly feasible inputs]\label{prop:complete}
 Fix a pose and input $\mathbf u$. Suppose $\mathcal S_A$ is compact, its mapped neighborhood lies
@@ -644,18 +654,16 @@ neighborhood. Bernstein enclosure errors, the losses from separating the terms, 
 remainders converge uniformly to zero for the fixed input. Eventually their sum is smaller than
 $\epsilon/2$, so every retained box passes its certificate.
 \end{proof}
-This result concerns optional subdivision and strictly feasible inputs, not completeness of the
-fixed native-patch certificate or finite certification of inputs with $F=0$.
-The two-level subdivided implementation has a finite computational budget. Re-centering Taylor models can
-also prevent successive finite certificates from being nested.
+This result concerns optional subdivision and strictly feasible inputs, not the fixed
+native-patch certificate, inputs with $F=0$, or nesting of successive finite certificates.
 
 % -----------------------------------------------------------------------------
 \section{Safety Filter}\label{sec:filter}
-Collecting the constraints~\eqref{eq:coef} of the active boxes of all pairs, the filter is
+Collecting the constraints~\eqref{eq:coef} (or~\eqref{eq:joint-coef}) of the active boxes of all pairs, the filter is
 \begin{equation}\label{eq:qp}
 \begin{aligned}
 (\mathbf u^\ast,\mathbf a^\ast)=\argmin_{\mathbf u\in\mathcal U,\,\mathbf a}\ &\norm{\mathbf u-\mathbf u^{\rm nom}}^2+\varepsilon_a\norm{\mathbf a}^2\\
-\text{s.t. }&\eqref{eq:coef}\ \text{for all active boxes},
+\text{s.t. }&\eqref{eq:coef}\ \text{or}\ \eqref{eq:joint-coef}\ \text{for all active boxes},
 \end{aligned}
 \end{equation}
 with $\mathbf u$ the stacked planar velocities or the joint velocities, $\mathbf a$ the epigraph
@@ -675,8 +683,8 @@ $(\mathbf u,\mathbf a)=\mathbf 0$ leaves the constant terms.
 \end{proof}
 \begin{corollary}\label{cor:closed}
 Suppose each pair satisfies the initial conditions of Theorem~\ref{thm:cover}. If an absolutely
-continuous closed-loop trajectory exists along which~\eqref{eq:qp} stays feasible and its applied
-inputs satisfy the conditions of Theorem~\ref{thm:invariance} almost everywhere, then along that trajectory
+continuous closed-loop trajectory exists along which, almost everywhere, the applied input solves a
+feasible~\eqref{eq:qp} or, for driftless dynamics, is zero, then along that trajectory
 no pair of ground-truth shapes intersects. The certified sublevel regions may touch at their
 level boundaries.
 \end{corollary}
@@ -684,19 +692,20 @@ level boundaries.
 Theorem~\ref{thm:invariance} keeps each pose in $\mathcal H_{AB}$, and Theorem~\ref{thm:cover}
 concludes.
 \end{proof}
-Stopping is certified when the constant terms are nonnegative. A finite certificate may fail to
-certify stopping near the boundary even though zero input preserves the exact safe set for the
-driftless model. Proposition~\ref{prop:tight} bounds the constant-term loss; it does not give a
-general physical width of this region without additional assumptions on the fields.
-No step needed slack in the reported subdivided experiments, and the safe set itself is unaffected.
+Stopping is certified when the constant terms are nonnegative, which may fail near the boundary;
+Proposition~\ref{prop:tight} bounds this constant-term loss. No step needed slack in the reported
+subdivided experiments, and the safe set itself is unaffected.
 Feasibility does not imply progress: exact non-convex geometry can hook and block
-bodies~\cite{reis2020undesirable}, and we do not resolve such deadlocks. In the experiments, a slack
-variable is added only if~\eqref{eq:qp} is infeasible.
+bodies~\cite{reis2020undesirable}, and we do not resolve such deadlocks. For driftless dynamics,
+applying $\mathbf u=\mathbf 0$ whenever~\eqref{eq:qp} is infeasible keeps every pose, and hence
+every $h$, constant; by Theorem~\ref{thm:invariance}, this fallback removes the feasibility
+hypothesis from Corollary~\ref{cor:closed} at the cost of progress. The experiments instead add a
+slack variable only if~\eqref{eq:qp} is infeasible and report every step that used it.
 
 % -----------------------------------------------------------------------------
 \section{Experiments}\label{sec:exp}
 
-The default certificate uses native SDF patches with $s=h_A$ and no online refinement.
+The default certificate uses native SDF patches with $s=\Delta_A$ and no online refinement.
 Section~\ref{sec:native} evaluates this setting with unchanged fields and levels.
 The remaining experiments report the separately identified, subdivided implementation; their
 clearances, success rates, and timings are not attributed to the native-patch default.
@@ -725,7 +734,7 @@ barrier~\cite{wang2017safety} uses the minimum enclosing circle of each fitted b
 center, and the same margin.
 
 \subsection{Native-Patch Default}\label{sec:native}
-We retain native patches with $s=h_A$ and disable online refinement, keeping the fields,
+We retain native patches with $s=\Delta_A$ and disable online refinement, keeping the fields,
 certified levels, nominal controllers, and initial conditions unchanged. These measurements use
 one CPU thread per process; the Franka trials run in concurrent batches, with other background
 activity not excluded. The timings are separate from the isolated timings
@@ -1109,17 +1118,19 @@ We compare the vertex reduction (V) and the joint Bernstein certificate (B) whil
 the spline fields, certified levels, and initial covers identical. All variants use
 distance-independent refinement with $\vartheta=0.1$ and at most two halvings; screening
 uses the unit lift. In addition to $w=1$, we test fixed multipliers with
-$\mathbf a=\nabla\phi_A(\mathbf c)$, $\mathbf b=\Rot^\top\nabla\phi_B(\mathbf y_{\mathbf c})$,
+$\boldsymbol\nu_A=\nabla\phi_A(\mathbf c)$, $\boldsymbol\nu_B=\Rot^\top\nabla\phi_B(\mathbf y_{\mathbf c})$,
 \begin{equation}
-w_{\rm N}=\sqrt{\frac{\norm{\mathbf b}^2+\delta}{\norm{\mathbf a}^2+\delta}},\qquad
-w_{\rm P}=-\frac{\mathbf a^\top\mathbf b}{\norm{\mathbf a}^2+\delta},\quad\delta=10^{-12}.
+w_{\rm N}=\sqrt{\frac{\norm{\boldsymbol\nu_B}^2+\delta}{\norm{\boldsymbol\nu_A}^2+\delta}},\qquad
+w_{\rm P}=-\frac{\boldsymbol\nu_A^\top\boldsymbol\nu_B}{\norm{\boldsymbol\nu_A}^2+\delta},\quad\delta=10^{-12}.
 \end{equation}
 The regularizer keeps the weights continuous at zero gradient. Negative projection weights
 are permitted, with the absolute value in the remainder of~\eqref{eq:joint-model}.
-Neither choice cancels the complete, input-dependent spatial gradient of the CBF condition.
+At an external tangency, both equal the multiplier $\lambda$ discussed after
+Proposition~\ref{prop:tight}; neither depends on the input, so neither cancels the
+input-dependent normal derivative of the CBF condition.
 
 Table~\ref{tab:cert-comparison} uses fixed horizons of 9~s for docking and 6~s for the rounded
-tube. The input modification is $J=\int\norm{\mathbf u-\mathbf u^{\rm nom}}\,dt$, compared
+tube. The input modification is $D=\int\norm{\mathbf u-\mathbf u^{\rm nom}}\,dt$, compared
 only within each scene. All twelve runs require zero slack. Docking has positive polygon-distance
 bounds; the independent tube audit covers all 601 saved states per variant and every modeled mesh
 triangle, using the analytic obstacle field and a 1-mm bound-reuse threshold, without fitted-field
@@ -1133,7 +1144,7 @@ pruning. All six tube lower bounds remain above 1~mm. The docking runs seat the 
 \setlength{\tabcolsep}{3pt}
 \begin{tabular}{lrrrr}
 \toprule
-Certificate & Dock $J$ & Tube $t_g$ [s] & Tube $J$ & Tube time [ms]\\
+Certificate & Dock $D$ & Tube $t_g$ [s] & Tube $D$ & Tube time [ms]\\
 \midrule
 V, $w=1$       & 0.656 & 3.99 & 1.948 & 34.6/83.7\\
 B, $w=1$       & 0.653 & 3.93 & 1.870 & 52.2/165.7\\
@@ -1152,7 +1163,8 @@ activity not excluded, rather than the isolated timings of Table~\ref{tab:franka
 
 The joint unit-weight certificate reduces tube input modification by about 4\%, at the cost
 of increasing the maximum row count from 26{,}440 to 89{,}424. The fixed multipliers do not
-improve the vertex variant's tube arrival time or input modification. These cases therefore
+improve the vertex variant's tube arrival time or input modification, as expected when both
+fitted fields have gradient norms close to one, so that $\lambda\approx1$. These cases therefore
 support retaining the unit-weight vertex reduction as the economical implementation, while
 the joint coefficient condition provides a direct alternative when the additional cost is
 acceptable. The multiplier tests establish neither a general improvement nor a second-order
@@ -1162,7 +1174,7 @@ We also compare the two unit-weight certificates on six saved Franka trials, sel
 that reached and three that stalled in the original experiment. With the same distance-independent
 refinement, both variants reach in four of six trials and require zero slack in all six.
 For the newly successful trial, the joint certificate reduces arrival time from 7.38 to 6.63~s
-and $J$ from 4.243 to 3.533; its median/p95 filter time increases from 46/116 to 73/250~ms.
+and $D$ from 4.243 to 3.533; its median/p95 filter time increases from 46/116 to 73/250~ms.
 In the most expensive trial neither variant reaches within 10~s, while median filter time rises
 from 115 to 253~ms and maximum row count from 41{,}776 to 146{,}691. These selected trials
 show a cost--performance tradeoff, not a new estimate of the 30-trial success rate.
@@ -1173,9 +1185,9 @@ start collision-free, and they certify non-intersection, not a prescribed cleara
 by enclosing dilated ground truths). They assume exact arithmetic; our implementation uses double
 precision without outward rounding.
 
-\emph{Closed-loop solutions.} The corollary is conditional on an absolutely continuous solution
-with feasible controls satisfying the certificates almost everywhere. It does not establish
-existence or uniqueness for the QP feedback with hard activation and optional refinement, or
+\emph{Closed-loop solutions.} The corollary assumes an absolutely continuous closed-loop solution;
+with the zero-input fallback of Sec.~\ref{sec:filter}, it needs no feasibility assumption. It does
+not establish existence or uniqueness for the QP feedback with hard activation and optional refinement, or
 admissibility of every Filippov selection. A positive activation threshold alone does not make
 entering constraints redundant. Enforcing rows only at simulation steps does not meet the
 almost-everywhere hypothesis between those steps.

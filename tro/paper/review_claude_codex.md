@@ -893,3 +893,24 @@ onto p. 13 (about 4.7k characters of reference text on p. 13). So:
   - (b) the audit-procedure sentences in the tube paragraph → 1 sentence citing the audit file;
   - (c) the "Finer native SDF patches" paragraph → 3 sentences;
   - (d) the Franka setup's audit description, which now appears twice (setup and table note).
+
+---
+
+## Batch 18 — 2026-09-30 (Claude, theory pass; edits applied directly on branch claude/tro-2027-paper-review-wg3qzv)
+
+Full write-up: `theory_review_2026-09-30.md`. All proofs re-derived; no unsound step found.
+Applied to main.tex (theory text only; method, experiments, figures unchanged; build stays at 13 pages):
+- C-31 closed: lem:cbf replaced by one sentence; Thm invariance now cites Prop coef.
+- Thm invariance: hypothesis weakened to "certificate h >= 0" (eta_0 > 0 and min(eta, delta_B) are unnecessary:
+  the proof only uses the interval where h_x < 0); zero input under driftless dynamics allowed.
+- New remark (Safety Filter): for driftless dynamics, falling back to u = 0 instead of a slack keeps every h
+  constant, so Cor closed no longer needs QP feasibility. Experiments still use slack (stated).
+- Safe set: Danskin reading H_AB = {min_{S_A} h >= 0} explains L1/L2 (closest point constrains one minimizer);
+  added danskin1966theory. Thm cover now states the certified non-overlap invariant and its converse.
+- After Prop tight: at an external tangency the Lagrange condition makes the gradients antiparallel even for fitted
+  fields; only the norm mismatch remains, removed by w = lambda (= w_N = w_P there). Explains the null result of
+  the fixed multipliers (lambda ~ 1). The joint certificate is described as a Lagrangian; w may vary per box/time.
+- C-32 (1) closed: eq qp includes joint-coef. Notation clashes removed: M_B (basis matrix) -> Lambda, planar J -> E,
+  cell size h -> Delta, rho (cover) -> r-bar, Q (Prop tight) -> N, a/b (comparison) -> nu_A/nu_B, J (input modification) -> D.
+Proposed, not applied (need code and reruns; user decision): free per-box multiplier as a QP variable with a
+second-order accuracy proposition, and a sampled-data theorem whose tightening is quadratic in the input.
