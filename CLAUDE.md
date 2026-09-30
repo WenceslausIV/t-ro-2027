@@ -16,4 +16,6 @@
   `tro/claude_review_dialogue.md`, audits in `results/manuscript_review/`.
 - `prototype_3d/RDF` (Franka meshes/kinematics, github.com/idiap/RDF) is a git submodule; after
   cloning run `git submodule update --init` before running the Franka/dual-arm/star scripts.
+- Scripts, notes, and outputs that the paper no longer uses are in `archive/` (see `archive/README.md`); reference
+  PDFs are in `refs/`.
 - Excluded from git: `*.gif`, `cache/dock_craft_T.npz` (> 100 MB), LaTeX build outputs.
