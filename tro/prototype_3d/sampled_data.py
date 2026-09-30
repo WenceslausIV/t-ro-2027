@@ -133,7 +133,7 @@ def solve_or_stop(u_nom, A, T, C, E, G_in, h_in, z_prev, Wc):
     """Hard QP; if it is infeasible, apply u = 0 (driftless: every pose, hence every h, stays constant)."""
     if Wc is not None and Wc.shape[1] == 0:
         Wc = None
-    u, s, z = S.solve(u_nom, A, T, C, E, G_in, h_in, z_prev, Wc)
+    u, s, z = S.solve(u_nom, A, T, C, E, G_in, h_in, z_prev, Wc, soft=False)
     if s > 0:
         return np.zeros_like(u_nom), False, None
     return u, True, z

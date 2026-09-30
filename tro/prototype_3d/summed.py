@@ -423,7 +423,7 @@ def violation(u, z, A, T, C, E, G_in, h_in, Wc=None):
     return v
 
 
-def solve(u_nom, A, T, C, E, G_in, h_in, z_prev=None, Wc=None):
+def solve(u_nom, A, T, C, E, G_in, h_in, z_prev=None, Wc=None, soft=True):
     """min |u - u_nom|^2 + EPS_T |a|^2 (+ EPS_W |w - 1|^2)  s.t.  A u + T a (+ Wc w) + C >= 0,  a >= |E u|,
     G_in u >= h_in (and 0 <= w <= W_MAX for 'free' multipliers, one per column of Wc).
     The feasible set in u equals that of A u + T |E u| + C >= 0 (T <= 0). Returns u, slack, z (warm start).
@@ -431,10 +431,17 @@ def solve(u_nom, A, T, C, E, G_in, h_in, z_prev=None, Wc=None):
     zero only if every row and input bound holds in double precision. A rejected solution of the dense
     least-distance solver (its NNLS can return an infeasible point without notice) is retried with the sparse
     interior-point solver. With QP_SOLVER = 'clarabel', large QPs go to the sparse solvers first; with
-    QP_SOLVER = 'daqp', every QP goes to _solve_active_set first."""
+    QP_SOLVER = 'daqp', every QP goes to _solve_active_set first. With soft=False (callers that stop on
+    infeasibility), a relaxation that the active-set solver finds infeasible returns (0, inf, None) at once:
+    the full QP, with more rows, is infeasible as well."""
     tried_sparse = False
     if QP_SOLVER == 'daqp':
         res = _solve_active_set(u_nom, A, T, C, E, G_in, h_in, Wc, z_prev)
+        if res == 'infeasible':
+            QP_STATS['infeasible'] += 1
+            if not soft:
+                return np.zeros_like(u_nom), np.inf, None
+            res = None
         if res is not None and violation(res[0], res[2], A, T, C, E, G_in, h_in, Wc) == 0.:
             return res
     if QP_SOLVER == 'clarabel' and len(C) >= QP_SPARSE_MIN_ROWS:
@@ -469,9 +476,9 @@ def _solve_active_set(u_nom, A, T, C, E, G_in, h_in, Wc, z_prev):
         auxiliary variable weighted by their count: T <= 0 and the objective drive every copy to |E_i u|, so
         both problems have the same minimizer;
       * a multiplier whose box has no row in the working set is fixed at its minimizer 1 of the relaxation.
-    Returns (u, 0, z) with the warm-start vector z of the dense path, or None (relaxation infeasible, solver
-    failure, or no convergence); the caller then uses the other solvers, and every returned input is checked
-    exactly."""
+    Returns (u, 0, z) with the warm-start vector z of the dense path, 'infeasible' if a relaxation is
+    infeasible, or None (solver failure or no convergence); the caller then uses the other solvers, and
+    every returned input is checked exactly."""
     import daqp
     from ctypes import c_int
     m, k = len(u_nom), len(E)
@@ -513,6 +520,8 @@ def _solve_active_set(u_nom, A, T, C, E, G_in, h_in, Wc, z_prev):
         x, _, flag, info = daqp.solve(np.diag(hd[cols]), f[cols], L[wi][:, cols].toarray(),
                                       np.r_[bu_x[cols], np.full(len(wi), 1e30)], np.r_[bl_x[cols], lb[wi]],
                                       np.zeros(len(cols) + len(wi), dtype=c_int), **kw)
+        if flag == -1:                                       # relaxation infeasible: so is the full QP
+            return 'infeasible'
         if flag < 0:
             return None
         lam = np.asarray(info['lam'])
