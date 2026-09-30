@@ -1,0 +1,31 @@
+{
+ "setup": "setup_20260928_171837.json",
+ "direction": "setup",
+ "goal": {
+  "p": [
+   0.4208963665571152,
+   -7.358463382908875e-17,
+   0.48164122183547603
+  ]
+ },
+ "nominal": {
+  "min_gap_mm": -30.611189138823974,
+  "reached": 2.84,
+  "slack_steps": 0,
+  "min_h_mm": Infinity,
+  "rows_max": 0,
+  "t_med_ms": 0.11154997628182173,
+  "t_max_ms": 4.46290010586381,
+  "contact_steps": 1015
+ },
+ "ours": {
+  "min_gap_mm": 15.055696581199516,
+  "reached": null,
+  "slack_steps": 0,
+  "min_h_mm": 49.963807805908424,
+  "rows_max": 7076,
+  "t_med_ms": 25.435950024984777,
+  "t_max_ms": 41.2686001509428,
+  "contact_steps": 0
+ }
+}

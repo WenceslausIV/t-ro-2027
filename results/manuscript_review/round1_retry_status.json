@@ -1,0 +1,8 @@
+{
+  "round": "round1_retry",
+  "state": "completed",
+  "child_pid": 50028,
+  "elapsed_s": 300.3,
+  "exit_code": 0,
+  "updated_utc": "2026-09-30T06:17:06.354602+00:00"
+}

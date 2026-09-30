@@ -1,0 +1,89 @@
+{
+  "dt": 0.01,
+  "dynamics": "si",
+  "recoveries": 0,
+  "min_row_norm_near_boundary": 0.9351257326466602,
+  "speed_bound": 0.8,
+  "angular_speed_bound": 1.4,
+  "gamma": 5.0,
+  "reached_s": 33.0,
+  "steps": 3300,
+  "min_physical_gap_m": 0.02149376658925083,
+  "verified_interval_gap_lower_m": 0.017302584970032696,
+  "unresolved_intervals": 0,
+  "collision_intervals": 0,
+  "min_h_m": -0.0003198545616061865,
+  "min_constraint_residual": -5.134781488891349e-16,
+  "slack_steps": 0,
+  "barrier_intervention_steps": 1474,
+  "controller_median_ms": 0.5026500439271331,
+  "controller_p95_ms": 0.6783699267543849,
+  "path_length_m": 23.81073261588658,
+  "final_position_error_m": 0.04939998454863845,
+  "field": {
+    "signature": "fbb97f51afb2fef311aa04798be21b3300fd35bb4b4cd1814a852b0c7394f23d",
+    "level": 0.044274972048733346,
+    "fit_s": 19.406429999973625,
+    "contact_s": 45.04688940010965,
+    "contact_ok": true,
+    "band_ok": true,
+    "band_min": 0.3699383035613796,
+    "regular_ok": true,
+    "regular_depth": 1,
+    "regular_open_boxes": 0,
+    "regions": 33985628,
+    "cells": [
+      160,
+      160,
+      48
+    ],
+    "coefficients": 1275312,
+    "wall_chord_error_m": 9.71469707049582e-05
+  },
+  "robot": {
+    "name": "reference rocket without exhaust",
+    "controls": 64,
+    "fitting_offset_m": 0.004,
+    "enclosure_ok": true,
+    "physical_radius_m": 0.30000000000000004,
+    "fitted_radius_m": 0.3013419443196287,
+    "length_m": 0.5440761221943746,
+    "width_m": 0.2981251172619176
+  },
+  "planner_margin": 0.02,
+  "wall_count": 2,
+  "wall_fits": [
+    {
+      "controls": 5825,
+      "spans": 5822,
+      "offset_m": 0.001,
+      "enclosure_ok": true,
+      "hull_separation_lower_m": 6.144911513028333e-08,
+      "boundary_distance_upper_m": 0.0014059884991089438,
+      "sampled_boundary_distance_max_m": 0.0010638644678118605,
+      "sampled_boundary_distance_median_m": 0.0009999999999998899,
+      "basis": "nonuniform periodic cubic B-spline"
+    },
+    {
+      "controls": 5844,
+      "spans": 5841,
+      "offset_m": 0.001,
+      "enclosure_ok": true,
+      "hull_separation_lower_m": 1.1069737126637614e-07,
+      "boundary_distance_upper_m": 0.0014113067737068976,
+      "sampled_boundary_distance_max_m": 0.0010641598030019393,
+      "sampled_boundary_distance_median_m": 0.001000000000000334,
+      "basis": "nonuniform periodic cubic B-spline"
+    }
+  ],
+  "source_sha256": {
+    "reference_maze_escape.py": "3c9b7bad2a3aa5c3e3526cdded498c3d64969a3021bace568c5dd9dbfcf2f900",
+    "maze_reference_geometry.py": "7a0e59004f6c64fbac1c79ad687e97815f3f1bfe40e64cf70a1adde80aa147ae",
+    "maze_escape.py": "ef4c7799e454e23c996059618069503bfe73c33353812780b0719c52379f4aed",
+    "rocket_geometry.py": "04a321e8ff58eaa1f46ad984cd49d3e96e3ae3b1726c23f0927b2a9fb0a5a93a"
+  },
+  "navigation": "Dead ends closed; fewest goal waypoints whose segments enter walls by <= WAYPOINT_CUT; CBF filters controls.",
+  "geometry": "Traced cubic physical walls enclosed by separately fitted periodic cubic B-splines.",
+  "gap_definition": "Polygon distance minus the uniform wall-curve chord deviation bound.",
+  "verification": "Float64 certificates and interval rigid-motion audit; no outward rounding."
+}

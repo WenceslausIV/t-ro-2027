@@ -1,0 +1,36 @@
+{
+  "separated": {
+    "lower": -0.0010000000000000044,
+    "witness": 0.0009999999999999957,
+    "adaptive": {
+      "status": "separated",
+      "lower_bound": 0.000999999999999994
+    }
+  },
+  "intersecting": {
+    "lower": -0.0029999999999999923,
+    "witness": -0.0009999999999999922,
+    "adaptive": {
+      "status": "collision",
+      "witness": [
+        0.0,
+        0.0,
+        0.04900000000000001
+      ],
+      "witness_value": -0.0009999999999999922,
+      "depth": 0
+    }
+  },
+  "far": {
+    "lower": 0.048,
+    "witness": Infinity,
+    "adaptive": {
+      "status": "separated",
+      "lower_bound": 0.25
+    }
+  },
+  "mesh_distance_near_far": [
+    0.01,
+    9.256421627281245
+  ]
+}

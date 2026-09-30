@@ -1,0 +1,140 @@
+\section{Surface-Cover Barriers}\label{sec:cover}
+We keep one SDF per body and enforce the first-contact condition on the whole certified surface; the
+construction is the same for planar and spatial bodies, rigid or articulated. Let body $A$ (e.g., a
+robot or a link) have the certified surface $\mathcal S_A=\{\phi_A=l_A\}$ in its frame, and let body $B$
+(e.g., another robot or an obstacle) have the field $\phi_B$ and level $l_B$ in its frame, both from
+Proposition~\ref{prop:level}. We write $\mathbf y(\mathbf x)$ for a point $\mathbf x$ of $A$ mapped into
+$B$'s frame by the current relative pose. For planar bodies, the fields are bivariate and the boxes
+below are squares.
+
+\subsection{Safe Set on the Continuous Surface}
+The safe set is the first-contact condition on every point of the certified surface,
+\begin{equation}\label{eq:safe}
+\mathcal H_{AB}=\big\{\text{poses}\ \big|\ h(\mathbf x)=\phi_B(\mathbf y(\mathbf x))-l_B\ge0\ \ \forall\mathbf x\in\mathcal S_A\big\};
+\end{equation}
+no box, sample, or bound enters its definition.
+\begin{theorem}\label{thm:cover}
+Suppose $\{\phi_A\le l_A\}$ and $\{\phi_B\le l_B\}$ are compact subsets of their domains, the bodies
+start with $\{\phi_A\le l_A\}\cap\{\phi_B<l_B\}=\emptyset$, and a continuous trajectory stays in
+$\mathcal H_{AB}$. Then $\mathcal G_A$ and $\mathcal G_B$ never intersect.
+\end{theorem}
+\begin{proof}
+For $\epsilon>0$, if $\{\phi_A\le l_A\}$ met $\{\phi_B\le l_B-\epsilon\}$, Lemma~\ref{lem:contact} would
+give a first point on both boundaries, where $\phi_A=l_A$ and $\phi_B=l_B-\epsilon$, contradicting
+$h\ge0$ on $\mathcal S_A$. Hence $\{\phi_A\le l_A\}\cap\{\phi_B<l_B\}=\emptyset$ throughout. A first
+contact of $\mathcal G_A$ and $\mathcal G_B$ would lie on $\partial\mathcal G_A\cap\partial\mathcal G_B$
+(Lemma~\ref{lem:contact}), where $\phi_A<l_A$ and $\phi_B<l_B$ by Proposition~\ref{prop:level}.
+\end{proof}
+
+\subsection{Certified Cover and Lifted Barrier}
+On each cell of $\phi_A$, the Bernstein coefficients of $\phi_A-l_A$ follow from~\eqref{eq:b2b}. If
+they all have one strict sign on a box, the box contains no point of $\mathcal S_A$ by the
+convex-hull property. Starting from the cells and halving every box whose coefficients change sign,
+restricted by~\eqref{eq:subdiv}, until its side is at most $s_{\max}$, yields finitely many boxes
+$\{\mathcal Q_k\}$ of side $s$, with centers $\mathbf c_k$ and half-diagonal $r$, whose union contains
+all of $\mathcal S_A$, not a sample of it. The cover is computed once per body; it only partitions
+the surface for the enforcement below and does not enter~\eqref{eq:safe}.
+
+By the comparison lemma, $\mathcal H_{AB}$ stays invariant if $\dot h(\mathbf x)\ge-\gamma h(\mathbf x)$
+at every surface point. The surface is implicit, so we impose this condition on whole boxes, after
+lifting the barrier so that the points of a box off the surface do not tighten it: for $\mathbf x$ in a
+box,
+\begin{equation}\label{eq:lift}
+\tilde h(\mathbf x)=\phi_A(\mathbf x)-l_A+\phi_B(\mathbf y(\mathbf x))-l_B ,
+\end{equation}
+which equals $h$ on $\mathcal S_A$. Since $\mathbf x$ is fixed in $A$'s frame, $\phi_A(\mathbf x)$ does
+not change, and $\dot{\tilde h}(\mathbf x)=\nabla\phi_B(\mathbf y)^\top\dot{\mathbf y}(\mathbf x)$. A
+box point displaced from the surface by $\delta$ toward $B$ has $\phi_A-l_A\approx\delta$ and
+$\phi_B-l_B\approx h-\delta$ for SDF-like fields, so $\tilde h\approx h$: the lifting cancels the
+first-order effect of the box size. The box points move with
+$\dot{\mathbf y}(\mathbf x)=\mathbf J\mathbf u+\mathbf W(\mathbf u)(\mathbf y-\mathbf y_{\mathbf c})$,
+affine in the inputs $\mathbf u$, where $\mathbf J\mathbf u$ is the velocity of the box center in
+$B$'s frame and $\mathbf W(\mathbf u)$ the relative angular velocity as a skew matrix
+(Sec.~\ref{sec:cover-der}).
+
+\subsection{Bernstein Coefficient Constraints}
+Cellwise bounds on the Frobenius norms of the Hessian and of the third-derivative tensor follow from
+the Bernstein coefficients of the second and third partial derivatives. They are piecewise
+constant, and constraints that switch between them would be discontinuous. We therefore use $C^2$
+majorants: a cubic B-spline $\kappa_B$ (resp.\ $M_B$) on the grid of $\phi_B$ whose control value
+with index $m$ is the maximum of the cellwise bounds over cells $m-4,\dots,m+1$ along each axis.
+Since cubic B-spline weights are nonnegative and sum to one, $M_B(\mathbf c)$ bounds the tensor on
+every cell adjacent to the cell of $\mathbf c$, hence on the ball of radius $r$ around $\mathbf c$
+whenever $r$ does not exceed the cell size; $M_A$ is built likewise. Let $q_A$ and $q_B$ be the
+second-order Taylor polynomials of $\phi_A$ at $\mathbf c$ and of $\phi_B$ at $\mathbf y_{\mathbf c}$.
+Taylor's theorem gives, on a box,
+$\phi_A\ge q_A-\tfrac16M_Ar^3$, $\phi_B\ge q_B-\tfrac16M_Br^3$, and
+$\norm{\nabla\phi_B-\nabla q_B}\le\tfrac12M_Br^2$, so that
+$\Psi(\mathbf x,\mathbf u)=\nabla\phi_B(\mathbf y)^\top\dot{\mathbf y}(\mathbf x)+\gamma\tilde h(\mathbf x)$
+satisfies
+\begin{equation}\label{eq:psi-lb}
+\Psi\ge P(\mathbf x,\mathbf u)-\tfrac\gamma6(M_A+M_B)r^3-\tfrac12M_Br^2\textstyle\sum_mL_m|u_m| ,
+\end{equation}
+where $P=\nabla q_B(\mathbf y)^\top\dot{\mathbf y}(\mathbf x)+\gamma\big(q_A(\mathbf x)-l_A+q_B(\mathbf
+y)-l_B\big)$ is quadratic in $\mathbf x$ and affine in $\mathbf u$, and $L_m$ bounds the speed of any box
+point per unit input $u_m$.
+\begin{proposition}\label{prop:coef}
+Let $\beta_k(\mathbf u)$, $k=1,\dots,3^n$, be the Bernstein coefficients of degree two per coordinate
+of $P(\cdot,\mathbf u)$ on a box $\mathcal Q$; they are affine in $\mathbf u$. If, for all $k$,
+\begin{equation}\label{eq:coef}
+\beta_k(\mathbf u)-\tfrac\gamma6(M_A+M_B)r^3-\tfrac12M_Br^2\textstyle\sum_mL_mt_m\ge0,\qquad t_m\ge|u_m|,
+\end{equation}
+then $\Psi(\mathbf x,\mathbf u)\ge0$ for every $\mathbf x\in\mathcal Q$.
+\end{proposition}
+\begin{proof}
+By the convex-hull property, $P(\mathbf x,\mathbf u)\ge\min_k\beta_k(\mathbf u)$ on $\mathcal Q$;
+combine with~\eqref{eq:psi-lb} and $t_m\ge|u_m|$.
+\end{proof}
+The constraints are affine in $(\mathbf u,\mathbf t)$. The epigraph variables $t_m$ are shared by all
+boxes, and since the left side of~\eqref{eq:coef} decreases in $t_m$, the feasible set in $\mathbf u$
+is exactly that of the same constraints with $|u_m|$; the filter remains a QP. The remainder terms
+tighten only the admissible inputs, and the one proportional to $|u_m|$ vanishes at rest. Online,
+$\phi_B$, its first two derivatives, and $M_B$ are evaluated at box centers; the Taylor data of
+$\phi_A$ are computed offline. The loss of the coefficients is of second order in the box size where
+the two level sets face each other:
+\begin{proposition}\label{prop:tight}
+With $\mathbf b=\nabla\phi_A(\mathbf c)+\Rot^\top\nabla\phi_B(\mathbf y_{\mathbf c})$ and
+$\mathbf Q=\nabla^2\phi_A(\mathbf c)+\Rot^\top\nabla^2\phi_B(\mathbf y_{\mathbf c})\Rot$, where
+$\Rot$ maps $A$'s frame to $B$'s, the constant terms of~\eqref{eq:coef} are at least
+$\gamma\big(\tilde h(\mathbf c)-\tfrac s2\norm{\mathbf b}_1-\tfrac{s^2}8\sum_{ij}|Q_{ij}|
+-\tfrac16(M_A+M_B)r^3\big)$.
+\end{proposition}
+\begin{proof}
+With $\mathbf x=\mathbf c+s\boldsymbol\tau$, $\boldsymbol\tau\in[-\frac12,\frac12]^n$, the degree-two
+coefficients of $\tau_i$, $\tau_i\tau_j$, and $\tau_i^2$ lie in $[-\frac12,\frac12]$,
+$[-\frac14,\frac14]$, and $[-\frac14,\frac14]$.
+\end{proof}
+Near a contact of SDF-like fields, $\nabla\phi_A\approx-\Rot^\top\nabla\phi_B$, so $\norm{\mathbf b}$ is
+of the order of the curvatures times $r$ and the whole loss is of order $r^2$; a bound on $\phi_B$
+alone over a box loses $\norm{\nabla\phi_B}r$ instead.
+
+\subsection{Derivatives and Pruning}\label{sec:cover-der}
+For planar rigid bodies with $SE(2)$ single integrators $\dot{\mathbf p}=\mathbf v$,
+$\dot\theta=\omega$, a point attached to $A$ at world position $\mathbf w$ has, in $B$'s frame, the
+velocity
+$\Rot(\theta_B)^{\!\top}\big(\mathbf v_A+\omega_AJ(\mathbf w-\mathbf p_A)-\mathbf v_B-\omega_BJ(\mathbf w-\mathbf p_B)\big)$
+with $J=\left[\begin{smallmatrix}0&-1\\1&0\end{smallmatrix}\right]$, and
+$\mathbf W=(\omega_A-\omega_B)J$. For a link $A$ of an articulated robot, a revolute joint $j$ before
+the link contributes the column $\mathbf z_j\times(\mathbf w-\mathbf o_j)$ and the angular velocity
+$\mathbf z_j\dot q_j$; for two moving arms, the joints of $B$'s arm enter with the opposite sign. In
+every case, $\mathbf J$ and $\mathbf W$ are linear in the inputs, and no closest point and no
+optimization are involved.
+
+\emph{Pruning.} A box needs no constraint if the constant terms of~\eqref{eq:coef}, divided by
+$\gamma$, are at least an activation threshold $\eta>0$: then $h\ge\eta$ on its part of the surface.
+We group the boxes of each body into clusters with center $\bar{\mathbf c}$ and radius $R$ (covering
+the boxes' balls) and skip a cluster if $\phi_B(\bar{\mathbf c})-GR-l_B+\min(\phi_A-l_A)\ge\eta$,
+where $G$ bounds $\norm{\nabla\phi_B}$ on the cells the cluster can reach and the minimum of
+$\phi_A-l_A$ over the cluster's boxes is certified offline.
+\begin{theorem}\label{thm:invariance}
+Let a locally Lipschitz feedback satisfy~\eqref{eq:coef} on every box whose certified lower bound of
+$\tilde h$ is below $\eta$. Then $\mathcal H_{AB}$ is forward invariant.
+\end{theorem}
+\begin{proof}
+Fix $\mathbf x\in\mathcal S_A$ with $h(\mathbf x)\ge0$ initially. Whenever $h(\mathbf x)<\eta$, every
+box containing $\mathbf x$ has a lower bound of $\tilde h$ below $\tilde h(\mathbf x)=h(\mathbf x)<\eta$,
+so it is constrained, and Proposition~\ref{prop:coef} gives
+$\dot h(\mathbf x)=\Psi(\mathbf x,\mathbf u)-\gamma h(\mathbf x)\ge-\gamma h(\mathbf x)$. Hence
+$h(\mathbf x)$ cannot cross zero.
+\end{proof}
+

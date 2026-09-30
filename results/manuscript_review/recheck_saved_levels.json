@@ -1,0 +1,53 @@
+{
+  "arch": {
+    "level": 0.005634634085129643,
+    "lower_bound": 0.0018830849732842036,
+    "gap": 0.00375154911184544,
+    "epsilon_tight": false,
+    "reason": "box_limit",
+    "depth": 2,
+    "unresolved_boxes": 161508,
+    "historical_level": 0.00199348794002533,
+    "old_strict_enclosure_reconfirmed": false
+  },
+  "hook": {
+    "level": 0.0018734643010061885,
+    "lower_bound": 0.0018234643010061886,
+    "gap": 4.9999999999999914e-05,
+    "epsilon_tight": true,
+    "reason": "complete",
+    "depth": 8,
+    "unresolved_boxes": 0,
+    "historical_level": 0.0019234642177813515,
+    "old_strict_enclosure_reconfirmed": true
+  },
+  "rack": {
+    "level": 0.0028541271252872672,
+    "lower_bound": 0.002804127125287267,
+    "gap": 5.000000000000013e-05,
+    "epsilon_tight": true,
+    "reason": "complete",
+    "depth": 9,
+    "unresolved_boxes": 0,
+    "historical_level": 0.0029041271252872795,
+    "old_strict_enclosure_reconfirmed": true
+  },
+  "rounded_star": {
+    "level": 0.0032252995740991003,
+    "lower_bound": 0.0014725048570871009,
+    "gap": 0.0017527947170119995,
+    "epsilon_tight": false,
+    "reason": "box_limit",
+    "depth": 3,
+    "unresolved_boxes": 173956,
+    "historical_level": 0.0015864356400355339,
+    "old_strict_enclosure_reconfirmed": false
+  },
+  "symmetric_maze": {
+    "historical_level": 0.0006633899038570995,
+    "recomputed_level": 0.0004680063375806656,
+    "old_strict_enclosure_reconfirmed": true,
+    "epsilon": 0.0001,
+    "chord_error": 9.972336151142206e-05
+  }
+}

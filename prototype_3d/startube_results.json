@@ -1,0 +1,26 @@
+{
+ "nominal": {
+  "method": "nominal",
+  "reached": null,
+  "min_gap_mm": -24.111343822462487,
+  "final_ee_err_mm": 24.854076404568204,
+  "inserted_mm": 164.76232187767238,
+  "slack_steps": 0,
+  "min_h_mm": Infinity,
+  "t_med_ms": 0.1975499326363206,
+  "t_max_ms": 8.269499987363815,
+  "rows_max": 0
+ },
+ "ours": {
+  "method": "ours",
+  "reached": null,
+  "min_gap_mm": 8.843479952384016,
+  "final_ee_err_mm": 218.91222607217992,
+  "inserted_mm": 24.018157995865263,
+  "slack_steps": 0,
+  "min_h_mm": -2.9216294617981364e-06,
+  "t_med_ms": 12.63775012921542,
+  "t_max_ms": 18.938800087198615,
+  "rows_max": 3537
+ }
+}

@@ -1,0 +1,31 @@
+{
+  "metadata": {
+    "scene": "rounded star tube",
+    "geometry_sha256": "2c3b6b0976223209eaa5107b2483b72660c616b550fb7e6066f247044bcc252f",
+    "row_mode": "bernstein",
+    "multiplier": "one",
+    "refine_near_m": "inf",
+    "refine_theta": 0.1,
+    "refine_depth": 2,
+    "dt_s": 0.01,
+    "python": "3.13.9",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "threads": 1,
+    "certificate_sha256": "3a8854cc9d89c233a06867d1c53daf94449b64a8541d6f6cd951652afee76706",
+    "obstacle_level_mm": 1.586435640035534
+  },
+  "metrics": {
+    "steps": 600,
+    "reached_s": 3.93,
+    "min_gap_bound_mm": 3.423209264468455,
+    "distance_scope": "evaluated states; existing mesh lower-bound routine",
+    "min_h_mm": 2.371321811342687,
+    "slack_steps": 0,
+    "uncertified_gap_states": 0,
+    "control_change_integral": 1.870488562178498,
+    "t_median_ms": 52.170900045894086,
+    "t_p95_ms": 165.71666490053752,
+    "rows_max": 89424,
+    "boxes_max": 3312
+  }
+}

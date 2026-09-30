@@ -1,0 +1,45 @@
+% Fixed-orientation diagnostic, independently implemented adapted baselines.
+\subsection{Comparison on a Shared Configuration-Space Envelope}
+\label{sec:three-baselines}
+We compare the proposed field with adaptations of the sampling-based nonsmooth
+barrier of Lutkus et al.~\cite{lutkus2025sampling} and the deforming ball-world
+controller of Notomista and Saveriano~\cite{notomista2021nonconvex}.
+To isolate online representation and control costs, all methods receive the same
+smooth conservative configuration-space envelope for a fixed-orientation
+non-convex cross-shaped robot translating past one non-convex cross-shaped
+obstacle. The exact configuration obstacle is a union of four rectangles; a
+periodic radial spline encloses its 20-mm clearance dilation, with a continuous
+containment bound obtained from angular Lipschitz constants.
+This shared-envelope experiment does not compare the methods' complete geometry
+preprocessing pipelines or their performance under rotation.
+
+Our constant-orientation field reduces exactly to a bicubic B-spline, whose
+boundary level, activation band, and regularity are verified offline.
+The sampling baseline uses $N\in\{64,256,1024\}$ boundary samples and a
+covering-radius correction. It enforces all sample constraints that are not
+redundant under the input bound, including all active minimizers, rather than
+selecting one closest feature. The ball-world baseline uses the single-obstacle
+radial diffeomorphism $F(x)=q_c+\rho(x-c)/r(\arg(x-c))$, and controls both
+$q_c$ and $\rho$. Its implementation includes the derivative with respect to
+the changing map parameters and joint rate scaling for the physical speed
+bound. These are independent adaptations, not reproductions of the source
+papers' experimental setups.
+
+Six offset approaches share the nominal controller, a 0.6-m/s input bound,
+gain 5, a 10-ms step, and a 12-s horizon. We evaluate physical-body separation,
+online computation, and input total variation; goal completion and deadlock
+resolution are outside this comparison. A common interval motion bound checks
+the 20-mm clearance along the linearly interpolated translation trajectories,
+with explicit unresolved intervals. Online timings are additionally measured
+at identical physical states to separate query cost from trajectory differences.
+The arithmetic uses double precision without verified rounding bounds.
+
+\input{three_baseline_table}
+
+Table~\ref{tab:three-baselines} shows the sampling resolution--clearance tradeoff.
+The field and the fine-sampling baseline achieve similar minimum physical gaps;
+the comparison reports their measured cost without assuming that smoothness
+alone guarantees lower input variation. The ball-world result measures its
+deforming-map overhead and physical safety in this shared geometry, without
+ranking its progress behavior. These measurements are specific to the present
+implementation and single-obstacle benchmark.

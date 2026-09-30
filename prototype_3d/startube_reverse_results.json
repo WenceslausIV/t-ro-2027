@@ -1,0 +1,31 @@
+{
+ "setup": "setup_20260928_171837.json",
+ "direction": "reverse",
+ "goal": {
+  "p": [
+   -0.1790628811747222,
+   -0.3046289963298003,
+   0.6659741692434407
+  ]
+ },
+ "nominal": {
+  "min_gap_mm": -29.86667294157264,
+  "reached": 3.0300000000000002,
+  "slack_steps": 0,
+  "min_h_mm": Infinity,
+  "rows_max": 0,
+  "t_med_ms": 0.08660019375383854,
+  "t_max_ms": 0.274500111117959,
+  "contact_steps": 47
+ },
+ "ours": {
+  "min_gap_mm": 14.95486193788772,
+  "reached": null,
+  "slack_steps": 0,
+  "min_h_mm": 49.985568942662425,
+  "rows_max": 16778,
+  "t_med_ms": 27.203849982470274,
+  "t_max_ms": 35.93820007517934,
+  "contact_steps": 0
+ }
+}

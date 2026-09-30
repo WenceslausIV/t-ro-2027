@@ -1,0 +1,35 @@
+[
+ {
+  "name": "center, look-ahead 0.6, wall following, no recovery",
+  "look": 0.6,
+  "ok": false,
+  "reached_s": null,
+  "barrier_intervention_steps": 10820,
+  "steps": 12000,
+  "min_physical_gap_m": 0.02989934932397758,
+  "min_h_m": -4.163336342344337e-17,
+  "path_length_m": 9.620340693191814
+ },
+ {
+  "name": "center, look-ahead 0.8, wall following, no recovery",
+  "look": 0.8,
+  "ok": false,
+  "reached_s": null,
+  "barrier_intervention_steps": 11810,
+  "steps": 12000,
+  "min_physical_gap_m": 0.03660885949505302,
+  "min_h_m": -3.066991105526995e-15,
+  "path_length_m": 1.763286130575927
+ },
+ {
+  "name": "center, look-ahead 1.2, wall following, no recovery",
+  "look": 1.2,
+  "ok": false,
+  "reached_s": null,
+  "barrier_intervention_steps": 11869,
+  "steps": 12000,
+  "min_physical_gap_m": 0.03472970507800846,
+  "min_h_m": 6.730727086790012e-16,
+  "path_length_m": 1.4119952637384778
+ }
+]

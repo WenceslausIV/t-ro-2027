@@ -1,0 +1,104 @@
+\section{Surface-Cover Barriers}\label{sec:cover}
+We keep one SDF per body and bound the first-contact condition online; the construction is the same
+for planar and spatial bodies, rigid or articulated. Let body $A$ (e.g., a robot or a link) have the
+certified surface $\mathcal S_A=\{\phi_A=l_A\}$ in its frame, and let body $B$ (e.g., another robot or
+an obstacle) have the field $\phi_B$ and level $l_B$ in its frame, both from
+Proposition~\ref{prop:level}. We write $\mathbf x$ for points of $A$ mapped into $B$'s frame by the
+current relative pose. For planar bodies, the fields are bivariate and the boxes below are squares.
+
+\subsection{Certified Cover of the Continuous Surface}
+On each cell of $\phi_A$, the Bernstein coefficients of $\phi_A-l_A$ follow from~\eqref{eq:b2b}. If
+they all have one strict sign on a box, the box contains no point of $\mathcal S_A$ by the
+convex-hull property. Starting from the cells and halving every box whose coefficients change sign,
+restricted by~\eqref{eq:subdiv}, until its side is at most $s_{\max}$, yields finitely many boxes
+$\{\mathcal Q_k\}$ with centers $\mathbf c_k$ and half-diagonal $r$ whose union contains all of
+$\mathcal S_A$, not a sample of it. The cover is computed once per body.
+
+\subsection{Curvature Majorant and Corner Barriers}
+Cellwise bounds on $\norm{\nabla^2\phi_B}_F$ follow from the Bernstein coefficients of the
+second derivatives. They are piecewise constant, and a barrier that switches between them would be
+discontinuous. We therefore use a $C^2$ majorant: a cubic B-spline $\kappa_B$ on the grid of $\phi_B$
+whose control value with index $m$ is the maximum of the cellwise bounds over cells $m-4,\dots,m+1$
+along each axis. Since cubic B-spline weights are nonnegative and sum to one, $\kappa_B(\mathbf c)$
+bounds the Hessian on every cell adjacent to the cell of $\mathbf c$, and hence on the ball of
+radius $r$ around $\mathbf c$ whenever $r$ does not exceed the cell size.
+
+\begin{proposition}\label{prop:taylor}
+Let a box $\mathcal Q$ of $A$ have center $\mathbf c$, corners $\mathbf v_1,\dots,\mathbf v_{2^n}$, and
+half-diagonal $r$ in $B$'s frame, and define for each corner
+\begin{equation}\label{eq:corner}
+h_{k}=\phi_B(\mathbf c)+\nabla\phi_B(\mathbf c)^{\top}(\mathbf v_k-\mathbf c)
+-\tfrac12\kappa_B(\mathbf c)\,r^2-l_B .
+\end{equation}
+Then $\min_{\mathbf x\in\mathcal Q}\phi_B(\mathbf x)-l_B\ge\min_kh_k$.
+\end{proposition}
+\begin{proof}
+For $\mathbf x\in\mathcal Q$, $\norm{\mathbf x-\mathbf c}\le r$, and Taylor's theorem gives
+$\phi_B(\mathbf x)\ge\phi_B(\mathbf c)+\nabla\phi_B(\mathbf c)^\top(\mathbf x-\mathbf c)
+-\tfrac12\kappa_B(\mathbf c)r^2$. The right-hand side is affine in $\mathbf x$, and the rigidly moved
+box is the convex hull of its corners, so its minimum is attained at a corner.
+\end{proof}
+Each $h_k$ is $C^2$ in the pose because $\phi_B$ and $\kappa_B$ are. The bound is applied only to
+boxes whose ball lies in the domain of $\phi_B$; we choose the domain so that every box meeting
+$\{\phi_B\le l_B\}$ has its ball inside it, so other boxes cannot meet this set. The bound is also
+tight up to the box size:
+\begin{proposition}\label{prop:tight}
+Under the assumptions of Proposition~\ref{prop:taylor},
+$0\le\min_{\mathbf x\in\mathcal Q}\phi_B(\mathbf x)-l_B-\min_kh_k\le\norm{\nabla\phi_B(\mathbf c)}r
++\tfrac12\kappa_B(\mathbf c)r^2$.
+\end{proposition}
+\begin{proof}
+The lower inequality is Proposition~\ref{prop:taylor}. For the upper one, $\mathbf c\in\mathcal Q$
+gives $\min_{\mathcal Q}\phi_B\le\phi_B(\mathbf c)$, and $\norm{\mathbf v_k-\mathbf c}=r$ gives
+$h_k\ge\phi_B(\mathbf c)-\norm{\nabla\phi_B(\mathbf c)}r-\tfrac12\kappa_B(\mathbf c)r^2-l_B$.
+\end{proof}
+With $\norm{\nabla\phi_B}\approx1$, the barriers therefore stop body $A$ at most about
+$l_A+l_B+r+\tfrac12\kappa_Br^2$ from $B$ beyond the fitting error, and this bound vanishes with the
+box size and the certified levels.
+
+\begin{theorem}\label{thm:cover}
+Suppose $\{\phi_A\le l_A\}$ and $\{\phi_B\le l_B\}$ are compact subsets of their domains, the
+bodies are initially disjoint with $\{\phi_A\le l_A\}\cap\{\phi_B<l_B\}=\emptyset$, and along a
+continuous trajectory $h_k\ge0$ for every corner of every box of the cover whose ball lies in the
+domain of $\phi_B$, and every box that meets $\{\phi_B\le l_B\}$ is such a box. Then $\mathcal G_A$
+and $\mathcal G_B$ never intersect.
+\end{theorem}
+\begin{proof}
+By Proposition~\ref{prop:taylor}, $\phi_B\ge l_B$ on $\mathcal S_A$ at all times. For $\epsilon>0$,
+if $\{\phi_A\le l_A\}$ met $\{\phi_B\le l_B-\epsilon\}$, Lemma~\ref{lem:contact} would give a first
+point on both boundaries, where $\phi_A=l_A$ and $\phi_B=l_B-\epsilon$, a contradiction. Hence
+$\{\phi_A\le l_A\}\cap\{\phi_B<l_B\}=\emptyset$ throughout. A first contact of $\mathcal G_A$ and
+$\mathcal G_B$ would lie on $\partial\mathcal G_A\cap\partial\mathcal G_B$
+(Lemma~\ref{lem:contact}), where $\phi_A<l_A$ and $\phi_B<l_B$ by Proposition~\ref{prop:level}.
+\end{proof}
+
+\subsection{Derivatives}
+With $\mathbf g=\nabla\phi_B(\mathbf c)$ and dots denoting velocities in $B$'s frame,
+differentiating~\eqref{eq:corner} gives
+\begin{equation}\label{eq:hdot-cover}
+\dot h_k=\big(\mathbf g+\nabla^2\phi_B(\mathbf c)(\mathbf v_k-\mathbf c)
+-\tfrac{r^2}{2}\nabla\kappa_B(\mathbf c)\big)^{\!\top}\dot{\mathbf c}
++\mathbf g^\top(\dot{\mathbf v}_k-\dot{\mathbf c}),
+\end{equation}
+and the point velocities are linear in the inputs. For planar rigid bodies with $SE(2)$ single
+integrators $\dot{\mathbf p}=\mathbf v$, $\dot\theta=\omega$, a point attached to $A$ at world position
+$\mathbf y$ has, in $B$'s frame, the velocity
+$\Rot(\theta_B)^{\!\top}\big(\mathbf v_A+\omega_AJ(\mathbf y-\mathbf p_A)-\mathbf v_B-\omega_BJ(\mathbf y-\mathbf p_B)\big)$
+with $J=\left[\begin{smallmatrix}0&-1\\1&0\end{smallmatrix}\right]$; for unicycles,
+$\mathbf v=v\,[\cos\theta,\sin\theta]^\top$. For a link $A$ of an articulated robot in front of a
+static body $B$, $\dot{\mathbf c}=J_{\mathbf c}(\mathbf q)\dot{\mathbf q}$ and
+$\dot{\mathbf v}_k=J_{\mathbf v_k}(\mathbf q)\dot{\mathbf q}$, with point Jacobians whose column for
+a revolute joint $j$ before the link is $\mathbf z_j\times(\cdot-\mathbf o_j)$; for two moving arms,
+both Jacobians enter. In every case the rows are affine in the inputs, and no closest point and no
+optimization are involved: online, $\phi_B$, its first two derivatives, and $\kappa_B$ are evaluated
+at box centers.
+
+\emph{Pruning.} Boxes whose certified lower bound exceeds an activation threshold $\eta>0$ need no
+constraint: their corner barriers are at least $\eta$, and by continuity a box re-enters the QP with
+barriers of at least $\eta$ (in discrete time, $\eta$ must exceed the decrease per step). We group the boxes of
+each body into clusters with center $\bar{\mathbf c}$ and radius $R$ (covering the boxes' balls) and
+skip a cluster if $\phi_B(\bar{\mathbf c})-GR-\tfrac12\bar M r^2-l_B\ge\eta$, where $G$ and $\bar M$
+are certified bounds of $\norm{\nabla\phi_B}$ and of $\kappa_B$ on the cells that the cluster and the
+majorants' supports can reach; this implies $h_k\ge\eta$ for all its corners. Remaining boxes are
+pruned individually with $\phi_B(\mathbf c)-\norm{\mathbf g}r-\tfrac12\kappa_B(\mathbf c)r^2-l_B\ge\eta$.
+

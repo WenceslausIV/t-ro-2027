@@ -1,0 +1,8 @@
+{
+  "round": "round1",
+  "state": "failed",
+  "child_pid": 45280,
+  "elapsed_s": 200.7,
+  "exit_code": 1,
+  "updated_utc": "2026-09-30T06:11:26.709670+00:00"
+}

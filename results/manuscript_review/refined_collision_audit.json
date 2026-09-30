@@ -1,0 +1,136 @@
+{
+  "spheres_m0_trial_00_witness": {
+    "source": "spheres_m0_trial_00_witness.npz",
+    "saved_states": 1000,
+    "inconclusive_states": 487,
+    "checked_states": 487,
+    "status": "separated_at_saved_states",
+    "unresolved_states": [],
+    "elapsed_s": 43.118934399914
+  },
+  "spheres_m0_trial_01_witness": {
+    "source": "spheres_m0_trial_01_witness.npz",
+    "saved_states": 437,
+    "inconclusive_states": 2,
+    "checked_states": 2,
+    "status": "separated_at_saved_states",
+    "unresolved_states": [],
+    "elapsed_s": 0.10079309996217489
+  },
+  "spheres_m0_trial_06_witness": {
+    "source": "spheres_m0_trial_06_witness.npz",
+    "saved_states": 1000,
+    "inconclusive_states": 5,
+    "checked_states": 5,
+    "status": "separated_at_saved_states",
+    "unresolved_states": [],
+    "elapsed_s": 0.2630747000221163
+  },
+  "spheres_m0_trial_17_witness": {
+    "source": "spheres_m0_trial_17_witness.npz",
+    "saved_states": 503,
+    "inconclusive_states": 103,
+    "checked_states": 61,
+    "status": "collision_witness",
+    "unresolved_states": [],
+    "state": 165,
+    "link": 8,
+    "obstacle": "arch",
+    "witness": {
+      "status": "collision",
+      "witness": [
+        0.5134223123942053,
+        0.21246961911097953,
+        0.6671126134008484
+      ],
+      "witness_value": -1.3695651279212184e-06,
+      "depth": 3
+    },
+    "elapsed_s": 6.51813429989852
+  },
+  "points_m0_trial_01_witness": {
+    "source": "points_m0_trial_01_witness.npz",
+    "saved_states": 482,
+    "inconclusive_states": 111,
+    "checked_states": 111,
+    "status": "separated_at_saved_states",
+    "unresolved_states": [],
+    "elapsed_s": 10.474071099888533
+  },
+  "points_m0_trial_05_witness": {
+    "source": "points_m0_trial_05_witness.npz",
+    "saved_states": 369,
+    "inconclusive_states": 9,
+    "checked_states": 9,
+    "status": "separated_at_saved_states",
+    "unresolved_states": [],
+    "elapsed_s": 1.005716900108382
+  },
+  "spheres_m0_trial_19_witness": {
+    "source": "spheres_m0_trial_19_witness.npz",
+    "saved_states": 1000,
+    "inconclusive_states": 793,
+    "checked_states": 793,
+    "status": "separated_at_saved_states",
+    "unresolved_states": [],
+    "elapsed_s": 101.71800560015254
+  },
+  "spheres_m0_trial_27_witness": {
+    "source": "spheres_m0_trial_27_witness.npz",
+    "saved_states": 432,
+    "inconclusive_states": 35,
+    "checked_states": 15,
+    "status": "collision_witness",
+    "unresolved_states": [],
+    "state": 249,
+    "link": 6,
+    "obstacle": "rack",
+    "witness": {
+      "status": "collision",
+      "witness": [
+        0.03890588544395663,
+        -0.4777234396616336,
+        0.21972971821196363
+      ],
+      "witness_value": -7.495636306207101e-06,
+      "depth": 1
+    },
+    "elapsed_s": 1.5020562999416143
+  },
+  "points_m0_trial_20_witness": {
+    "source": "points_m0_trial_20_witness.npz",
+    "saved_states": 324,
+    "inconclusive_states": 20,
+    "checked_states": 20,
+    "status": "separated_at_saved_states",
+    "unresolved_states": [],
+    "elapsed_s": 1.8561959001235664
+  },
+  "points_m0_trial_21_witness": {
+    "source": "points_m0_trial_21_witness.npz",
+    "saved_states": 395,
+    "inconclusive_states": 20,
+    "checked_states": 20,
+    "status": "separated_at_saved_states",
+    "unresolved_states": [],
+    "elapsed_s": 1.7484046998433769
+  },
+  "kkt_trial_22_witness": {
+    "source": "kkt_trial_22_witness.npz",
+    "saved_states": 876,
+    "inconclusive_states": 7,
+    "checked_states": 7,
+    "status": "separated_at_saved_states",
+    "unresolved_states": [],
+    "elapsed_s": 0.4598595001734793
+  },
+  "kkt_trial_29_witness": {
+    "source": "kkt_trial_29_witness.npz",
+    "saved_states": 1000,
+    "inconclusive_states": 19,
+    "checked_states": 19,
+    "status": "separated_at_saved_states",
+    "unresolved_states": [],
+    "elapsed_s": 1.696086699841544
+  }
+}

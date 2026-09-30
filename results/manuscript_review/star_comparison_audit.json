@@ -1,0 +1,74 @@
+{
+  "star_bernstein-norm": {
+    "source": "results\\certificate_ablation\\pilot\\star_bernstein-norm.npz",
+    "sha256": "12e8a0019a4f904c69e4af38185ad8da90743ab4effcec18d281f465f955b0cf",
+    "states": 601,
+    "min_bound_mm": 1.0045570456552257,
+    "unresolved_states": 0,
+    "direct_link_checks": 180,
+    "transferred_bounds": 4628,
+    "reuse_threshold_mm": 1.0,
+    "scope": "All saved states including final state; all modeled mesh triangles; no fitted-field pruning; no between-step certificate; double precision.",
+    "elapsed_s": 29.878683699993417
+  },
+  "star_bernstein-one": {
+    "source": "results\\certificate_ablation\\pilot\\star_bernstein-one.npz",
+    "sha256": "7580a65f716a171fa031a37cdd52ea4ceea3f2f0a7addbf9ceba8715300b030a",
+    "states": 601,
+    "min_bound_mm": 1.0042919051094865,
+    "unresolved_states": 0,
+    "direct_link_checks": 181,
+    "transferred_bounds": 4627,
+    "reuse_threshold_mm": 1.0,
+    "scope": "All saved states including final state; all modeled mesh triangles; no fitted-field pruning; no between-step certificate; double precision.",
+    "elapsed_s": 30.707283900119364
+  },
+  "star_bernstein-proj": {
+    "source": "results\\certificate_ablation\\pilot\\star_bernstein-proj.npz",
+    "sha256": "83d04e5d5a908691a671d0fbcf554a8814c421e75b16a44349c4f6af06fc402d",
+    "states": 601,
+    "min_bound_mm": 1.0193610555287864,
+    "unresolved_states": 0,
+    "direct_link_checks": 181,
+    "transferred_bounds": 4627,
+    "reuse_threshold_mm": 1.0,
+    "scope": "All saved states including final state; all modeled mesh triangles; no fitted-field pruning; no between-step certificate; double precision.",
+    "elapsed_s": 30.297382600139827
+  },
+  "star_vertex-norm": {
+    "source": "results\\certificate_ablation\\pilot\\star_vertex-norm.npz",
+    "sha256": "1b0b5137bc54ff70feddcca5d8699cc557437bd05e7eba0ee03f0a6e75c4661a",
+    "states": 601,
+    "min_bound_mm": 1.007844848242387,
+    "unresolved_states": 0,
+    "direct_link_checks": 181,
+    "transferred_bounds": 4627,
+    "reuse_threshold_mm": 1.0,
+    "scope": "All saved states including final state; all modeled mesh triangles; no fitted-field pruning; no between-step certificate; double precision.",
+    "elapsed_s": 30.85311339981854
+  },
+  "star_vertex-one": {
+    "source": "results\\certificate_ablation\\pilot\\star_vertex-one.npz",
+    "sha256": "ad51f13d3fd487f78b7fb4482b8b101c8f0e7a4b39e464a110b94ccfb6270c1e",
+    "states": 601,
+    "min_bound_mm": 1.0021040285065341,
+    "unresolved_states": 0,
+    "direct_link_checks": 182,
+    "transferred_bounds": 4626,
+    "reuse_threshold_mm": 1.0,
+    "scope": "All saved states including final state; all modeled mesh triangles; no fitted-field pruning; no between-step certificate; double precision.",
+    "elapsed_s": 32.377806700067595
+  },
+  "star_vertex-proj": {
+    "source": "results\\certificate_ablation\\pilot\\star_vertex-proj.npz",
+    "sha256": "b52c75c5f7e059540a5411be3f76a13c4b5849e10e96ccb3bb37a7557092e5ec",
+    "states": 601,
+    "min_bound_mm": 1.0031138882464277,
+    "unresolved_states": 0,
+    "direct_link_checks": 181,
+    "transferred_bounds": 4627,
+    "reuse_threshold_mm": 1.0,
+    "scope": "All saved states including final state; all modeled mesh triangles; no fitted-field pruning; no between-step certificate; double precision.",
+    "elapsed_s": 30.754292899975553
+  }
+}

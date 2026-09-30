@@ -1,0 +1,68 @@
+{
+  "dt": 0.01,
+  "dynamics": "si",
+  "recoveries": 0,
+  "min_row_norm_near_boundary": Infinity,
+  "speed_bound": 0.8,
+  "angular_speed_bound": 1.4,
+  "gamma": 5.0,
+  "reached_s": 32.42,
+  "steps": 3242,
+  "min_physical_gap_m": 0.004693562797039099,
+  "verified_interval_gap_lower_m": 0.0005943994489591795,
+  "unresolved_intervals": 0,
+  "collision_intervals": 0,
+  "min_h_m": 0.0027156804907254002,
+  "min_constraint_residual": -7.771561172376096e-16,
+  "slack_steps": 0,
+  "barrier_intervention_steps": 1323,
+  "barriers_max": 504,
+  "controller_median_ms": 1.9058000762015581,
+  "controller_p95_ms": 3.705594828352332,
+  "path_length_m": 23.522832247496478,
+  "final_position_error_m": 0.04953247391606232,
+  "construction": "summed-field barriers",
+  "field": {
+    "wall_cell_mm": 12.5,
+    "robot_cell_mm": 10.0,
+    "wall_cells": [
+      791,
+      791
+    ],
+    "l_wall_mm": 0.6633899038570995,
+    "l_robot_mm": 1.4269655234456624,
+    "wall_chord_bound_mm": 0.09972336151142205,
+    "n_boxes": 383,
+    "side_mm": 5.0,
+    "fit_s": 40.307593300007284,
+    "level_wall_s": 0.4843778999056667,
+    "act_m": 0.05,
+    "frame_m": [
+      [
+        -4.44,
+        -3.34
+      ],
+      [
+        4.44,
+        5.54
+      ]
+    ],
+    "symmetric_ports": true,
+    "straight_port_lengths_m": [
+      1.1399999999999997,
+      1.1399999999999997
+    ]
+  },
+  "robot": {
+    "name": "reference rocket without exhaust",
+    "controls": 64,
+    "fitting_offset_m": 0.004,
+    "enclosure_ok": true,
+    "physical_radius_m": 0.30000000000000004,
+    "fitted_radius_m": 0.3013419443196287,
+    "length_m": 0.5440761221943746,
+    "width_m": 0.2981251172619176
+  },
+  "wall_count": 2,
+  "gap_definition": "Polygon distance minus the certified chord bound of the wall cubics."
+}

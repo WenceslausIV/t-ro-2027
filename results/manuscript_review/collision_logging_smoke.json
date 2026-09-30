@@ -1,0 +1,42 @@
+{
+  "nominal": {
+    "lower_bounds": [
+      0.04733436687470454,
+      0.04733436687470454
+    ],
+    "witness_values": [
+      Infinity,
+      Infinity
+    ]
+  },
+  "spheres": {
+    "lower_bounds": [
+      0.04733436687470454,
+      0.04733436687470454
+    ],
+    "witness_values": [
+      Infinity,
+      Infinity
+    ]
+  },
+  "points": {
+    "lower_bounds": [
+      0.04733436687470454,
+      0.04733436687470454
+    ],
+    "witness_values": [
+      Infinity,
+      Infinity
+    ]
+  },
+  "kkt": {
+    "lower_bounds": [
+      0.04733436687470454,
+      0.04733436687470454
+    ],
+    "witness_values": [
+      Infinity,
+      Infinity
+    ]
+  }
+}

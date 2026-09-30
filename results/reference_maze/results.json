@@ -1,0 +1,76 @@
+{
+  "dt": 0.01,
+  "speed_bound": 0.8,
+  "angular_speed_bound": 1.4,
+  "gamma": 5.0,
+  "reached_s": 40.44,
+  "steps": 4044,
+  "min_physical_gap_m": 0.03974584409827998,
+  "verified_interval_gap_lower_m": 0.035057428069372815,
+  "unresolved_intervals": 0,
+  "collision_intervals": 0,
+  "min_h_m": 0.011798077984195868,
+  "min_constraint_residual": -1.1102230246251565e-16,
+  "slack_steps": 0,
+  "barrier_intervention_steps": 100,
+  "controller_median_ms": 0.38000004133209586,
+  "controller_p95_ms": 0.4534699604846537,
+  "path_length_m": 30.364619199830614,
+  "final_position_error_m": 0.012899218932041363,
+  "field": {
+    "signature": "c65d5a7b041b08abcb1b14f2d545927ee25870ba483c9cd072e72c109a08c3c5",
+    "level": 0.038021772731720506,
+    "fit_s": 17.234647699980997,
+    "contact_s": 15.07297139998991,
+    "contact_ok": true,
+    "band_ok": true,
+    "band_min": 0.4031360704413355,
+    "regular_ok": true,
+    "regular_depth": 7,
+    "regular_open_boxes": 0,
+    "regions": 10474958,
+    "cells": [
+      160,
+      160,
+      48
+    ],
+    "coefficients": 1275312,
+    "wall_chord_error_m": 9.991678976212909e-05
+  },
+  "robot_scale": 0.55,
+  "planner_margin": 0.02,
+  "wall_count": 2,
+  "wall_fits": [
+    {
+      "controls": 4405,
+      "spans": 4402,
+      "offset_m": 0.001,
+      "enclosure_ok": true,
+      "hull_separation_lower_m": 5.9410380037671555e-08,
+      "boundary_distance_upper_m": 0.0014639344790989728,
+      "sampled_boundary_distance_max_m": 0.001114341339035607,
+      "sampled_boundary_distance_median_m": 0.001000000000000334,
+      "basis": "nonuniform periodic cubic B-spline"
+    },
+    {
+      "controls": 4176,
+      "spans": 4173,
+      "offset_m": 0.001,
+      "enclosure_ok": true,
+      "hull_separation_lower_m": 4.1457076704239375e-08,
+      "boundary_distance_upper_m": 0.0014664495875889925,
+      "sampled_boundary_distance_max_m": 0.0011165327978268635,
+      "sampled_boundary_distance_median_m": 0.0009999999999999998,
+      "basis": "nonuniform periodic cubic B-spline"
+    }
+  ],
+  "source_sha256": {
+    "reference_maze_escape.py": "5e2504e6e967fe9c16c6086fa7266671bac51360db1c128e3722987f7330abae",
+    "maze_reference_geometry.py": "557bfd3ad904eeec3d1f36ff129b034837ae9bdb2eb11e09b6e7139e747ef095",
+    "maze_escape.py": "40555e78fab442dc7331cdce8127e9970bbbef9a04032c6ada248677b97c9880"
+  },
+  "navigation": "Offline A* in the inflated maze supplies nominal waypoints; CBF filters controls.",
+  "geometry": "Traced cubic physical walls enclosed by separately fitted periodic cubic B-splines.",
+  "gap_definition": "Polygon distance minus the uniform wall-curve chord deviation bound.",
+  "verification": "Float64 certificates and interval rigid-motion audit; no outward rounding."
+}

@@ -1,0 +1,279 @@
+{
+  "protocol": {
+    "seed": 20260926,
+    "dt_s": 0.01,
+    "horizon_s": 12.0,
+    "trials": 1,
+    "speed_limit_m_per_s": 0.6,
+    "gamma": 5.0,
+    "clearance_m": 0.02,
+    "world_radius_m": 4.2,
+    "robot_rectangles_half_extents": [
+      [
+        0.26,
+        0.09
+      ],
+      [
+        0.09,
+        0.26
+      ]
+    ],
+    "obstacle_rectangles_half_extents": [
+      [
+        0.5,
+        0.14
+      ],
+      [
+        0.14,
+        0.5
+      ]
+    ],
+    "centers": [
+      [
+        0.0,
+        0.0
+      ]
+    ],
+    "deadlock_metrics": false,
+    "scope": "shared C-space envelope, fixed-orientation nonconvex translating body",
+    "timings": "CPU wall-clock: complete online controller including QP/mapping; excludes validation",
+    "sampling_margin": "covering-radius correction in distance units, squared in barrier",
+    "ball_adaptation": "F_theta theta_dot correction and joint time scaling for speed polygon"
+  },
+  "environment": {
+    "python": "3.13.9",
+    "numpy": "2.2.6",
+    "scipy": "1.16.3",
+    "torch": "2.7.1+cu118",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "processor": "AMD64 Family 23 Model 113 Stepping 0, AuthenticAMD"
+  },
+  "shared_geometry": {
+    "knots": 128,
+    "radial_padding_m": 0.01873423368706971,
+    "lipschitz_exact": 2.6836,
+    "lipschitz_spline": 2.276697312690559,
+    "verification_nodes": 32768,
+    "requested_clearance_m": 0.02,
+    "preprocessing_s": 0.04237849998753518
+  },
+  "field": {
+    "fit_s": 0.41582110000308603,
+    "contact_cert_s": 3.54991699999664,
+    "total_preparation_s": 4.197325600078329,
+    "level_m": 0.005080534574053038,
+    "tolerance_m": 0.001,
+    "band_min_m": 0.5452867226917921,
+    "regularity": true,
+    "regularity_depth": 0,
+    "regions": 1456,
+    "runtime_storage_bytes": 7372800,
+    "coefficient_bytes": 127008,
+    "angular_axis": "constant; fixed-orientation translation benchmark",
+    "arithmetic": "float64; exact-arithmetic bounds, no outward rounding"
+  },
+  "checks": {
+    "radial_enclosure_check_min_m": 0.0004259043136921603,
+    "map_jacobian_max_error": 8.043032906357439e-11
+  },
+  "runs": {
+    "Ours": [
+      {
+        "collision": false,
+        "clearance_unresolved_intervals": 0,
+        "sampled_clearance_violation": false,
+        "verified_distance_lower_bound_m": 0.043508388452878466,
+        "sampled_min_distance_m": 0.043705748999286476,
+        "control_median_ms": 0.35305,
+        "control_p95_ms": 0.5277649999999999,
+        "input_tv_m_per_s": 0.5962468440350206,
+        "max_speed_m_per_s": 0.5795554957734412,
+        "path_length_m": 2.14715379344094,
+        "min_barrier_raw": -8.332221078898028e-08,
+        "max_rows": 2,
+        "start": [
+          -2.8,
+          0.16879335835583253
+        ],
+        "goal": [
+          2.8,
+          -0.16879335835583253
+        ]
+      }
+    ],
+    "Sampling-64": [
+      {
+        "collision": false,
+        "clearance_unresolved_intervals": 0,
+        "sampled_clearance_violation": false,
+        "verified_distance_lower_bound_m": 0.15117622047785662,
+        "sampled_min_distance_m": 0.15117622047785662,
+        "control_median_ms": 0.1842,
+        "control_p95_ms": 0.29522499999999996,
+        "input_tv_m_per_s": 0.591069014286248,
+        "max_speed_m_per_s": 0.5795554957734412,
+        "path_length_m": 1.8941727512965787,
+        "min_barrier_raw": 2.220446049250313e-16,
+        "max_rows": 7,
+        "start": [
+          -2.8,
+          0.16879335835583253
+        ],
+        "goal": [
+          2.8,
+          -0.16879335835583253
+        ]
+      }
+    ],
+    "Sampling-128": [
+      {
+        "collision": false,
+        "clearance_unresolved_intervals": 0,
+        "sampled_clearance_violation": false,
+        "verified_distance_lower_bound_m": 0.09490530606044434,
+        "sampled_min_distance_m": 0.09490530606044434,
+        "control_median_ms": 0.2002,
+        "control_p95_ms": 0.353815,
+        "input_tv_m_per_s": 0.5811105517838034,
+        "max_speed_m_per_s": 0.5795554957734412,
+        "path_length_m": 1.9483859534653207,
+        "min_barrier_raw": 1.235990476633475e-16,
+        "max_rows": 13,
+        "start": [
+          -2.8,
+          0.16879335835583253
+        ],
+        "goal": [
+          2.8,
+          -0.16879335835583253
+        ]
+      }
+    ],
+    "Sampling-256": [
+      {
+        "collision": false,
+        "clearance_unresolved_intervals": 0,
+        "sampled_clearance_violation": false,
+        "verified_distance_lower_bound_m": 0.06683225676647409,
+        "sampled_min_distance_m": 0.06683225676647409,
+        "control_median_ms": 0.17124999999999999,
+        "control_p95_ms": 0.2946649999999997,
+        "input_tv_m_per_s": 0.5809023727469368,
+        "max_speed_m_per_s": 0.5795554957734412,
+        "path_length_m": 1.9768445104816406,
+        "min_barrier_raw": 6.223320470066795e-17,
+        "max_rows": 25,
+        "start": [
+          -2.8,
+          0.16879335835583253
+        ],
+        "goal": [
+          2.8,
+          -0.16879335835583253
+        ]
+      }
+    ],
+    "Ball-world": [
+      {
+        "collision": false,
+        "clearance_unresolved_intervals": 0,
+        "sampled_clearance_violation": false,
+        "verified_distance_lower_bound_m": 0.03869103962469786,
+        "sampled_min_distance_m": 0.0387146839282031,
+        "control_median_ms": 0.24375,
+        "control_p95_ms": 0.4442699999999996,
+        "input_tv_m_per_s": 0.5819347423337495,
+        "max_speed_m_per_s": 0.5795554957734412,
+        "path_length_m": 2.0053078758493204,
+        "min_barrier_raw": -1.0408340855860843e-17,
+        "max_rows": 2,
+        "start": [
+          -2.8,
+          0.16879335835583253
+        ],
+        "goal": [
+          2.8,
+          -0.16879335835583253
+        ],
+        "min_jacobian_determinant": 0.015617702182997942,
+        "max_jacobian_condition": 1.0630129209766028,
+        "min_rate_scale": 1.0
+      }
+    ]
+  },
+  "summary": {
+    "Ours": {
+      "control_median_ms": 0.35305,
+      "control_p95_ms": 0.5277649999999999,
+      "min_distance_mm": 43.70574899928648,
+      "verified_lower_bound_mm": 43.508388452878464,
+      "input_tv_mean": 0.5962468440350206,
+      "collisions": 0,
+      "clearance_unresolved": 0
+    },
+    "Sampling-64": {
+      "control_median_ms": 0.1842,
+      "control_p95_ms": 0.29522499999999996,
+      "min_distance_mm": 151.17622047785662,
+      "verified_lower_bound_mm": 151.17622047785662,
+      "input_tv_mean": 0.591069014286248,
+      "collisions": 0,
+      "clearance_unresolved": 0
+    },
+    "Sampling-128": {
+      "control_median_ms": 0.2002,
+      "control_p95_ms": 0.353815,
+      "min_distance_mm": 94.90530606044433,
+      "verified_lower_bound_mm": 94.90530606044433,
+      "input_tv_mean": 0.5811105517838034,
+      "collisions": 0,
+      "clearance_unresolved": 0
+    },
+    "Sampling-256": {
+      "control_median_ms": 0.17124999999999999,
+      "control_p95_ms": 0.2946649999999997,
+      "min_distance_mm": 66.83225676647409,
+      "verified_lower_bound_mm": 66.83225676647409,
+      "input_tv_mean": 0.5809023727469368,
+      "collisions": 0,
+      "clearance_unresolved": 0
+    },
+    "Ball-world": {
+      "control_median_ms": 0.24375,
+      "control_p95_ms": 0.4442699999999996,
+      "min_distance_mm": 38.7146839282031,
+      "verified_lower_bound_mm": 38.69103962469786,
+      "input_tv_mean": 0.5819347423337495,
+      "collisions": 0,
+      "clearance_unresolved": 0
+    }
+  },
+  "source_sha256": "37ed9247c0c99bc230801a34faa5504c3abb347d9ab4ced6cbb6c14d11393d8f",
+  "sources": [
+    "https://arxiv.org/abs/2504.09038",
+    "https://arxiv.org/abs/2106.06330"
+  ],
+  "sampling": {
+    "Sampling-64": {
+      "samples_per_obstacle": 64,
+      "covering_radius_m": 0.11916457762548369,
+      "preprocessing_s": 0.00040040002204477787,
+      "coordinate_storage_bytes": 1024,
+      "note": "KD-tree internal memory excluded; all distance ties enforced"
+    },
+    "Sampling-128": {
+      "samples_per_obstacle": 128,
+      "covering_radius_m": 0.05958228881274184,
+      "preprocessing_s": 0.0001151000615209341,
+      "coordinate_storage_bytes": 2048,
+      "note": "KD-tree internal memory excluded; all distance ties enforced"
+    },
+    "Sampling-256": {
+      "samples_per_obstacle": 256,
+      "covering_radius_m": 0.02979114440637092,
+      "preprocessing_s": 0.00015059998258948326,
+      "coordinate_storage_bytes": 4096,
+      "note": "KD-tree internal memory excluded; all distance ties enforced"
+    }
+  }
+}

@@ -1,0 +1,125 @@
+{
+  "dt_s": 0.01,
+  "horizon_s": 12.0,
+  "patch_side_m": 0.04,
+  "training_spacing_m": 0.005,
+  "levels_mm": [
+    1.8537744987366598,
+    2.83437733111315
+  ],
+  "patch_counts": [
+    650,
+    690
+  ],
+  "starts": [
+    [
+      -1.5,
+      0.0,
+      0.2
+    ],
+    [
+      0.18,
+      -1.45,
+      1.1
+    ]
+  ],
+  "goals": [
+    [
+      1.5,
+      0.15,
+      -0.7
+    ],
+    [
+      -0.15,
+      1.5,
+      2.4
+    ]
+  ],
+  "refinement_depth": 0,
+  "row_mode": "vertex",
+  "multiplier": "one",
+  "activation_m": 0.05,
+  "timing_note": "One CPU thread; background activity not excluded. Fixed 12-s horizon, filter only; excludes geometry audit and drawing.",
+  "audit_note": "Exact polygon geometry: vertex-to-edge distances plus containment and edge-crossing tests at all states; motion bounds with recursive bisection for linear pose interpolation, double precision (no outward rounding).",
+  "trials": {
+    "patch": {
+      "cover_boxes": 87,
+      "cover_side_mm": 40.0,
+      "goal_time_s": null,
+      "collision_states": 0,
+      "min_saved_gap_mm": 21.403003756879315,
+      "interpolated_gap_lower_bound_mm": 14.984338583267652,
+      "unresolved_intervals": 0,
+      "slack_steps": 0,
+      "max_slack": 0.0,
+      "max_rows": 32,
+      "max_active_boxes": 8,
+      "active_steps": 1102,
+      "filter_median_ms": 1.8078000284731388,
+      "filter_p95_ms": 2.557780034840107,
+      "active_filter_median_ms": 1.85445009265095,
+      "active_filter_p95_ms": 2.5658399797976017,
+      "input_modification": 15.745648275071344,
+      "path_lengths_m": [
+        2.3323297420687963,
+        2.356042457083355
+      ],
+      "final_position_errors_m": [
+        1.4962809094912453,
+        1.44520171567366
+      ]
+    },
+    "fine": {
+      "cover_boxes": 718,
+      "cover_side_mm": 5.0,
+      "goal_time_s": null,
+      "collision_states": 0,
+      "min_saved_gap_mm": 4.515818253943513,
+      "interpolated_gap_lower_bound_mm": 0.07182674634266008,
+      "unresolved_intervals": 0,
+      "slack_steps": 0,
+      "max_slack": 0.0,
+      "max_rows": 628,
+      "max_active_boxes": 157,
+      "active_steps": 1102,
+      "filter_median_ms": 3.306449973024428,
+      "filter_p95_ms": 4.67891989974305,
+      "active_filter_median_ms": 3.389050019904971,
+      "active_filter_p95_ms": 4.695980018004775,
+      "input_modification": 15.194625153493062,
+      "path_lengths_m": [
+        2.2287797526619126,
+        2.561375024760499
+      ],
+      "final_position_errors_m": [
+        1.4151493551051013,
+        1.2208008600958353
+      ]
+    },
+    "unfiltered": {
+      "goal_time_s": 4.14,
+      "collision_states": 117,
+      "min_saved_gap_mm": 0.0,
+      "interpolated_gap_lower_bound_mm": 0.0,
+      "unresolved_intervals": 0,
+      "slack_steps": 0,
+      "max_slack": 0.0,
+      "max_rows": 0,
+      "max_active_boxes": 0,
+      "active_steps": 0,
+      "filter_median_ms": 0.1559500815346837,
+      "filter_p95_ms": 0.22032493725419042,
+      "active_filter_median_ms": null,
+      "active_filter_p95_ms": null,
+      "input_modification": 0.1046097383072333,
+      "path_lengths_m": [
+        3.003750593200155,
+        2.9684115359332495
+      ],
+      "final_position_errors_m": [
+        3.4184637861170893e-07,
+        3.1757364800879745e-07
+      ]
+    }
+  }
+}

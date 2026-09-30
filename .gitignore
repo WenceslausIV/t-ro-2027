@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+
+# Local Claude Code settings
+.claude/
+
+# Rendered animations (regenerable; several are > 50 MB)
+*.gif
+
+# Over GitHub's 100 MB file limit (compiled C-space field of the removed tabulated method)
+cache/dock_craft_T.npz
+
+# LaTeX build outputs
+tro/build*/
+*.aux
+*.blg
+*.bbl
+*.log
+*.out
+*.synctex.gz

@@ -1,0 +1,14 @@
+{
+  "trajectory": "prototype_3d\\startube_setup_ours.npz",
+  "states": 1501,
+  "scope": "all saved states, all modeled link mesh triangles; not inter-step motion",
+  "triangle_max_edge_mm": 4.0,
+  "min_bound_mm": 1.0001274252500352,
+  "unresolved_states": 0,
+  "uses_fitted_field_pruning": false,
+  "direct_link_checks": 193,
+  "rigid_motion_transfers": 11815,
+  "reuse_margin_mm": 1.0,
+  "audit_source_sha256": "99a0bb5b91bc15926605b35cc29737b913da927704942af7ba7f2497f57b0aed",
+  "trajectory_sha256": "d307f085bcbefa2c24214f4653a4ac7303fd4a11af2da33e7a97c35ee0364e7d"
+}

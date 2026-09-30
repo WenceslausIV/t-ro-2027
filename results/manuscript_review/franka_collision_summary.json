@@ -1,0 +1,171 @@
+{
+  "scope": "Historical evaluated saved states only; no between-step or final unlogged-state claim.",
+  "collision_definition": "Negative attained primitive-SDF minimum at a mesh point; large negative lower bounds imply such a centroid witness using the maximum triangle radius.",
+  "separation_definition": "Positive whole-triangle bounds, with adaptive subdivision when the coarse bound is inconclusive.",
+  "arithmetic": "Double precision, without outward rounding.",
+  "nominal_collision_trials": 30,
+  "methods": {
+    "spheres_m0": {
+      "counts": {
+        "collision": 13,
+        "separated": 17,
+        "unresolved": 0
+      },
+      "trials": {
+        "collision": [
+          5,
+          8,
+          10,
+          12,
+          16,
+          17,
+          21,
+          22,
+          23,
+          24,
+          25,
+          27,
+          29
+        ],
+        "separated": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          6,
+          7,
+          9,
+          11,
+          13,
+          14,
+          15,
+          18,
+          19,
+          20,
+          26,
+          28
+        ],
+        "unresolved": []
+      }
+    },
+    "points_m0": {
+      "counts": {
+        "collision": 15,
+        "separated": 15,
+        "unresolved": 0
+      },
+      "trials": {
+        "collision": [
+          0,
+          3,
+          6,
+          8,
+          10,
+          12,
+          15,
+          16,
+          17,
+          19,
+          22,
+          24,
+          25,
+          27,
+          29
+        ],
+        "separated": [
+          1,
+          2,
+          4,
+          5,
+          7,
+          9,
+          11,
+          13,
+          14,
+          18,
+          20,
+          21,
+          23,
+          26,
+          28
+        ],
+        "unresolved": []
+      }
+    },
+    "kkt": {
+      "counts": {
+        "collision": 5,
+        "separated": 25,
+        "unresolved": 0
+      },
+      "trials": {
+        "collision": [
+          3,
+          8,
+          12,
+          17,
+          24
+        ],
+        "separated": [
+          0,
+          1,
+          2,
+          4,
+          5,
+          6,
+          7,
+          9,
+          10,
+          11,
+          13,
+          14,
+          15,
+          16,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          25,
+          26,
+          27,
+          28,
+          29
+        ],
+        "unresolved": []
+      }
+    },
+    "spheres_margin_1cm": {
+      "counts": {
+        "collision": 0,
+        "separated": 30,
+        "unresolved": 0
+      },
+      "minimum_saved_state_lower_bound_mm": 0.939424495435679
+    },
+    "points_margin_1cm": {
+      "counts": {
+        "collision": 0,
+        "separated": 30,
+        "unresolved": 0
+      },
+      "minimum_saved_state_lower_bound_mm": 1.4383715297349988
+    },
+    "ours_subdivided": {
+      "counts": {
+        "collision": 0,
+        "separated": 30,
+        "unresolved": 0
+      },
+      "minimum_saved_state_lower_bound_mm": 1.1164773052543433
+    }
+  },
+  "sources": {
+    "results\\manuscript_review\\check_collision_witnesses.json": "8ca9b3bcd3449207aca7ec9920085544ab6afcceae6835f3c179442545af8eee",
+    "results\\manuscript_review\\refined_collision_audit.json": "24975f72aa09273ccce2105ff9954545e87f7e9f22934cb4547b4058b7d0485f",
+    "prototype_3d\\franka_baselines.json": "f8d6c56f47d96abbc0ce71128ba2d2db9ed6720cba5ee868ccf16eb08a1fcc13",
+    "prototype_3d\\franka_results.json": "e03b32b6169badda87347f74f69a99e0a1889b23dd8a328431632a112f2869a6"
+  }
+}

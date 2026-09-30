@@ -1,0 +1,112 @@
+{
+  "arch": {
+    "status": "verified",
+    "level": 0.00199348794002533,
+    "minimum_discard_margin": 6.839747739104812e-09,
+    "history": [
+      {
+        "depth": 0,
+        "side": 0.008,
+        "evaluated": 17596,
+        "remaining": 17596
+      },
+      {
+        "depth": 1,
+        "side": 0.004,
+        "evaluated": 75784,
+        "remaining": 65646
+      },
+      {
+        "depth": 2,
+        "side": 0.002,
+        "evaluated": 266824,
+        "remaining": 149832
+      },
+      {
+        "depth": 3,
+        "side": 0.001,
+        "evaluated": 600388,
+        "remaining": 123646
+      },
+      {
+        "depth": 4,
+        "side": 0.0005,
+        "evaluated": 447636,
+        "remaining": 12316
+      },
+      {
+        "depth": 5,
+        "side": 0.00025,
+        "evaluated": 45744,
+        "remaining": 11088
+      },
+      {
+        "depth": 6,
+        "side": 0.000125,
+        "evaluated": 39632,
+        "remaining": 8606
+      },
+      {
+        "depth": 7,
+        "side": 6.25e-05,
+        "evaluated": 32576,
+        "remaining": 0
+      }
+    ]
+  },
+  "rounded_star": {
+    "status": "verified",
+    "level": 0.0015864356400355339,
+    "minimum_discard_margin": 3.4500729304692834e-09,
+    "history": [
+      {
+        "depth": 0,
+        "side": 0.008,
+        "evaluated": 10423,
+        "remaining": 10423
+      },
+      {
+        "depth": 1,
+        "side": 0.004,
+        "evaluated": 41443,
+        "remaining": 41379
+      },
+      {
+        "depth": 2,
+        "side": 0.002,
+        "evaluated": 168266,
+        "remaining": 116747
+      },
+      {
+        "depth": 3,
+        "side": 0.001,
+        "evaluated": 555998,
+        "remaining": 150671
+      },
+      {
+        "depth": 4,
+        "side": 0.0005,
+        "evaluated": 364621,
+        "remaining": 26320
+      },
+      {
+        "depth": 5,
+        "side": 0.00025,
+        "evaluated": 81458,
+        "remaining": 9659
+      },
+      {
+        "depth": 6,
+        "side": 0.000125,
+        "evaluated": 22700,
+        "remaining": 1069
+      },
+      {
+        "depth": 7,
+        "side": 6.25e-05,
+        "evaluated": 4956,
+        "remaining": 162
+      }
+    ]
+  }
+}

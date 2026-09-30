@@ -1,0 +1,35 @@
+{
+ "setup": "setup_20260928_171837.json",
+ "direction": "setup",
+ "goal": {
+  "p": [
+   0.4208963665571152,
+   -7.358463382908875e-17,
+   0.48164122183547603
+  ]
+ },
+ "nominal": {
+  "min_gap_mm": -30.611189138823974,
+  "reached": 2.84,
+  "slack_steps": 0,
+  "min_h_mm": Infinity,
+  "rows_max": 0,
+  "boxes_max": 0,
+  "t_p95_ms": 0.2838250598870217,
+  "t_med_ms": 0.08829985745251179,
+  "t_max_ms": 3.808500012382865,
+  "contact_steps": 1015
+ },
+ "ours": {
+  "min_gap_mm": 2.983116262998976,
+  "reached": 4.08,
+  "slack_steps": 0,
+  "min_h_mm": 0.0002181365792022757,
+  "rows_max": 148743,
+  "boxes_max": 5509,
+  "t_p95_ms": 288.9249398722313,
+  "t_med_ms": 210.15119994990528,
+  "t_max_ms": 677.2121998947114,
+  "contact_steps": 0
+ }
+}

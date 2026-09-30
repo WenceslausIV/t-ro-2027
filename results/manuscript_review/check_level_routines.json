@@ -1,0 +1,74 @@
+{
+  "polygon": 0.00021,
+  "mesh": 0.00021,
+  "implicit_sphere": 0.00011,
+  "abutting_union_conservative_cap": {
+    "level": 1.1500000000000002e-05,
+    "lower_bound": -0.00012152378258992454,
+    "gap": 0.00013302378258992455,
+    "epsilon_tight": false,
+    "reason": "depth_limit",
+    "depth": 2,
+    "unresolved_boxes": 1792
+  },
+  "sphere_conservative_box_cap": {
+    "level": 0.0004700711316671531,
+    "lower_bound": 0.0001,
+    "gap": 0.0003700711316671531,
+    "epsilon_tight": false,
+    "reason": "box_limit",
+    "depth": 0,
+    "unresolved_boxes": 50
+  },
+  "cubic_arch": 0.010009990463256836,
+  "historical_link_level_rechecks": [
+    {
+      "link": 1,
+      "saved_level": 0.002532891996581976,
+      "recomputed_level": 0.002532891996581976,
+      "difference": 0.0
+    },
+    {
+      "link": 2,
+      "saved_level": 0.002370212598136773,
+      "recomputed_level": 0.002370212598136773,
+      "difference": 0.0
+    },
+    {
+      "link": 3,
+      "saved_level": 0.0032477881154558755,
+      "recomputed_level": 0.0032477881154558755,
+      "difference": 0.0
+    },
+    {
+      "link": 4,
+      "saved_level": 0.0024111409407245868,
+      "recomputed_level": 0.0024111409407245868,
+      "difference": 0.0
+    },
+    {
+      "link": 5,
+      "saved_level": 0.0020644309587589294,
+      "recomputed_level": 0.0020644309587589294,
+      "difference": 0.0
+    },
+    {
+      "link": 6,
+      "saved_level": 0.002812682602471172,
+      "recomputed_level": 0.002812682602471172,
+      "difference": 0.0
+    },
+    {
+      "link": 7,
+      "saved_level": 0.0037891433302819615,
+      "recomputed_level": 0.0037891433302819615,
+      "difference": 0.0
+    },
+    {
+      "link": 8,
+      "saved_level": 0.0017561842508497453,
+      "recomputed_level": 0.0017561842508497453,
+      "difference": 0.0
+    }
+  ]
+}

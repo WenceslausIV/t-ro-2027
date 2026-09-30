@@ -1,0 +1,17 @@
+{
+  "trials": 30,
+  "reached": 6,
+  "trials_needing_slack": 2,
+  "slack_steps": 1497,
+  "trials_with_negative_distance_bound": 0,
+  "min_gap_bound_mm": 15.327212670076344,
+  "median_min_gap_bound_mm": 26.547159880070403,
+  "filter_median_ms": 10.5350500671193,
+  "filter_p95_ms": 16.677124914713204,
+  "max_rows": 2064,
+  "max_active_boxes": 258,
+  "cover_boxes": 6847,
+  "distance_cap_mm": 45.0,
+  "maximum_triangle_radius_mm": 2.6656331252954653,
+  "note": "Saved-state mesh bounds, including final states; no between-step guarantee. One thread per process; trials ran in concurrent batches with other background activity. Timings are exploratory, not isolated speed comparisons."
+}

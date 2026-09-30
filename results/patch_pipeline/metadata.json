@@ -1,0 +1,51 @@
+{
+  "shape_seed": 3,
+  "shape_index": 3,
+  "sdf_cell_m": 0.04,
+  "training_spacing_m": 0.005,
+  "certified_level_m": 0.001986568671067786,
+  "native_cover_count": 86,
+  "cover_side_m": 0.04,
+  "render_grid": [
+    501,
+    501
+  ],
+  "subdivision": false,
+  "contour_spacing_m": 0.04,
+  "contour_levels_m": [
+    -0.2,
+    -0.16,
+    -0.12,
+    -0.08,
+    -0.04,
+    0.04,
+    0.08,
+    0.12,
+    0.16,
+    0.2,
+    0.24,
+    0.28,
+    0.32,
+    0.36,
+    0.4,
+    0.44,
+    0.48,
+    0.52,
+    0.56
+  ],
+  "domain_lo_m": [
+    -0.5717998026119853,
+    -0.6081460482032132
+  ],
+  "domain_hi_m": [
+    0.6282001973880147,
+    0.5918539517967868
+  ],
+  "zoom_center_m": [
+    -0.09955575902634302,
+    -0.13259582172501486
+  ],
+  "zoom_width_m": 0.048,
+  "ground_truth": "Exact signed point-to-segment polygon distance",
+  "note": "Display grid only renders the field; cover selection uses Bernstein coefficients. Panel d is the sufficient vertex certificate, with epigraph constraints understood."
+}

@@ -1,0 +1,20 @@
+{
+  "signature": "ac337e46dcb96d0a400a71359576e326282fe4b9085be4d1d66a500969328932",
+  "level": 0.03866322219136422,
+  "fit_s": 26.55782200000249,
+  "contact_s": 61.858631799928844,
+  "contact_ok": true,
+  "band_ok": true,
+  "band_min": 0.36966445309905716,
+  "regular_ok": true,
+  "regular_depth": 1,
+  "regular_open_boxes": 0,
+  "regions": 32459338,
+  "cells": [
+    160,
+    160,
+    48
+  ],
+  "coefficients": 1275312,
+  "wall_chord_error_m": 9.284487402739508e-05
+}

@@ -1,0 +1,42 @@
+{
+  "metadata": {
+    "scene": "dock",
+    "geometry_sha256": "1bf159f020226c65a7c0c0394a6d4bf3293709d833592de8f84df9ccc53f8c75",
+    "row_mode": "vertex",
+    "multiplier": "norm",
+    "refine_near_m": "inf",
+    "refine_theta": 0.1,
+    "refine_depth": 2,
+    "dt_s": 0.01,
+    "python": "3.13.9",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "threads": 1,
+    "certificate_sha256": "3a8854cc9d89c233a06867d1c53daf94449b64a8541d6f6cd951652afee76706"
+  },
+  "metrics": {
+    "steps": 900,
+    "reached_s": null,
+    "min_gap_bound_mm": 1.6568767170591636,
+    "distance_scope": "polygon intervals and states",
+    "min_h_mm": -0.024226462939431096,
+    "slack_steps": 0,
+    "uncertified_gap_states": 0,
+    "control_change_integral": 0.6554169948297701,
+    "t_median_ms": 8.601299952715635,
+    "t_p95_ms": 11.202695069368927,
+    "rows_max": 1672,
+    "boxes_max": 418,
+    "final_pose": [
+      [
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.651658179455006,
+        0.0023767004383484862,
+        3.141675348728228
+      ]
+    ]
+  }
+}

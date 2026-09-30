@@ -1,0 +1,41 @@
+[
+ {
+  "look": 0.8,
+  "wall_follow": 0.0,
+  "ok": false,
+  "level": 0.03866322219136422,
+  "reached_s": null,
+  "barrier_intervention_steps": 10623,
+  "steps": 12000,
+  "min_physical_gap_m": 0.029731660532422842,
+  "verified_interval_gap_lower_m": 0.029386902824387065,
+  "min_h_m": -4.871365948122541e-08,
+  "path_length_m": 11.001717107749887
+ },
+ {
+  "look": 1.0,
+  "wall_follow": 0.15,
+  "ok": false,
+  "level": 0.03866322219136422,
+  "reached_s": null,
+  "barrier_intervention_steps": 10626,
+  "steps": 12000,
+  "min_physical_gap_m": 0.015343646990912027,
+  "verified_interval_gap_lower_m": 0.015343646990911883,
+  "min_h_m": -1.790234627208065e-15,
+  "path_length_m": 10.95548196140426
+ },
+ {
+  "look": 1.5,
+  "wall_follow": 0.15,
+  "ok": false,
+  "level": 0.03866322219136422,
+  "reached_s": null,
+  "barrier_intervention_steps": 11831,
+  "steps": 12000,
+  "min_physical_gap_m": 0.02615988920458771,
+  "verified_interval_gap_lower_m": 0.026159889204587405,
+  "min_h_m": -4.385380947269368e-15,
+  "path_length_m": 1.6416133641741781
+ }
+]

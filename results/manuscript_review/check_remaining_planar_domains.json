@@ -1,0 +1,18 @@
+{
+  "rocket": {
+    "radius_m": 0.003535533905932738,
+    "collar_width_m": 0.007071067811865476,
+    "whole_cell_collar_width_m": 0.01,
+    "bernstein_lower_above_level_m": 0.048428833438158306,
+    "positive": true,
+    "level": 0.0014269655234456623
+  },
+  "fig1_square": {
+    "radius_m": 0.028284271247461905,
+    "collar_width_m": 0.05656854249492381,
+    "whole_cell_collar_width_m": 0.08,
+    "bernstein_lower_above_level_m": 0.023029992596285832,
+    "positive": true,
+    "level": 0.001986568671067786
+  }
+}

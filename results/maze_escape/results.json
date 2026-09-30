@@ -1,0 +1,220 @@
+{
+  "dt": 0.01,
+  "speed_bound": 0.8,
+  "angular_speed_bound": 1.4,
+  "gamma": 5.0,
+  "reached_s": 30.07,
+  "steps": 3007,
+  "min_physical_gap_m": 0.037657581331764334,
+  "verified_interval_gap_lower_m": 0.033458671598587515,
+  "unresolved_intervals": 0,
+  "collision_intervals": 0,
+  "min_h_m": 0.0004357968188854547,
+  "min_constraint_residual": -4.787836793695988e-16,
+  "slack_steps": 0,
+  "barrier_intervention_steps": 266,
+  "controller_median_ms": 0.5551999201998115,
+  "controller_p95_ms": 0.8662799606099724,
+  "path_length_m": 21.350882633252454,
+  "final_position_error_m": 0.049437890692312476,
+  "wall_count": 8,
+  "capsule_beam_count": 12,
+  "walls": [
+    {
+      "name": "bottom",
+      "beams": [
+        [
+          [
+            -4.1,
+            -4.9
+          ],
+          [
+            4.15,
+            -4.9
+          ],
+          0.22
+        ]
+      ]
+    },
+    {
+      "name": "top",
+      "beams": [
+        [
+          [
+            -4.2,
+            4.9
+          ],
+          [
+            3.85,
+            4.9
+          ],
+          0.26
+        ]
+      ]
+    },
+    {
+      "name": "left",
+      "beams": [
+        [
+          [
+            -5.05,
+            -4.2
+          ],
+          [
+            -5.05,
+            4.05
+          ],
+          0.23
+        ]
+      ]
+    },
+    {
+      "name": "right",
+      "beams": [
+        [
+          [
+            5.0,
+            -4.1
+          ],
+          [
+            5.0,
+            2.2
+          ],
+          0.3
+        ]
+      ]
+    },
+    {
+      "name": "long_cross",
+      "beams": [
+        [
+          [
+            -4.0,
+            -1.5
+          ],
+          [
+            0.5,
+            -1.5
+          ],
+          0.24
+        ],
+        [
+          [
+            -2.0,
+            -3.2
+          ],
+          [
+            -2.0,
+            0.3
+          ],
+          0.25
+        ]
+      ]
+    },
+    {
+      "name": "left_facing_T",
+      "beams": [
+        [
+          [
+            3.25,
+            -3.5
+          ],
+          [
+            3.25,
+            -0.15
+          ],
+          0.2
+        ],
+        [
+          [
+            1.7,
+            -2.7
+          ],
+          [
+            3.25,
+            -2.7
+          ],
+          0.22
+        ]
+      ]
+    },
+    {
+      "name": "downward_T",
+      "beams": [
+        [
+          [
+            -0.2,
+            2.5
+          ],
+          [
+            3.7,
+            2.5
+          ],
+          0.29
+        ],
+        [
+          [
+            1.8,
+            0.8
+          ],
+          [
+            1.8,
+            2.5
+          ],
+          0.27
+        ]
+      ]
+    },
+    {
+      "name": "upward_T",
+      "beams": [
+        [
+          [
+            -4.25,
+            1.5
+          ],
+          [
+            -2.7,
+            1.5
+          ],
+          0.2
+        ],
+        [
+          [
+            -3.6,
+            1.5
+          ],
+          [
+            -3.6,
+            3.55
+          ],
+          0.23
+        ]
+      ]
+    }
+  ],
+  "min_wall_separation_m": 0.36999999999999983,
+  "field": {
+    "signature": "c9fb46c9fd341c1533e2c3272c471b3cd5367038d6ba552b174cf04508f6f4c5",
+    "fit_s": 146.0661628000671,
+    "contact_s": 28.794442199985497,
+    "level": 0.04888745704994891,
+    "contact_ok": true,
+    "band_ok": true,
+    "band_min": 0.255170066615374,
+    "regular_ok": true,
+    "regular_depth": 7,
+    "regular_open_boxes": 0,
+    "regions": 7159928,
+    "cells": [
+      160,
+      160,
+      48
+    ],
+    "coefficients": 1275312
+  },
+  "source_sha256": "144e5a012922531c33a97fca3f787a23fbc1480aa42e1cf04b6c597f70a124c1",
+  "navigation": "Prescribed waypoint sequence; CBF is the safety filter, not a route planner.",
+  "geometry": "Eight disconnected walls: unions of exact capsules, with cubic enclosing beam boundaries. Cached robot GT polygon.",
+  "verification": "Float64 contact/band/regularity checks and interval Lipschitz clearance audit; no outward rounding."
+}

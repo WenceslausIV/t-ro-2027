@@ -1,0 +1,8 @@
+{
+  "level": 0.2,
+  "analytic_boundary_upper": 0.10050506338833459,
+  "diagnostic_sample_max": 0.0050506338833468,
+  "center_value": 1.0,
+  "sublevel_radius_upper": 1.0954451150103321,
+  "conclusion": "Strict boundary inclusion does not imply solid enclosure, even for a C2 cubic spline with a compact sublevel set."
+}

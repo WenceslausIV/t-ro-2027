@@ -1,0 +1,565 @@
+{
+  "max_triangle_radius_mm": 2.6656331252954653,
+  "methods": {
+    "spheres_m0": [
+      {
+        "trial": 0,
+        "historical_lower_bound_mm": -1.5748101209424112,
+        "status": "unresolved",
+        "replay_lower_bound_mm": -1.5748101209424112,
+        "bound_difference_mm": 0.0,
+        "minimum_centroid_sdf_mm": 0.4085300429245379,
+        "reached": null,
+        "slack_steps": 0,
+        "elapsed_s": 78.62694610003382
+      },
+      {
+        "trial": 1,
+        "historical_lower_bound_mm": -0.19820139863603006,
+        "status": "unresolved",
+        "replay_lower_bound_mm": -0.19820139863603006,
+        "bound_difference_mm": 0.0,
+        "minimum_centroid_sdf_mm": 1.2167942213940006,
+        "reached": 4.37,
+        "slack_steps": 0,
+        "elapsed_s": 24.72433779994026
+      },
+      {
+        "trial": 2,
+        "historical_lower_bound_mm": 8.239065212327782,
+        "status": "positive_historical_saved_state_bound"
+      },
+      {
+        "trial": 3,
+        "historical_lower_bound_mm": 1.202425034318873,
+        "status": "positive_historical_saved_state_bound"
+      },
+      {
+        "trial": 4,
+        "historical_lower_bound_mm": 17.929581589008862,
+        "status": "positive_historical_saved_state_bound"
+      },
+      {
+        "trial": 5,
+        "historical_lower_bound_mm": -2.8517226871362746,
+        "status": "collision_implied_by_centroid",
+        "witness_sdf_upper_mm": -0.18608956184080938
+      },
+      {
+        "trial": 6,
+        "historical_lower_bound_mm": -0.19672467138594998,
+        "status": "unresolved",
+        "replay_lower_bound_mm": -0.19672467138594998,
+        "bound_difference_mm": 0.0,
+        "minimum_centroid_sdf_mm": 2.011797584646655,
+        "reached": null,
+        "slack_steps": 0,
+        "elapsed_s": 141.22032539988868
+      },
+      {
+        "trial": 7,
+        "historical_lower_bound_mm": 3.892754840711098,
+        "status": "positive_historical_saved_state_bound"
+      },
+      {
+        "trial": 8,
+        "historical_lower_bound_mm": -5.892699585239133,
+        "status": "collision_implied_by_centroid",
+        "witness_sdf_upper_mm": -3.227066459943668
+      },
+      {
+        "trial": 9,
+        "historical_lower_bound_mm": 11.086183067500247,
+        "status": "positive_historical_saved_state_bound"
+      },
+      {
+        "trial": 10,
+        "historical_lower_bound_mm": -5.115873940637099,
+        "status": "collision_implied_by_centroid",
+        "witness_sdf_upper_mm": -2.450240815341634
+      },
+      {
+        "trial": 11,
+        "historical_lower_bound_mm": 2.9647666691918233,
+        "status": "positive_historical_saved_state_bound"
+      },
+      {
+        "trial": 12,
+        "historical_lower_bound_mm": -10.217865464654269,
+        "status": "collision_implied_by_centroid",
+        "witness_sdf_upper_mm": -7.552232339358803
+      },
+      {
+        "trial": 13,
+        "historical_lower_bound_mm": 2.9699100952962807,
+        "status": "positive_historical_saved_state_bound"
+      },
+      {
+        "trial": 14,
+        "historical_lower_bound_mm": 9.410914221912417,
+        "status": "positive_historical_saved_state_bound"
+      },
+      {
+        "trial": 15,
+        "historical_lower_bound_mm": 4.624963763350038,
+        "status": "positive_historical_saved_state_bound"
+      },
+      {
+        "trial": 16,
+        "historical_lower_bound_mm": -6.843835822454947,
+        "status": "collision_implied_by_centroid",
+        "witness_sdf_upper_mm": -4.178202697159482
+      },
+      {
+        "trial": 17,
+        "historical_lower_bound_mm": -1.906217769715295,
+        "status": "collision_witness",
+        "replay_lower_bound_mm": -1.906217769715295,
+        "bound_difference_mm": 0.0,
+        "minimum_centroid_sdf_mm": -0.023571300913490315,
+        "reached": 5.03,
+        "slack_steps": 0,
+        "elapsed_s": 31.338885700097308
+      },
+      {
+        "trial": 18,
+        "historical_lower_bound_mm": 2.6841783930857113,
+        "status": "positive_historical_saved_state_bound"
+      },
+      {
+        "trial": 19,
+        "historical_lower_bound_mm": -0.924702532016307,
+        "status": "unresolved",
+        "replay_lower_bound_mm": -0.924702532016307,
+        "bound_difference_mm": 0.0,
+        "minimum_centroid_sdf_mm": 0.7237068395628994,
+        "reached": null,
+        "slack_steps": 0,
+        "elapsed_s": 196.7974150001537
+      },
+      {
+        "trial": 20,
+        "historical_lower_bound_mm": 3.0840686463670846,
+        "status": "positive_historical_saved_state_bound"
+      },
+      {
+        "trial": 21,
+        "historical_lower_bound_mm": -3.861342466887156,
+        "status": "collision_implied_by_centroid",
+        "witness_sdf_upper_mm": -1.1957093415916908
+      },
+      {
+        "trial": 22,
+        "historical_lower_bound_mm": -4.12189368105324,
+        "status": "collision_implied_by_centroid",
+        "witness_sdf_upper_mm": -1.4562605557577744
+      },
+      {
+        "trial": 23,
+        "historical_lower_bound_mm": -2.9947294046896147,
+        "status": "collision_implied_by_centroid",
+        "witness_sdf_upper_mm": -0.3290962793941494
+      },
+      {
+        "trial": 24,
+        "historical_lower_bound_mm": -5.678282843139193,
+        "status": "collision_implied_by_centroid",
+        "witness_sdf_upper_mm": -3.012649717843728
+      },
+      {
+        "trial": 25,
+        "historical_lower_bound_mm": -8.066866243715207,
+        "status": "collision_implied_by_centroid",
+        "witness_sdf_upper_mm": -5.401233118419742
+      },
+      {
+        "trial": 26,
+        "historical_lower_bound_mm": 5.540847016704371,
+        "status": "positive_historical_saved_state_bound"
+      },
+      {
+        "trial": 27,
+        "historical_lower_bound_mm": -2.0862591556996377,
+        "status": "collision_witness",
+        "replay_lower_bound_mm": -2.0862591556996377,
+        "bound_difference_mm": 0.0,
+        "minimum_centroid_sdf_mm": -0.08394976610367338,
+        "reached": 4.32,
+        "slack_steps": 0,
+        "elapsed_s": 18.91750260000117
+      },
+      {
+        "trial": 28,
+        "historical_lower_bound_mm": 8.656562023159823,
+        "status": "positive_historical_saved_state_bound"
+      },
+      {
+        "trial": 29,
+        "historical_lower_bound_mm": -4.834655775713863,
+        "status": "collision_implied_by_centroid",
+        "witness_sdf_upper_mm": -2.1690226504183974
+      }
+    ],
+    "points_m0": [
+      {
+        "trial": 0,
+        "historical_lower_bound_mm": -6.288143598425893,
+        "status": "collision_implied_by_centroid",
+        "witness_sdf_upper_mm": -3.6225104731304274
+      },
+      {
+        "trial": 1,
+        "historical_lower_bound_mm": -1.84816787111403,
+        "status": "unresolved",
+        "replay_lower_bound_mm": -1.84816787111403,
+        "bound_difference_mm": 0.0,
+        "minimum_centroid_sdf_mm": 0.3005987555414307,
+        "reached": 4.82,
+        "slack_steps": 0,
+        "elapsed_s": 24.028364000143483
+      },
+      {
+        "trial": 2,
+        "historical_lower_bound_mm": 7.156677860391991,
+        "status": "positive_historical_saved_state_bound"
+      },
+      {
+        "trial": 3,
+        "historical_lower_bound_mm": -7.132377115495067,
+        "status": "collision_implied_by_centroid",
+        "witness_sdf_upper_mm": -4.4667439901996016
+      },
+      {
+        "trial": 4,
+        "historical_lower_bound_mm": 21.92097642580147,
+        "status": "positive_historical_saved_state_bound"
+      },
+      {
+        "trial": 5,
+        "historical_lower_bound_mm": -0.9432826750220337,
+        "status": "unresolved",
+        "replay_lower_bound_mm": -0.9432826750220337,
+        "bound_difference_mm": 0.0,
+        "minimum_centroid_sdf_mm": 1.3696048812969623,
+        "reached": 3.69,
+        "slack_steps": 0,
+        "elapsed_s": 23.229837199905887
+      },
+      {
+        "trial": 6,
+        "historical_lower_bound_mm": -7.005893720414496,
+        "status": "collision_implied_by_centroid",
+        "witness_sdf_upper_mm": -4.340260595119031
+      },
+      {
+        "trial": 7,
+        "historical_lower_bound_mm": 5.175679036579218,
+        "status": "positive_historical_saved_state_bound"
+      },
+      {
+        "trial": 8,
+        "historical_lower_bound_mm": -5.668953473470706,
+        "status": "collision_implied_by_centroid",
+        "witness_sdf_upper_mm": -3.003320348175241
+      },
+      {
+        "trial": 9,
+        "historical_lower_bound_mm": 13.74848184691833,
+        "status": "positive_historical_saved_state_bound"
+      },
+      {
+        "trial": 10,
+        "historical_lower_bound_mm": -10.667469226404823,
+        "status": "collision_implied_by_centroid",
+        "witness_sdf_upper_mm": -8.001836101109358
+      },
+      {
+        "trial": 11,
+        "historical_lower_bound_mm": 9.038433651563494,
+        "status": "positive_historical_saved_state_bound"
+      },
+      {
+        "trial": 12,
+        "historical_lower_bound_mm": -5.8197494220419355,
+        "status": "collision_implied_by_centroid",
+        "witness_sdf_upper_mm": -3.15411629674647
+      },
+      {
+        "trial": 13,
+        "historical_lower_bound_mm": 5.92089053769792,
+        "status": "positive_historical_saved_state_bound"
+      },
+      {
+        "trial": 14,
+        "historical_lower_bound_mm": 7.031908950763952,
+        "status": "positive_historical_saved_state_bound"
+      },
+      {
+        "trial": 15,
+        "historical_lower_bound_mm": -13.355516818669237,
+        "status": "collision_implied_by_centroid",
+        "witness_sdf_upper_mm": -10.689883693373773
+      },
+      {
+        "trial": 16,
+        "historical_lower_bound_mm": -6.189519756686393,
+        "status": "collision_implied_by_centroid",
+        "witness_sdf_upper_mm": -3.523886631390928
+      },
+      {
+        "trial": 17,
+        "historical_lower_bound_mm": -10.540573687354984,
+        "status": "collision_implied_by_centroid",
+        "witness_sdf_upper_mm": -7.8749405620595185
+      },
+      {
+        "trial": 18,
+        "historical_lower_bound_mm": 4.525682873812527,
+        "status": "positive_historical_saved_state_bound"
+      },
+      {
+        "trial": 19,
+        "historical_lower_bound_mm": -6.408488240770536,
+        "status": "collision_implied_by_centroid",
+        "witness_sdf_upper_mm": -3.742855115475071
+      },
+      {
+        "trial": 20,
+        "historical_lower_bound_mm": -1.0867691952226075,
+        "status": "unresolved",
+        "replay_lower_bound_mm": -1.0867691952226075,
+        "bound_difference_mm": 0.0,
+        "minimum_centroid_sdf_mm": 0.7514717044514816,
+        "reached": 3.24,
+        "slack_steps": 0,
+        "elapsed_s": 18.670067300088704
+      },
+      {
+        "trial": 21,
+        "historical_lower_bound_mm": -1.044493753048601,
+        "status": "unresolved",
+        "replay_lower_bound_mm": -1.044493753048601,
+        "bound_difference_mm": 0.0,
+        "minimum_centroid_sdf_mm": 1.011456517059273,
+        "reached": 3.95,
+        "slack_steps": 0,
+        "elapsed_s": 20.75184960011393
+      },
+      {
+        "trial": 22,
+        "historical_lower_bound_mm": -3.1058242422767908,
+        "status": "collision_implied_by_centroid",
+        "witness_sdf_upper_mm": -0.4401911169813255
+      },
+      {
+        "trial": 23,
+        "historical_lower_bound_mm": 0.09538188133080507,
+        "status": "positive_historical_saved_state_bound"
+      },
+      {
+        "trial": 24,
+        "historical_lower_bound_mm": -5.413049571815142,
+        "status": "collision_implied_by_centroid",
+        "witness_sdf_upper_mm": -2.7474164465196766
+      },
+      {
+        "trial": 25,
+        "historical_lower_bound_mm": -7.00635413391985,
+        "status": "collision_implied_by_centroid",
+        "witness_sdf_upper_mm": -4.340721008624385
+      },
+      {
+        "trial": 26,
+        "historical_lower_bound_mm": 2.4897602183855465,
+        "status": "positive_historical_saved_state_bound"
+      },
+      {
+        "trial": 27,
+        "historical_lower_bound_mm": -3.7475304764854065,
+        "status": "collision_implied_by_centroid",
+        "witness_sdf_upper_mm": -1.0818973511899412
+      },
+      {
+        "trial": 28,
+        "historical_lower_bound_mm": 10.457414407442386,
+        "status": "positive_historical_saved_state_bound"
+      },
+      {
+        "trial": 29,
+        "historical_lower_bound_mm": -4.138863264955178,
+        "status": "collision_implied_by_centroid",
+        "witness_sdf_upper_mm": -1.4732301396597132
+      }
+    ],
+    "kkt": [
+      {
+        "trial": 0,
+        "historical_lower_bound_mm": 1.960605433214746,
+        "status": "positive_historical_saved_state_bound"
+      },
+      {
+        "trial": 1,
+        "historical_lower_bound_mm": 1.049359262006307,
+        "status": "positive_historical_saved_state_bound"
+      },
+      {
+        "trial": 2,
+        "historical_lower_bound_mm": 47.51591446407323,
+        "status": "positive_historical_saved_state_bound"
+      },
+      {
+        "trial": 3,
+        "historical_lower_bound_mm": -41.85368902125545,
+        "status": "collision_implied_by_centroid",
+        "witness_sdf_upper_mm": -39.188055895959984
+      },
+      {
+        "trial": 4,
+        "historical_lower_bound_mm": 60.153393429213736,
+        "status": "positive_historical_saved_state_bound"
+      },
+      {
+        "trial": 5,
+        "historical_lower_bound_mm": 2.5741463470434467,
+        "status": "positive_historical_saved_state_bound"
+      },
+      {
+        "trial": 6,
+        "historical_lower_bound_mm": 2.437954502209606,
+        "status": "positive_historical_saved_state_bound"
+      },
+      {
+        "trial": 7,
+        "historical_lower_bound_mm": 5.2913687108236305,
+        "status": "positive_historical_saved_state_bound"
+      },
+      {
+        "trial": 8,
+        "historical_lower_bound_mm": -9.735134005640168,
+        "status": "collision_implied_by_centroid",
+        "witness_sdf_upper_mm": -7.069500880344703
+      },
+      {
+        "trial": 9,
+        "historical_lower_bound_mm": 14.96257130562031,
+        "status": "positive_historical_saved_state_bound"
+      },
+      {
+        "trial": 10,
+        "historical_lower_bound_mm": 0.553521907636832,
+        "status": "positive_historical_saved_state_bound"
+      },
+      {
+        "trial": 11,
+        "historical_lower_bound_mm": 5.565623162466395,
+        "status": "positive_historical_saved_state_bound"
+      },
+      {
+        "trial": 12,
+        "historical_lower_bound_mm": -24.6035316750608,
+        "status": "collision_implied_by_centroid",
+        "witness_sdf_upper_mm": -21.937898549765336
+      },
+      {
+        "trial": 13,
+        "historical_lower_bound_mm": 7.337907618381033,
+        "status": "positive_historical_saved_state_bound"
+      },
+      {
+        "trial": 14,
+        "historical_lower_bound_mm": 32.280471784963254,
+        "status": "positive_historical_saved_state_bound"
+      },
+      {
+        "trial": 15,
+        "historical_lower_bound_mm": 3.869572383437262,
+        "status": "positive_historical_saved_state_bound"
+      },
+      {
+        "trial": 16,
+        "historical_lower_bound_mm": 1.3739126178643721,
+        "status": "positive_historical_saved_state_bound"
+      },
+      {
+        "trial": 17,
+        "historical_lower_bound_mm": -32.17362295917174,
+        "status": "collision_implied_by_centroid",
+        "witness_sdf_upper_mm": -29.507989833876273
+      },
+      {
+        "trial": 18,
+        "historical_lower_bound_mm": 5.452070885725716,
+        "status": "positive_historical_saved_state_bound"
+      },
+      {
+        "trial": 19,
+        "historical_lower_bound_mm": 1.8239544277971549,
+        "status": "positive_historical_saved_state_bound"
+      },
+      {
+        "trial": 20,
+        "historical_lower_bound_mm": 5.220997500332659,
+        "status": "positive_historical_saved_state_bound"
+      },
+      {
+        "trial": 21,
+        "historical_lower_bound_mm": 1.487393887968551,
+        "status": "positive_historical_saved_state_bound"
+      },
+      {
+        "trial": 22,
+        "historical_lower_bound_mm": -0.07059708529324853,
+        "status": "unresolved",
+        "replay_lower_bound_mm": -0.07059708529324853,
+        "bound_difference_mm": 0.0,
+        "minimum_centroid_sdf_mm": 2.1648460323194265,
+        "reached": 8.76,
+        "slack_steps": 0,
+        "elapsed_s": 203.726706400048
+      },
+      {
+        "trial": 23,
+        "historical_lower_bound_mm": 2.335088384793418,
+        "status": "positive_historical_saved_state_bound"
+      },
+      {
+        "trial": 24,
+        "historical_lower_bound_mm": -22.383555042741826,
+        "status": "collision_implied_by_centroid",
+        "witness_sdf_upper_mm": -19.71792191744636
+      },
+      {
+        "trial": 25,
+        "historical_lower_bound_mm": 1.860610801409011,
+        "status": "positive_historical_saved_state_bound"
+      },
+      {
+        "trial": 26,
+        "historical_lower_bound_mm": 5.697490940329922,
+        "status": "positive_historical_saved_state_bound"
+      },
+      {
+        "trial": 27,
+        "historical_lower_bound_mm": 20.310146128601613,
+        "status": "positive_historical_saved_state_bound"
+      },
+      {
+        "trial": 28,
+        "historical_lower_bound_mm": 10.439128536825825,
+        "status": "positive_historical_saved_state_bound"
+      },
+      {
+        "trial": 29,
+        "historical_lower_bound_mm": -1.2981810687160031,
+        "status": "unresolved",
+        "replay_lower_bound_mm": -1.2981810687160031,
+        "bound_difference_mm": 0.0,
+        "minimum_centroid_sdf_mm": 0.6208455022487323,
+        "reached": null,
+        "slack_steps": 0,
+        "elapsed_s": 118.76814669999294
+      }
+    ]
+  },
+  "nominal_collisions_implied_by_centroid_witness": 30
+}

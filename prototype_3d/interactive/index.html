@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>SDF Safety Filter Sandbox</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root { --bg:#f4f5f7; --panel:#ffffff; --ink:#1d2330; --muted:#667085; --accent:#1f6feb; --on:#0f9d58; --warn:#d93025; --line:#d0d5dd; }
+  html, body { margin:0; height:100%; background:var(--bg); color:var(--ink); font:13px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; overflow:hidden; }
+  #view { position:absolute; inset:0; }
+  #panel { position:absolute; top:12px; left:12px; width:250px; background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:12px; box-shadow:0 4px 18px rgba(0,0,0,.08); }
+  #panel h1 { font-size:14px; margin:0 0 8px; }
+  .row { display:flex; flex-wrap:wrap; gap:6px; margin:6px 0; }
+  button { flex:1 1 45%; padding:7px 8px; border:1px solid var(--line); background:#fff; border-radius:7px; cursor:pointer; font:inherit; color:var(--ink); }
+  button:hover { border-color:var(--accent); }
+  button.on { background:var(--accent); color:#fff; border-color:var(--accent); }
+  #metrics { margin-top:8px; font-variant-numeric:tabular-nums; color:var(--muted); white-space:pre; font-size:12px; }
+  #metrics b { color:var(--ink); font-weight:600; }
+  .hint { color:var(--muted); font-size:11.5px; margin-top:8px; }
+  .legend span { display:inline-block; width:10px; height:10px; border-radius:2px; margin-right:4px; vertical-align:-1px; }
+  #err { position:absolute; bottom:12px; left:12px; color:var(--warn); font-weight:600; }
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<div id="view"></div>
+<div id="panel">
+  <h1>SDF safety filter sandbox</h1>
+  <div class="row">
+    <button id="b-move">Move</button>
+    <button id="b-goal">Goal to EE</button>
+  </div>
+  <div class="row">
+    <button id="b-obj">Add object</button>
+    <button id="b-star">Add star tube</button>
+  </div>
+  <div class="row">
+    <button id="b-clear">Remove objects</button>
+    <button id="b-save">Save setup</button>
+  </div>
+  <div class="row">
+    <button id="b-dual">Dual arm</button>
+    <button id="b-play">Play arm 2</button>
+  </div>
+  <div class="row">
+    <button id="b-gt">Hide GT</button>
+    <button id="b-sdf">Hide SDF</button>
+  </div>
+  <div class="row">
+    <button id="b-mode">Gizmo: translate</button>
+    <button id="b-reset">Reset</button>
+  </div>
+  <div id="metrics">connecting…</div>
+  <div class="hint legend">
+    <span style="background:#9aa0a6"></span>ground truth &nbsp;
+    <span style="background:#ff8a1f"></span>arm-1 SDF &nbsp;
+    <span style="background:#8e6bd8"></span>arm-2 SDF &nbsp;
+    <span style="background:#2f7fd1"></span>object SDF<br>
+    Click an object to attach the gizmo; click empty space for the goal. Keys: T translate, R rotate.
+  </div>
+</div>
+<div id="err"></div>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { TransformControls } from 'three/addons/controls/TransformControls.js';
+
+const view = document.getElementById('view');
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.25));  // cap: transparent shells are fill-rate heavy
+renderer.setSize(innerWidth, innerHeight);
+view.appendChild(renderer.domElement);
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xf4f5f7);
+THREE.Object3D.DEFAULT_UP.set(0, 0, 1);
+const camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, 0.01, 50);
+camera.up.set(0, 0, 1);
+camera.position.set(1.8, -1.6, 1.3);
+const orbit = new OrbitControls(camera, renderer.domElement);
+orbit.target.set(0.35, 0, 0.4);
+orbit.update();
+scene.add(new THREE.HemisphereLight(0xffffff, 0x8a8f99, 1.1));
+const sun = new THREE.DirectionalLight(0xffffff, 1.4); sun.position.set(2, -3, 4); scene.add(sun);
+const grid = new THREE.GridHelper(3, 30, 0xb8bec8, 0xd8dce3); grid.rotation.x = Math.PI / 2; scene.add(grid);
+
+// Lambert shading: per-vertex lighting, much cheaper per pixel than the physically based material
+const matGT = () => new THREE.MeshLambertMaterial({ color: 0x9aa0a6, side: THREE.DoubleSide });
+const matSDF = (c) => new THREE.MeshLambertMaterial({ color: c, transparent: true, opacity: .3, depthWrite: false, side: THREE.FrontSide });
+function b64(s, T) {             // base64 -> typed array (float32 vertices / uint32 faces)
+  const bin = atob(s), u8 = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+  return new T(u8.buffer);
+}
+function geom(m) {
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(b64(m.v64, Float32Array), 3));
+  g.setIndex(new THREE.BufferAttribute(b64(m.f64, Uint32Array), 1));
+  g.computeVertexNormals(); return g;
+}
+function setMatrix(obj, T) {       // T: 4x4 row-major nested list
+  obj.matrix.set(T[0][0],T[0][1],T[0][2],T[0][3], T[1][0],T[1][1],T[1][2],T[1][3],
+                 T[2][0],T[2][1],T[2][2],T[2][3], 0,0,0,1);
+  obj.matrixWorldNeedsUpdate = true;
+}
+// smooth display: snapshots carry the simulation time; the browser keeps a short buffer and renders the arms
+// ~70 ms in the past, interpolating linearly in time between the two snapshots around that instant
+// (position lerp, rotation slerp), so the motion keeps a constant speed however irregularly packets arrive
+const _m = new THREE.Matrix4(), _s = new THREE.Vector3();
+function decompose(T) {
+  _m.set(T[0][0],T[0][1],T[0][2],T[0][3], T[1][0],T[1][1],T[1][2],T[1][3], T[2][0],T[2][1],T[2][2],T[2][3], 0,0,0,1);
+  const p = new THREE.Vector3(), q = new THREE.Quaternion(); _m.decompose(p, q, _s); return [p, q];
+}
+const DELAY = 0.07;          // s
+const snaps = [];            // {t, a1: [[p,q]...], a2: [[p,q]...] | null}
+let offset = null;           // estimate of (browser clock - simulation clock)
+function pushSnapshot(s) {
+  if (s.t === undefined) return;
+  if (snaps.length && s.t <= snaps[snaps.length - 1].t) return;
+  const now = performance.now() / 1000, o = now - s.t;
+  offset = (offset === null || Math.abs(o - offset) > .5) ? o : offset + .05 * (o - offset);
+  snaps.push({ t: s.t, a1: s.arm1.map(decompose), a2: s.arm2 ? s.arm2.map(decompose) : null });
+  while (snaps.length > 60) snaps.shift();
+}
+const _p = new THREE.Vector3(), _q = new THREE.Quaternion();
+function interpolate() {
+  if (!snaps.length) return;
+  const tr = performance.now() / 1000 - offset - DELAY;
+  let i = snaps.length - 1;
+  while (i > 0 && snaps[i].t > tr) i--;
+  const A = snaps[i], B = snaps[Math.min(i + 1, snaps.length - 1)];
+  const u = B.t > A.t ? Math.min(Math.max((tr - A.t) / (B.t - A.t), 0), 1) : 0;
+  for (const [k, key] of [[0, 'a1'], [1, 'a2']]) {
+    if (!A[key] || !B[key]) continue;
+    arm[k].forEach((l, j) => {
+      l.grp.position.copy(_p.copy(A[key][j][0]).lerp(B[key][j][0], u));
+      l.grp.quaternion.copy(_q.copy(A[key][j][1]).slerp(B[key][j][1], u));
+    });
+  }
+}
+
+let G = null, showGT = true, showSDF = true;
+const arm = [[], []], gtMeshes = [], sdfMeshes = [], objects = new Map();
+const base2 = new THREE.Group();
+
+function makeArm(k, color) {
+  const bm = new THREE.Mesh(geom(G.base), matGT()); gtMeshes.push(bm);
+  if (k === 0) scene.add(bm); else { base2.matrixAutoUpdate = false; setMatrix(base2, G.base2); base2.add(bm); scene.add(base2); }
+  for (const L of G.links) {
+    const grp = new THREE.Group();
+    const gt = new THREE.Mesh(geom(L.gt), matGT()); const sd = new THREE.Mesh(geom(L.sdf), matSDF(color));
+    sd.renderOrder = 2; grp.add(gt); grp.add(sd); gtMeshes.push(gt); sdfMeshes.push(sd);
+    scene.add(grp); arm[k].push({ grp, gt });
+  }
+}
+function applyVisibility() {
+  gtMeshes.forEach(m => m.visible = showGT); sdfMeshes.forEach(m => m.visible = showSDF);
+}
+
+// end-effector goal marker
+const goal = new THREE.Group();
+goal.add(new THREE.Mesh(new THREE.SphereGeometry(.022, 24, 16), new THREE.MeshStandardMaterial({ color: 0xe8453c })));
+goal.add(new THREE.AxesHelper(.09));
+scene.add(goal);
+const gizmo = new TransformControls(camera, renderer.domElement);
+gizmo.setSize(.8);
+gizmo.addEventListener('dragging-changed', e => { orbit.enabled = !e.value; dragging = e.value; });
+scene.add(gizmo);
+let dragging = false, goalInit = false;
+gizmo.attach(goal);
+
+function objectGroup(o) {
+  const grp = new THREE.Group();
+  const gt = new THREE.Mesh(geom(G.objects[o.type].gt), matGT()); const sd = new THREE.Mesh(geom(G.objects[o.type].sdf), matSDF(0x2f7fd1));
+  sd.renderOrder = 2; grp.add(gt); grp.add(sd); gtMeshes.push(gt); sdfMeshes.push(sd);
+  grp.userData = { id: o.id, gt }; scene.add(grp); applyVisibility(); return grp;
+}
+function setPose(grp, p, R) {
+  const m = new THREE.Matrix4().set(R[0][0],R[0][1],R[0][2],p[0], R[1][0],R[1][1],R[1][2],p[1], R[2][0],R[2][1],R[2][2],p[2], 0,0,0,1);
+  m.decompose(grp.position, grp.quaternion, grp.scale);
+}
+
+// selection: click an object to move it, empty space to move the goal
+const ray = new THREE.Raycaster(), mouse = new THREE.Vector2();
+let downAt = null;
+renderer.domElement.addEventListener('pointerdown', e => { downAt = [e.clientX, e.clientY]; });
+renderer.domElement.addEventListener('pointerup', e => {
+  if (!downAt || dragging || Math.hypot(e.clientX - downAt[0], e.clientY - downAt[1]) > 4) return;
+  mouse.set(e.clientX / innerWidth * 2 - 1, -e.clientY / innerHeight * 2 + 1);
+  ray.setFromCamera(mouse, camera);
+  const hits = ray.intersectObjects([...objects.values()], true);
+  if (hits.length) { let o = hits[0].object; while (o.parent && !o.userData.id) o = o.parent; gizmo.attach(o); }
+  else gizmo.attach(goal);
+});
+addEventListener('keydown', e => {
+  if (e.key === 't' || e.key === 'T') setMode('translate');
+  if (e.key === 'r' || e.key === 'R') setMode('rotate');
+});
+function setMode(m) { gizmo.setMode(m); document.getElementById('b-mode').textContent = 'Gizmo: ' + m; }
+document.getElementById('b-mode').onclick = () => setMode(gizmo.getMode() === 'translate' ? 'rotate' : 'translate');
+
+// server communication
+async function post(path, body) {
+  const r = await fetch(path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  return r.json();
+}
+const cmd = c => post('/cmd', { cmd: c }).then(apply);
+document.getElementById('b-move').onclick = () => cmd('move');
+document.getElementById('b-goal').onclick = async () => { const s = await cmd('goal_to_ee'); goalFrom(s); };
+document.getElementById('b-obj').onclick = () => cmd('add_object');
+document.getElementById('b-star').onclick = () => cmd('add_star');
+document.getElementById('b-save').onclick = async () => {
+  await post('/input', inputs());                 // make sure the server has the latest gizmo poses
+  const s = await cmd('save');
+};
+document.getElementById('b-clear').onclick = () => { gizmo.attach(goal); cmd('remove_objects'); };
+document.getElementById('b-dual').onclick = () => cmd('dual');
+document.getElementById('b-play').onclick = () => cmd('play2');
+document.getElementById('b-reset').onclick = async () => { gizmo.attach(goal); const s = await cmd('reset'); goalFrom(s); };
+document.getElementById('b-gt').onclick = e => { showGT = !showGT; if (!showGT) showSDF = true; sync(); };
+document.getElementById('b-sdf').onclick = e => { showSDF = !showSDF; if (!showSDF) showGT = true; sync(); };
+function sync() {
+  document.getElementById('b-gt').classList.toggle('on', !showGT);
+  document.getElementById('b-sdf').classList.toggle('on', !showSDF);
+  applyVisibility();
+}
+function goalFrom(s) {
+  const R = s.goal.R, p = s.goal.p;
+  setPose(goal, p, R);
+}
+
+function apply(s) {
+  pushSnapshot(s);
+  const hit = new Set((s.metrics && s.metrics.hit_links) || []);
+  arm[0].forEach((l, i) => l.gt.material.color.set(hit.has(i) ? 0xd93025 : 0x9aa0a6));
+  const d = !!s.arm2;
+  arm[1].forEach(l => l.grp.visible = d); base2.visible = d;
+  const seen = new Set();
+  for (const o of s.objects) {
+    seen.add(o.id);
+    // object poses are owned by the browser (gizmo): the server pose is used only when the object appears
+    if (!objects.has(o.id)) { const g = objectGroup(o); setPose(g, o.p, o.R); objects.set(o.id, g); gizmo.attach(g); }
+  }
+  for (const [id, g] of objects) if (!seen.has(id)) { if (gizmo.object === g) gizmo.attach(goal); scene.remove(g); objects.delete(id); }
+  if (!goalInit) { goalFrom(s); goalInit = true; }
+  document.getElementById('b-move').classList.toggle('on', s.moving);
+  document.getElementById('b-dual').classList.toggle('on', s.dual);
+  document.getElementById('b-play').classList.toggle('on', s.play2);
+  const m = s.metrics || {};
+  const f = (x, u = ' mm') => (x === null || x === undefined) ? '—' : x.toFixed(1) + u;
+  document.getElementById('metrics').innerHTML =
+    `render        <b>${fps.toFixed(0)} fps</b>   sim <b>${f(m.sim_hz, ' Hz')}</b>\n` +
+    `filter step   <b>${f(m.t_ctrl_ms, ' ms')}</b>\n` +
+    `barriers      <b>${m.barriers ?? 0}</b>${m.filter_active ? '  (acting)' : ''}${m.slack ? '  SLACK' : ''}\n` +
+    `min h         <b>${f(m.min_h_mm)}</b>\n` +
+    `gap objects   <b>${f(m.gap_obj_mm)}</b>  (certified, &lt;5 cm)\n` +
+    `gap arm 2     <b>${f(m.gap_arm2_mm)}</b>  (sampled, &lt;3 cm)\n` +
+    `goal error    <b>${f(m.ee_err_mm)}</b>` +
+    (s.saved ? `\nsaved         <b>${s.saved.split(/[\\/]/).pop()}</b>` : '');
+}
+
+function inputs() {
+  const q = goal.quaternion, p = goal.position;
+  const objs = [];
+  for (const [id, g] of objects) objs.push({ id, p: [g.position.x, g.position.y, g.position.z],
+    q: [g.quaternion.x, g.quaternion.y, g.quaternion.z, g.quaternion.w] });
+  return { goal: { p: [p.x, p.y, p.z], q: [q.x, q.y, q.z, q.w] }, objects: objs };
+}
+let busy = false;
+async function tick() {
+  if (!busy && G) {
+    busy = true;
+    try { apply(await post('/input', goalInit ? inputs() : {})); document.getElementById('err').textContent = ''; }
+    catch (e) { document.getElementById('err').textContent = 'server not reachable: ' + e; }
+    busy = false;
+  }
+}
+
+(async () => {
+  G = await (await fetch('/geometry')).json();
+  makeArm(0, 0xff8a1f); makeArm(1, 0x8e6bd8);
+  applyVisibility();
+  setInterval(tick, 25);
+})();
+
+addEventListener('resize', () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); });
+let fps = 0, nFrames = 0, tFps = performance.now();
+renderer.setAnimationLoop(() => {
+  interpolate(); renderer.render(scene, camera); nFrames++;
+  const t = performance.now(); if (t - tFps > 500) { fps = nFrames * 1000 / (t - tFps); nFrames = 0; tFps = t; }
+});
+</script>
+</body>
+</html>

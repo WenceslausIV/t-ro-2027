@@ -1,0 +1,29 @@
+{
+  "signature": "9ca05fa5169759320f7e955ecd59400c02a821ad12807bd114cee871c1ace53c",
+  "level_m": 0.008913355031542843,
+  "tolerance_m": 0.0001,
+  "tightest_level_lower_m": 0.008813355031542843,
+  "tightest_level_upper_m": 0.008913355031542843,
+  "boundary_ok": true,
+  "band_ok": true,
+  "regular_ok": true,
+  "regular_depth": 1,
+  "regular_open_boxes": 0,
+  "band_min": 0.6697914852273126,
+  "cells": [
+    600,
+    600
+  ],
+  "raster_m": 0.0025,
+  "regions": 23393,
+  "certificate_s": 0.418081899988465,
+  "interior_ok": true,
+  "interior_depth": 10,
+  "interior_boxes": 254302,
+  "interpretation": "Workspace sublevel enclosure; no robot inflation.",
+  "arithmetic": "Float64; no outward rounding.",
+  "source_sha256": {
+    "maze_levelset_figure.py": "187954222a04c9d2564c86f155f24c766c4e473393671f4154e5eaec3aedf010",
+    "maze_reference_geometry.py": "557bfd3ad904eeec3d1f36ff129b034837ae9bdb2eb11e09b6e7139e747ef095"
+  }
+}

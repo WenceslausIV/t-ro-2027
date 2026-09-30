@@ -1,0 +1,47 @@
+{
+ "setup": "setup_20260928_171837.json",
+ "direction": "setup",
+ "goal": {
+  "p": [
+   0.4208963665571152,
+   -7.358463382908875e-17,
+   0.48164122183547603
+  ]
+ },
+ "nominal": {
+  "min_gap_mm": -30.611189138823974,
+  "reached": 2.84,
+  "slack_steps": 0,
+  "min_h_mm": Infinity,
+  "rows_max": 0,
+  "boxes_max": 0,
+  "t_p95_ms": 0.13490497367456555,
+  "t_med_ms": 0.08889986202120781,
+  "t_max_ms": 5.301600089296699,
+  "contact_steps": 1015
+ },
+ "ours": {
+  "min_gap_mm": 7.314375030886953,
+  "reached": null,
+  "slack_steps": 0,
+  "min_h_mm": 0.06638853740960078,
+  "rows_max": 17442,
+  "boxes_max": 646,
+  "t_p95_ms": 42.12516502011567,
+  "t_med_ms": 29.390999930910766,
+  "t_max_ms": 92.02770004048944,
+  "contact_steps": 0
+ },
+ "corner": {
+  "min_gap_mm": 15.055696581199516,
+  "reached": null,
+  "slack_steps": 0,
+  "min_h_mm": 49.963807805908424,
+  "rows_max": 7076,
+  "boxes_max": 0,
+  "t_p95_ms": 40.14566482510417,
+  "t_med_ms": 27.525799931026995,
+  "t_max_ms": 54.58789994008839,
+  "contact_steps": 0
+ }
+}

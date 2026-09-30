@@ -1,0 +1,58 @@
+[
+  {
+    "link": 1,
+    "prune_radius": 0.21963375991860132,
+    "mesh_radius": 0.19973265611084368,
+    "certified_surface_radius_bound": 0.20954095088273178,
+    "margin": 0.010092809035869538
+  },
+  {
+    "link": 2,
+    "prune_radius": 0.22156430516382533,
+    "mesh_radius": 0.20165575377173928,
+    "certified_surface_radius_bound": 0.21141912190942208,
+    "margin": 0.01014518325440325
+  },
+  {
+    "link": 3,
+    "prune_radius": 0.17820273399203654,
+    "mesh_radius": 0.15837304813882816,
+    "certified_surface_radius_bound": 0.16850973243368805,
+    "margin": 0.009693001558348485
+  },
+  {
+    "link": 4,
+    "prune_radius": 0.2045168615410957,
+    "mesh_radius": 0.18516307111779812,
+    "certified_surface_radius_bound": 0.19578239348499882,
+    "margin": 0.008734468056096872
+  },
+  {
+    "link": 5,
+    "prune_radius": 0.28470458378307806,
+    "mesh_radius": 0.2647819440898468,
+    "certified_surface_radius_bound": 0.2740173724143933,
+    "margin": 0.01068721136868478
+  },
+  {
+    "link": 6,
+    "prune_radius": 0.16144701996393587,
+    "mesh_radius": 0.14160290142295442,
+    "certified_surface_radius_bound": 0.15174700643219197,
+    "margin": 0.009700013531743906
+  },
+  {
+    "link": 7,
+    "prune_radius": 0.1489996369836373,
+    "mesh_radius": 0.12903823510261342,
+    "certified_surface_radius_bound": 0.14112551782059254,
+    "margin": 0.007874119163044757
+  },
+  {
+    "link": 8,
+    "prune_radius": 0.13566210860660646,
+    "mesh_radius": 0.11589165241369168,
+    "certified_surface_radius_bound": 0.126206537679648,
+    "margin": 0.009455570926958451
+  }
+]

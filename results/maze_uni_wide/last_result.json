@@ -1,0 +1,23 @@
+{
+  "dt": 0.01,
+  "dynamics": "uni",
+  "recoveries": 0,
+  "min_row_norm_near_boundary": 0.04399436476096953,
+  "speed_bound": 0.8,
+  "angular_speed_bound": 1.4,
+  "gamma": 5.0,
+  "reached_s": null,
+  "steps": 12000,
+  "min_physical_gap_m": 0.02615988920458771,
+  "verified_interval_gap_lower_m": 0.026159889204587405,
+  "unresolved_intervals": 0,
+  "collision_intervals": 0,
+  "min_h_m": -4.385380947269368e-15,
+  "min_constraint_residual": -3.387047586844716e-16,
+  "slack_steps": 0,
+  "barrier_intervention_steps": 11831,
+  "controller_median_ms": 1.366599928587675,
+  "controller_p95_ms": 2.3095000069588423,
+  "path_length_m": 1.6416133641741781,
+  "final_position_error_m": 9.392685998241841
+}

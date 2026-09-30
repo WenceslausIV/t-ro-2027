@@ -1,0 +1,60 @@
+\subsection{Comparison of Finite Certificates}\label{sec:cert-comparison}
+We compare the vertex reduction (V) and the joint Bernstein certificate (B) while keeping
+the spline fields, certified levels, and initial covers identical. All variants use
+distance-independent refinement with $\vartheta=0.1$ and at most two halvings; screening
+uses the unit lift. In addition to $w=1$, we test fixed multipliers with
+$\mathbf a=\nabla\phi_A(\mathbf c)$, $\mathbf b=\Rot^\top\nabla\phi_B(\mathbf y_{\mathbf c})$,
+\begin{equation}
+w_{\rm N}=\sqrt{\frac{\norm{\mathbf b}^2+\delta}{\norm{\mathbf a}^2+\delta}},\qquad
+w_{\rm P}=-\frac{\mathbf a^\top\mathbf b}{\norm{\mathbf a}^2+\delta},\quad\delta=10^{-12}.
+\end{equation}
+The regularizer keeps the weights continuous at zero gradient. Negative projection weights
+are permitted, with the absolute value in the remainder of~\eqref{eq:joint-model}.
+Neither choice cancels the complete, input-dependent spatial gradient of the CBF condition.
+
+Table~\ref{tab:cert-comparison} uses fixed horizons of 9~s for docking and 6~s for the rounded
+tube. The input modification is $J=\int\norm{\mathbf u-\mathbf u^{\rm nom}}\,dt$, compared
+only within each scene. All twelve runs require zero slack, and their evaluated distance
+lower bounds are positive. The docking runs seat the vehicle; the nominal target is intentionally
+10~cm beyond full seating, so reaching that infeasible target is not the docking success criterion.
+
+\begin{table}[t]
+\caption{Certificate Comparison with Fixed Geometry}
+\label{tab:cert-comparison}
+\centering\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lrrrr}
+\toprule
+Certificate & Dock $J$ & Tube $t_g$ [s] & Tube $J$ & Tube time [ms]\\
+\midrule
+V, $w=1$       & 0.656 & 3.99 & 1.948 & 34.6/83.7\\
+B, $w=1$       & 0.653 & 3.93 & 1.870 & 52.2/165.7\\
+V, $w_{\rm N}$ & 0.655 & 3.99 & 1.951 & 33.9/85.3\\
+B, $w_{\rm N}$ & 0.653 & 3.92 & 1.857 & 52.2/165.6\\
+V, $w_{\rm P}$ & 0.655 & 4.00 & 1.965 & 34.7/83.3\\
+B, $w_{\rm P}$ & 0.653 & 3.95 & 1.896 & 51.0/166.5\\
+\bottomrule
+\end{tabular}
+\\[3pt]
+\parbox{\columnwidth}{\footnotesize $t_g$: simulated goal-arrival time. Filter time: median/p95
+over the fixed 6-s horizon, one CPU thread. These are exploratory measurements with background
+activity not excluded, rather than the isolated timings of Table~\ref{tab:franka}. The tube's
+15-s experiment above has a different timing distribution.}
+\end{table}
+
+The joint unit-weight certificate reduces tube input modification by about 4\%, at the cost
+of increasing the maximum row count from 26{,}440 to 89{,}424. The fixed multipliers do not
+improve the vertex variant's tube arrival time or input modification. These cases therefore
+support retaining the unit-weight vertex reduction as the economical implementation, while
+the joint coefficient condition provides a direct alternative when the additional cost is
+acceptable. The multiplier tests establish neither a general improvement nor a second-order
+conservatism result.
+
+We also compare the two unit-weight certificates on six saved Franka trials, selected as three
+that reached and three that stalled in the original experiment. With the same distance-independent
+refinement, both variants reach in four of six trials and require zero slack in all six.
+For the newly successful trial, the joint certificate reduces arrival time from 7.38 to 6.63~s
+and $J$ from 4.243 to 3.533; its median/p95 filter time increases from 46/116 to 73/250~ms.
+In the most expensive trial neither variant reaches within 10~s, while median filter time rises
+from 115 to 253~ms and maximum row count from 41{,}776 to 146{,}691. These selected trials
+show a cost--performance tradeoff, not a new estimate of the 30-trial success rate.

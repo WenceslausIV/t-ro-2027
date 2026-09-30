@@ -1,0 +1,137 @@
+{
+  "dock_station": {
+    "radius_m": 0.007071067811865476,
+    "collar_width_m": 0.014142135623730952,
+    "whole_cell_collar_width_m": 0.025,
+    "bernstein_lower_above_level_m": 0.12357775950904124,
+    "positive": true,
+    "level": 0.0012032154052108743,
+    "source": "reconstructed with original polygon/fit settings"
+  },
+  "dock_craft": {
+    "radius_m": 0.007071067811865476,
+    "collar_width_m": 0.014142135623730952,
+    "whole_cell_collar_width_m": 0.02,
+    "bernstein_lower_above_level_m": 0.039421385394799856,
+    "positive": true,
+    "level": 0.00047214789915434643,
+    "source": "reconstructed with original polygon/fit settings"
+  },
+  "overview_0": {
+    "radius_m": 0.028284271247461905,
+    "collar_width_m": 0.05656854249492381,
+    "whole_cell_collar_width_m": 0.08,
+    "bernstein_lower_above_level_m": 0.017396746571958627,
+    "positive": true,
+    "level": 0.0018537744987366597,
+    "source": "reconstructed Fig. 2 fields"
+  },
+  "overview_3": {
+    "radius_m": 0.028284271247461905,
+    "collar_width_m": 0.05656854249492381,
+    "whole_cell_collar_width_m": 0.08,
+    "bernstein_lower_above_level_m": 0.016172497495129685,
+    "positive": true,
+    "level": 0.0028343773311131503,
+    "source": "reconstructed Fig. 2 fields"
+  },
+  "five_stats_0": {
+    "radius_m": 0.003535533905932738,
+    "collar_width_m": 0.007071067811865476,
+    "whole_cell_collar_width_m": 0.01,
+    "bernstein_lower_above_level_m": 0.08956927582756516,
+    "positive": true,
+    "level": 0.00031636354623335136,
+    "source": "reconstructed historical field; no trajectory changed"
+  },
+  "five_stats_1": {
+    "radius_m": 0.003535533905932738,
+    "collar_width_m": 0.007071067811865476,
+    "whole_cell_collar_width_m": 0.01,
+    "bernstein_lower_above_level_m": 0.0894938273109555,
+    "positive": true,
+    "level": 0.00035848680873737615,
+    "source": "reconstructed historical field; no trajectory changed"
+  },
+  "five_stats_2": {
+    "radius_m": 0.003535533905932738,
+    "collar_width_m": 0.007071067811865476,
+    "whole_cell_collar_width_m": 0.01,
+    "bernstein_lower_above_level_m": 0.08958787790699387,
+    "positive": true,
+    "level": 0.0002663712969205879,
+    "source": "reconstructed historical field; no trajectory changed"
+  },
+  "five_stats_3": {
+    "radius_m": 0.003535533905932738,
+    "collar_width_m": 0.007071067811865476,
+    "whole_cell_collar_width_m": 0.01,
+    "bernstein_lower_above_level_m": 0.08957308548789211,
+    "positive": true,
+    "level": 0.0002714359634159778,
+    "source": "reconstructed historical field; no trajectory changed"
+  },
+  "five_stats_4": {
+    "radius_m": 0.003535533905932738,
+    "collar_width_m": 0.007071067811865476,
+    "whole_cell_collar_width_m": 0.01,
+    "bernstein_lower_above_level_m": 0.08952591864076652,
+    "positive": true,
+    "level": 0.0003520578777441371,
+    "source": "reconstructed historical field; no trajectory changed"
+  },
+  "five_swap_0": {
+    "radius_m": 0.003535533905932738,
+    "collar_width_m": 0.007071067811865476,
+    "whole_cell_collar_width_m": 0.01,
+    "bernstein_lower_above_level_m": 0.08955948658945474,
+    "positive": true,
+    "level": 0.0003118088537676194,
+    "source": "reconstructed historical field; no trajectory changed"
+  },
+  "five_swap_1": {
+    "radius_m": 0.003535533905932738,
+    "collar_width_m": 0.007071067811865476,
+    "whole_cell_collar_width_m": 0.01,
+    "bernstein_lower_above_level_m": 0.08953841106311869,
+    "positive": true,
+    "level": 0.00030131353506101204,
+    "source": "reconstructed historical field; no trajectory changed"
+  },
+  "five_swap_2": {
+    "radius_m": 0.003535533905932738,
+    "collar_width_m": 0.007071067811865476,
+    "whole_cell_collar_width_m": 0.01,
+    "bernstein_lower_above_level_m": 0.08951271242805747,
+    "positive": true,
+    "level": 0.00033688979199046696,
+    "source": "reconstructed historical field; no trajectory changed"
+  },
+  "five_swap_3": {
+    "radius_m": 0.003535533905932738,
+    "collar_width_m": 0.007071067811865476,
+    "whole_cell_collar_width_m": 0.01,
+    "bernstein_lower_above_level_m": 0.08947178205025291,
+    "positive": true,
+    "level": 0.0003452852881206153,
+    "source": "reconstructed historical field; no trajectory changed"
+  },
+  "five_swap_4": {
+    "radius_m": 0.003535533905932738,
+    "collar_width_m": 0.007071067811865476,
+    "whole_cell_collar_width_m": 0.01,
+    "bernstein_lower_above_level_m": 0.0895514131144738,
+    "positive": true,
+    "level": 0.0002949231491274797,
+    "source": "reconstructed historical field; no trajectory changed"
+  },
+  "symmetric_maze_walls": {
+    "radius_m": 0.003535533905932738,
+    "collar_width_m": 0.007071067811865476,
+    "whole_cell_collar_width_m": 0.0125,
+    "bernstein_lower_above_level_m": 0.48404302088294265,
+    "positive": true,
+    "level": 0.0006633899038570995,
+    "source": "reconstructed field with saved historical level"
+  }
+}

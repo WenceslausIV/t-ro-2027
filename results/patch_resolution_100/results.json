@@ -1,0 +1,117 @@
+{
+  "shape": "five_robot_setup(seed=3, scale=1.0), GT[3]",
+  "domain_lo": [
+    -0.5660731668201143,
+    -0.45436924101711484
+  ],
+  "domain_hi": [
+    0.6239268331798856,
+    0.4456307589828852
+  ],
+  "training_spacing_m": 0.005,
+  "level_tolerance_m": 0.0001,
+  "diagnostic_grid": [
+    481,
+    361
+  ],
+  "near_surface_band_m": 0.03,
+  "fine_reproduction_max_error_m": 0.0,
+  "notes": [
+    "Timing: imports excluded, one BLAS thread, background activity not excluded.",
+    "Boundary levels certified by edge branch-and-bound with Bernstein Hessian bounds in double precision.",
+    "Distance errors and contour gaps are sampled diagnostics, not continuous certificates.",
+    "No controller simulation performed."
+  ],
+  "results": [
+    {
+      "counts": [
+        119,
+        90
+      ],
+      "patches": 10710,
+      "patch_mm": [
+        10.0,
+        10.0
+      ],
+      "effective_planar_controls": 11346,
+      "actual_stored_controls": 68076,
+      "timing_runs": [
+        {
+          "data_s": 1.0223729000426829,
+          "coefficient_s": 0.004612300079315901,
+          "total_s": 1.0269852001219988
+        },
+        {
+          "data_s": 1.046739500015974,
+          "coefficient_s": 0.006526299985125661,
+          "total_s": 1.0532658000010997
+        },
+        {
+          "data_s": 1.3017982000019401,
+          "coefficient_s": 0.007573300041258335,
+          "total_s": 1.3093715000431985
+        }
+      ],
+      "median_total_s": 1.0532658000010997,
+      "median_coefficient_s": 0.006526299985125661,
+      "certified_level_mm": 0.2714359634159778,
+      "certification_s": 0.04764569993130863,
+      "global_planar_hessian_bound": 572.5583449125237,
+      "grid_rmse_mm": 0.1762783569838401,
+      "grid_max_abs_error_mm": 2.367135957929076,
+      "near_surface_rmse_mm": 0.04670357470343278,
+      "near_surface_max_abs_error_mm": 1.2581616128465485,
+      "certified_contour_sampled_gap_mm": {
+        "min": 0.11267956909605029,
+        "median": 0.27046086892806803,
+        "max": 0.4291016648107858
+      },
+      "contour_components": 1
+    },
+    {
+      "counts": [
+        10,
+        10
+      ],
+      "patches": 100,
+      "patch_mm": [
+        119.0,
+        90.0
+      ],
+      "effective_planar_controls": 169,
+      "actual_stored_controls": 1014,
+      "timing_runs": [
+        {
+          "data_s": 1.2367461998946965,
+          "coefficient_s": 0.0021077001001685858,
+          "total_s": 1.238853899994865
+        },
+        {
+          "data_s": 1.1632422998081893,
+          "coefficient_s": 0.001501699909567833,
+          "total_s": 1.164743999717757
+        },
+        {
+          "data_s": 1.1254048000555485,
+          "coefficient_s": 0.001495300093665719,
+          "total_s": 1.1269001001492143
+        }
+      ],
+      "median_total_s": 1.164743999717757,
+      "median_coefficient_s": 0.001501699909567833,
+      "certified_level_mm": 16.828331340253914,
+      "certification_s": 0.005931499879807234,
+      "global_planar_hessian_bound": 87.82362773174175,
+      "grid_rmse_mm": 4.715748158662527,
+      "grid_max_abs_error_mm": 26.251011496787353,
+      "near_surface_rmse_mm": 4.801366464842365,
+      "near_surface_max_abs_error_mm": 18.336092878117924,
+      "certified_contour_sampled_gap_mm": {
+        "min": 0.09885221967217357,
+        "median": 17.38015930496006,
+        "max": 36.86462109977048
+      },
+      "contour_components": 1
+    }
+  ]
+}

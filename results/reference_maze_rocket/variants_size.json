@@ -1,0 +1,58 @@
+[
+ {
+  "radius": 0.26,
+  "length": 0.4715326392351247,
+  "width": 0.25837510162699523,
+  "level": 0.042310264737051094,
+  "look": 0.5,
+  "ok": false,
+  "reached_s": null,
+  "barrier_intervention_steps": 11769,
+  "steps": 12000,
+  "min_physical_gap_m": 0.03146849624210475,
+  "min_h_m": -2.490466166626959e-12,
+  "path_length_m": 1.8758969942200825
+ },
+ {
+  "radius": 0.26,
+  "length": 0.4715326392351247,
+  "width": 0.25837510162699523,
+  "level": 0.042310264737051094,
+  "look": 0.8,
+  "ok": false,
+  "reached_s": null,
+  "barrier_intervention_steps": 11827,
+  "steps": 12000,
+  "min_physical_gap_m": 0.03904111346128308,
+  "min_h_m": -3.2335245592207684e-15,
+  "path_length_m": 1.486206932160317
+ },
+ {
+  "radius": 0.23,
+  "length": 0.4171250270156872,
+  "width": 0.2285625899008035,
+  "level": 0.04082434264008503,
+  "look": 0.5,
+  "ok": false,
+  "reached_s": null,
+  "barrier_intervention_steps": 10627,
+  "steps": 12000,
+  "min_physical_gap_m": 0.02177959023041535,
+  "min_h_m": -4.794775687599895e-15,
+  "path_length_m": 11.292025991928817
+ },
+ {
+  "radius": 0.23,
+  "length": 0.4171250270156872,
+  "width": 0.2285625899008035,
+  "level": 0.04082434264008503,
+  "look": 0.8,
+  "ok": false,
+  "reached_s": null,
+  "barrier_intervention_steps": 11824,
+  "steps": 12000,
+  "min_physical_gap_m": 0.0305585788082926,
+  "min_h_m": -4.8780424144467815e-15,
+  "path_length_m": 1.5175343742035872
+ }
+]

@@ -1,0 +1,48 @@
+{
+  "metadata": {
+    "scene": "dock",
+    "cover_policy": "native SDF patches, s=h",
+    "refinement_depth": 0,
+    "row_mode": "vertex",
+    "multiplier": "one",
+    "dt_s": 0.01,
+    "geometry_sha256": "67d77e01c28b6db8c5abbc177c768ff77e19c6e04cba6f179d9bc493e70c05fa",
+    "threads": 1,
+    "timing_note": "Background activity not excluded; exploratory timings.",
+    "side_mm": 10.0,
+    "cover_boxes": 772,
+    "levels_mm": [
+      1.2032154052108743,
+      0.4721478991543464
+    ]
+  },
+  "metrics": {
+    "steps": 900,
+    "reached_s": null,
+    "min_gap_bound_mm": 9.11059299910466,
+    "distance_scope": "polygon intervals and states",
+    "min_h_mm": 7.64292499601249e-06,
+    "slack_steps": 0,
+    "uncertified_gap_states": 0,
+    "control_change_integral": 0.7691924880212077,
+    "t_median_ms": 3.0798999359831214,
+    "t_p95_ms": 3.669594891835004,
+    "rows_max": 768,
+    "boxes_max": 192,
+    "final_pose": [
+      [
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.6591656388609425,
+        0.0013399215464515628,
+        3.145581351013551
+      ]
+    ],
+    "tip_depth_m": 0.690826406296035,
+    "seats": true,
+    "final_gap_mm": 9.11059299910466
+  }
+}

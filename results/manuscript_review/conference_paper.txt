@@ -1,0 +1,846 @@
+Geometry-Aware Control Barrier Functions for Collision Avoidance
+via Bernstein Polynomial Approximations
+Siwon Jo 1, Yanze Zhang 2, Yupeng Yang3, and Wenhao Luo 2
+Abstract— Safe navigation often relies on well-defined condi-
+tions based on the shape of robots and obstacles, and can be
+challenging when they have irregular geometries. While Control
+Barrier Functions (CBFs) offer an efficient mechanism to
+enforce safe set forward invariance, common shape surrogates
+(e.g., spheres or super-ellipsoids) either are overly conservative
+in unstructured scenes or require many local primitives, which
+inflates constraint counts and degrades real-time performance.
+In this paper, we introduce a novel geometry-aware Control
+Barrier Function (CBF) based on Bernstein–Polynomial Signed
+Distance Fields (BP-SDFs). It provides a unified way to rep-
+resent the obstacles and robots, so as to represent the barrier
+function with a unified minimum distance. Benefiting from the
+differentiability of the Bernstein polynomials, one can easily
+enforce the control constraints in a closed loop. We validate
+the method’s efficiency and performance to guarantee safety in
+single-robot navigation and heterogeneous multi-robot collision
+avoidance via simulations under different environments.
+I. INTRODUCTION
+Safe navigation is both essential and inherently challeng-
+ing in most robotics systems [1]–[4], especially when robots
+and obstacles exhibit irregular geometries. The specification
+of safe conditions depends on how shapes interact across
+poses rather than on point-to-point (e.g., center-to-center)
+distance [5], [6]. On the other hand, enforcing safe motions
+needs to consider the dynamics and control limits of the
+robots, as well as their impact on the evolving safe con-
+ditions. Thus, it is critical to characterize geometry-aware
+safety that reflects the true risk of contact and design con-
+trollers that can effectively enforce safety during operation.
+Control Barrier Functions (CBFs) [7] have emerged as
+an efficient tool for certifying safety, which are typically
+implemented as safety filters that modify the nominal control
+inputs to ensure the robot is always within the safe set.
+However, traditional CBFs-related approaches use spheres
+[8] or super-ellipsoids [9] to define the safe state space by
+benefiting from their simplicity and differentiability, which
+would not work well for unstructured environments. In par-
+ticular, in unstructured environments, existing methods either
+inflate the geometry of robots and obstacles [10] or approx-
+imate obstacle boundaries with sets of small spheres [11],
+∗This work was supported in part by the U.S. National Science Founda-
+tion under Grants 2530297 and 2528997.
+1Siwon Jo is with the GRASP Laboratory, University of Pennsylvania,
+Philadelphia, PA, USA. Email:jo16@seas.upenn.edu
+2Yanze Zhang and Wenhao Luo are with the Department of Com-
+puter Science, University of Illinois Chicago, Chicago, IL, USA.
+Email:{yzhan361,wenhao}@uic.edu
+3Yupeng Yang is with the Department of Computer Science, Uni-
+versity of North Carolina at Charlotte, Charlotte, NC, USA. Email:
+yyang52@charlotte.edu
+[12]. Nevertheless, the former introduces overly conservative
+behaviors, and the latter increases the number of constraints,
+which in turn impacts the efficiency of the solution.
+In this context, the work in [13] builds non-conservative
+CBFs by computing differentiable signed distances (and
+penetration depth) between a polytopic robot and polytopic
+obstacles via convex programs in the Minkowski-difference
+space, which supports geometry-exact safety constraints
+within a real-time Control Lyapunov Function – Control
+Barrier Function (CLF–CBF) control framework. However,
+the safety is enforced pairwise per obstacle in static multi-
+obstacle scenarios, which may increase infeasibility under
+tight bounds and require significant computational overhead
+for complex environments.
+Existing works have also explored learning unified CBFs
+for obstacles in real-time, but they often struggle with
+computational inefficiency, which limits their application in
+the real world. For example, work in [14] uses Gaussian
+Process (GP) to model the CBFs. However, maintaining
+and updating the GP posterior in the control loop scales
+cubically with the number of data points and carries sizable
+constants (e.g., kernel factorizations, hyperparameter tuning),
+which makes high-rate control difficult as data accumulate.
+Alternatively, [15] adopts an implicit neural representation of
+the CBF with backpropagated gradients but only considers
+single-robot cases, leaving inter-robot collision avoidance as
+an open challenge.
+More recently, the authors in [16] used Bernstein poly-
+nomials to approximate signed distance fields (BP-SDF),
+thereby enabling the representation of safe space. While this
+advances geometric modeling, the method primarily focuses
+on static safety representation and does not explicitly show
+how the learned safe representation can be converted into
+control constraintswith closed-loop safety guarantees. As a
+result, it is not directly applicable to controller synthesis in
+dynamic scenarios and multi-robot settings, where multiple
+moving robots may interact closely with one another. Build-
+ing on this work, we propose to extend the BP-SDF to de-
+fine novel CBFs that convert pose-dependent geometry into
+certifiable safety constraints directly governing collision-free
+motions for the robots in real time. Specifically, we represent
+both the robot and the workspace obstacles using a BP-SDF
+in their body frames and evaluate them in the world frame
+via rigid transformations. Then, the Karush–Kuhn–Tucker
+(KKT) conditions are analyzed to find the minimum distance
+that is used to define our geometry-aware CBFs. Benefiting
+from the differentiability of the Bernstein polynomials, we
+are able to explicitly define the admissible control space,
+arXiv:2605.30696v1  [cs.RO]  29 May 2026
+leading to collision-free movements of the robots with irregu-
+lar shapes. This yields forward-invariant safety with minimal
+deviation from nominal commands and scales to dynamic,
+multi-robot scenes. Ourcontributionscan be summarized
+as:
+•We introduce a novel unified barrier function repre-
+sentation with a single SDF for multiple obstacles
+using Bernstein polynomials. This approach provides a
+common template for deriving geometry-aware control
+constraints for safe navigation in unstructured environ-
+ments.
+•We define a novel notion ofGeometry-aware Control
+Barrier Functionsbuilt on Bernstein polynomial repre-
+sentations and explicitly derive control constraints from
+the proposed CBFs for arbitrary smooth convex SDF
+level sets, which yields closed-loop safety certificates.
+•We include results from the experiments for multi-robot
+collision avoidance and multi-obstacle robot navigation
+that verify the effectiveness of the framework.
+II. PRELIMINARIES
+Considering a team ofNrobots moving in thed-
+dimensional spaceR d, the position of each robot is denoted
+asx i∈X i⊂R d,∀i∈{1,...,N}, with dynamics governed
+by:
+˙xi =f i(xi) +g i(xi)ui (1)
+wheref i :R d →R d andg i :R d →R d×q are locally
+Lipschitz continuous andu i∈R q is the control input for
+roboti.
+A. Control Barrier Functions
+In this section, we briefly review the concept of Control
+Barrier Functions (CBFs) [7]. Given the control-affine system
+in Eq. (1), a desired safe set for the state of roboti
+can be specified as the 0-superlevel set of a continuously
+differentiable functionh:R d→R,
+Hi ={x i∈R d :h(x i)≥0}.(2)
+CBFs have been used to design control constraints that
+enforce the forward invariance of the safe setH i for robot
+i, i.e., if the system starts withinH i, it remains there for all
+future time under satisfying controllers. The key result can
+be summarized as follows.
+Lemma 1.(Summarized from [7]) Given a dynamical system
+affine in control and a desired setH i as the 0-superlevel
+set of acontinuously differentiablefunctionh(x i) :X i→
+R, the functionhis called a control barrier function, if
+there exists an extended class-Kfunction 1 κ(·)such that
+supui∈Ui{˙h(xi,u i)} ≥ −κ(h(xi))for allx i ∈ Xi. The
+admissible control space for any Lipschitz continuous con-
+trolleru i∈U i renderingH i forward invariant (i.e., keeping
+the system statex i inH i over time) thus becomes:
+B(xi) ={u i∈U i|Lfh(xi) +L gh(xi)ui +κ(h(x i))≥0}
+1In the rest of this letter, we select the particular choice ofκ(h(x i)) =
+γh(xi)withγas a user-defined parameter [7].
+whereL f andL g denote the Lie derivatives along the vector
+fieldsfandg, respectively.
+Existing work [8] leverages Lemma 1 to enforce pairwise
+distance constraints between robots or between robots and
+obstacles. However, directly encoding such constraints be-
+comes cumbersome in environments with complex or irreg-
+ular geometries. Note that when multiple CBF constraints
+are present, the safety guarantee relies on the composition
+of CBFs. Readers are referred to [9], [17] for detailed
+discussion. For systems with higher-order dynamics, the
+corresponding extension can be found in [18]. This motivates
+the use of a more general geometric representation of safe
+sets, which leads us to the notion of Signed Distance Fields
+(SDF) and Bernstein polynomials discussed next.
+B. Signed Distance Fields Representation using Bernstein
+Polynomials
+Existing work has adoptedSigned Distance Field(SDF)
+[19] as a general representation of safe set of states. This pro-
+vides an implicit and differentiable description of arbitrary
+geometries summarized below.
+Definition 2.(Summarized from [19])[Signed Distance
+Field] For a setΩ⊂R d, the signed distance field is defined
+as
+SΩ(p) =±inf
+p′∈∂Ω
+∥p−p ′∥2,(3)
+wherepis a point in the Euclidean space, withS Ω(p)<0
+ifp∈Ω,S Ω(p) = 0ifp∈∂Ω, andS Ω(p)>0otherwise.
+It is noted that directly storing or evaluatingS Ω(p)for
+arbitrary shapes can be computationally expensive, and in
+many cases the complex geometry ofΩmakes an explicit
+analytic form intractable. To overcome this challenge, exist-
+ing work has employedBernstein polynomial(BP) approx-
+imations of SDFs [16], which yield a compact and smooth
+parameterization suitable for optimization and control.
+Definition 3.(Summarized from [20])[Bernstein Polynomial
+Basis] Givenξ∈[0,1], letϕ(ξ)∈R Q be the vector of basis
+functions whoseq-th element, for Bernstein polynomials of
+orderQ(degreeQ−1), is
+ϕq(ξ) =
+Q−1
+q
+
+ξq(1−ξ) Q−1−q, q= 0,...,Q−1.
+With this, for any pointp∈R d, the multivariate basis is
+constructed via the Kronecker product
+Ψ(p) =
+dO
+p=1
+ϕ(ξp)∈R Qd
+,(4)
+whereξ p = [p]p−[p] min
+p
+[p]maxp −[p] minp
+∈[0,1]andp= 1,...,d
+are the dimension-wise normalized coordinates ofp(i.e.,
+the normalized value of the point’sp-th dimension), where
+[p]min and[p] max cover the maximum relative distance.
+Thus, given Definition 3, the SDF is approximated as a
+weighted combination of theQ d tensor–product Bernstein
+basis functions (orderQper dimension) [16]:
+ˆSΩ(p) =⟨Ψ(p),w⟩= Ψ(p) ⊤w,(5)
+where ˆSΩ(p)∈R,Ψ(p)∈R Qd
+is the multivariate Bernstein
+basis vector evaluated at the pointp, andw∈R Qd
+are the
+coefficients.⟨·,·⟩is the operation of the inner product.
+Following [16], the coefficientswcan be obtained via
+linear least-squares regression under the assumption that
+robot shapes are learned offline. Suppose we haveKsam-
+pled points{p (j),S Ω(p(j))}K
+j=1 with ground-truth signed
+distancesS Ω(p(j)). By stacking the basis evaluations into
+a design matrixΨ∈R Qd×K and the ground-truth distances
+intof∈R K, the linear regression problem is
+w∗ = arg min
+w
+∥Ψ⊤w−f∥ 2
+2 (6)
+IfΨhas full row rank, the closed-form solution can be
+formally defined as:
+w∗ =
+ 
+Ψ Ψ⊤−1
+Ψ f(7)
+With the closed-form coefficientsw ∗, we can obtain the
+smooth SDF approximation ˆSΩ(p) = Ψ(p) ⊤w∗ over the
+workspace. However, obtaining the solution via explicit in-
+version of a large matrix is unnecessary and often prohibitive,
+both computationally and in memory, and can be numerically
+unstable [21]. Readers are referred to [16] for more detailed
+discussions.
+C. Problem Statement
+In this paper, our objective is to develop a control frame-
+work thatleverages the Bernstein–polynomial approxima-
+tion ˆSΩ of the SDF andemploys control barrier functions
+(CBFs)to encode and enforce safety in realistic, complex
+environments. While the BP–SDF surrogate offers a compact
+and differentiable geometric representation, translating this
+approximation into formal safety guarantees remains non-
+trivial in cluttered scenes and in the presence of interacting
+agents. With that, given any control boundu max∈Rof each
+roboti, the problem becomes how to minimally modify any
+pre-defined nominal inputu nom with BP–SDF–defined safe
+set, i.e., enforcing nonnegative distance between the robot
+ˆSR(·)and the non-robot ˆSO(·):
+u∗ = arg min
+u
+||u−u nom||2 (8)
+s.t.x∈{dist( ˆSO(·) = 0, ˆSR(·) = 0)≥0}(9)
+||u||≤u max
+Accordingly, in this paper, we focus on two questions:
+•Single-robot safe navigation.Given a BP–SDF approx-
+imation of the workspace containing multiple irregular-
+shaped static obstacles, how can we transfer the state
+constraints in Eq. (9) to control constraints and design
+a control framework that can guarantee that the robot
+safely navigates in the workspace?
+•Multi-robot extension.Given a team ofNrobots
+where each robotimaintains a robot-specific BP–SDF
+ˆSi
+Ω, how can this framework be extended to multiple
+robots so that collisions among moving agents are
+avoided?
+III. METHOD
+In this section, we build on the unified SDF representation
+in Eq. (5) to formulate novel control barrier functions that di-
+rectly encode geometry-aware collision avoidance conditions
+and derive corresponding control constraints. We first present
+the single-robot SDF barrier certificates and then extend the
+approach to the multi-robot setting.
+A. Unified Barrier Function with Bernstein polynomials
+LetO= SM
+j=1oj denote the union of all obstacles.
+Following the work [16], we use Bernstein polynomials to
+represent the Signed Distance Field (SDF) of the robotx i and
+obstaclesx obs
+o ∈O. As shown in Fig. 1(a) and leveraging
+Eq. (5), we represent the robotiby a SDF ˆSi
+R(·)and the
+composite obstacle set by a singleunifiedSDF ˆSO(·).
+ˆSi
+R(pi) =⟨Ψ(p i),w i⟩, ˆSO(pobs
+o ) =⟨Ψ(p obs
+o ),w o⟩
+where ˆSi
+R(·)is in the robot’s local frame and ˆSO(·)is in the
+unified obstacle frame.p i andp obs
+o represent the pointpin
+the robot frame and unified obstacle frame.
+We define the functionΦ(x,p local)to transform the point
+in the local framep local to the global framep. With this,
+Fi(xi,p) = ˆSi
+R(Φ−1
+i (xi,p))(10)
+represents the distance between any pointpand the boundary
+of the robotiin the space.
+Therefore,F i(xi,p) = 0can be used to define the zero
+level set for the robotigiven its SDF.
+Inspired by [22], we first characterize the safe space using
+the minimum distance between the robot and the composite
+obstacle set. To this end, we formulate the following opti-
+mization problem to find the closest pointp ∗ on the obstacle
+boundary to the robot:
+p∗
+i,o = arg min
+p
+Fi(xi,p)(11)
+s.t.F o(xobs
+o ,p) = 0
+AsF i(xi,p)denotes the signed distance frompto the
+boundary of roboti, minimizing it corresponds to finding the
+closest point to the robot. And the constraintF o(xobs
+o ,p) = 0
+enforces thatplies on the obstacle boundary. Therefore, as
+illustrated in Fig. 1, the solutionp ∗
+i,o is exactly the obstacle
+boundary point with the minimum distance from the robot,
+which is then used to define the barrier function for collision
+avoidance. By solving the optimization problem in (11), one
+can obtain the optimal solutionp ∗
+i,o, which is the closest
+point on the obstacle boundary to roboti.
+Hence, to formally characterize safety, we directly uti-
+lize the property of the BP-SDF, which returns the signed
+distance from the robot to any given point. By evaluating
+Fig. 1: Examples of the level sets for SDF approximation using Bernstein
+polynomials on robots and obstacles.(a)With a safety marginl∈R, the
+green contour represents thel-level set of the approximated SDF of the robot
+i. The three blue contours represent thel-level set of the approximated
+SDF w.r.t. all three obstacles in the workspace using a single Bernstein
+polynomial representation.(b)The green contour represents thel-level set of
+the approximated SDF of the robotiin the robot frameO i, satisfying ˆSR≥
+l.(c)The blue contours represent thel-level set of the approximated SDF
+of the composite obstacle setOin the frameO O, satisfying ˆSO≥l.(d)
+The green and blue contours represent thel-level sets of the approximated
+SDF for robotiandj.
+the robot’s SDF at the closest obstacle-boundary pointp ∗
+i,o,
+we formally define theGeometry-aware Control Barrier
+Function (CBF)as:
+h(xi,x obs
+o ) =F i(xi,p∗
+i,o)(12)
+Therefore,h(x i,x obs
+o )≥0indicates that robotiremains
+away from the obstacle, whileh(x i,x obs
+o )<0indicates
+overlap between the robot and the obstacle. Accordingly, the
+safe set is defined as
+Hobs
+i,o =
+
+(xi,x obs
+o )∈R d|h(x i,x obs
+o )≥0
+	
+.(13)
+B. Single-robot Geometry-aware Control Barrier Certifi-
+cates
+By using the KKT condition to solve the problem in
+Eq. (11), we can obtain the optimal value of the barrier
+functionhand the closest point to the robot,p ∗. We propose
+the following proposition to define the safe control space.
+Proposition 4(Geometry-aware Control Barrier Certifi-
+cates).Consider robotiwith control–affine dynamics(1)
+moving in a workspace with any-shaped static obstacles
+which are enclosed by a unified SDF ˆSO. The barrier func-
+tionh(x i,x obs
+o )and the corresponding obstacle boundary
+point arep∗
+i,o in Eq.(11). Following Lemma. 1, for the robot
+iand the environment with obstaclesO, the admissible con-
+trol space for any Lipschitz continuous controller rendering
+the safe set in Eq.(13)forward invariant, thus becomes:
+Bobs
+u =
+
+ui∈U i|a i(xi,p∗
+i,o) +A i(xi,p∗
+i,o)ui
+≥−γh(x i,x obs
+o )
+	 (14)
+wherea i(xi,p∗
+i,o) =∇ xiFi(xi,p∗
+i,o)⊤fi(xi)and
+Ai(xi,p∗
+i,o) =∇ xiFi(xi,p∗
+i,o)⊤gi(xi).
+Proof.We assume the BP-SDF level sets are convex such
+that the closest pointp ∗
+i,o changes smoothly without discon-
+tinuous jumps. Additionally,||∇F i||̸= 0on the boundary of
+the BP-SDF learned offline.
+With this, differentiating Eq. (12) with respect to timet
+using the chain rule yields:
+˙h(xi,x obs
+o ) =∇ xiFi(xi,p∗
+i,o)⊤ ˙xi +∇ pFi(xi,p∗
+i,o)⊤ ˙p∗
+i,o
+Based on the KKT conditions of the optimization problem in
+Eq. (11), the spatial gradient∇ pFi(xi,p∗)is parallel to the
+normal vector of the obstacle boundary atp ∗. Since ˙p∗ is
+tangent to the obstacle boundary, their inner product is zero,
+i.e.,∇ pFi(xi,p∗)⊤ ˙p∗ = 0.
+Substituting this identity gives us the general form:
+˙h(xi,x obs
+o ) =∇ xiFi(xi,p∗
+i,o)⊤ ˙xi (15)
+Following Lemma 1, the safe control space can thus be
+given by Eq. (14).□
+This defines the admissible control space that ensures the
+robot to stay away from the obstacle boundary. Finally, one
+can define the safe controlleru ∗
+i for a robot navigating in a
+multi-obstacle scenario by minimally modifying the nominal
+controlu nom
+i with Quadratic Programming (QP):
+u∗
+i = arg min
+ui
+||ui−u nom
+i ||2
+2 (16)
+s.t.a i(xi,p∗
+i,o) +A i(xi,p∗
+i,o)ui≥−γh(x i,x obs
+o )
+||ui||≤u max
+i
+whereu max
+i denotes the control bound for roboti.
+C. Handling Non-Smoothness in Composite Obstacles
+As defined in Section III-A, representing multiple obsta-
+cles as a single composite setOprovides a unified geometric
+constraint. However, in such a case, the closest pointp ∗
+i,o
+on the obstacle boundary can discontinuously jump between
+different obstacles while the robot is moving. This can
+make the distance function non-smooth, which violates the
+continuous differentiability property of CBFs.
+To deal with the composite set of obstacles scenario while
+maintaining smoothness, we adopt a Configuration Space (C-
+space) approach. By approximating the robot as a bounding
+circle of radiusr[8], we inflate the ground-truth composite
+obstacles using the Minkowski sum to create the C-space
+obstacles, denoted asO C =O⊕D(r), whereD(r)represents
+a disk of radiusr. We then construct a unified BP-SDF
+for the C-space, denoted as ˆSOC(·). However, if this causes
+overly conservative behaviors of the robot, we can define
+each obstacle as an individual safety constraint.
+Fig. 2: C-space (red) of composite obstacle setO C inflated by the radiusr
+of the roboti(green). The right figure shows the SDF ˆSOC of the C-space
+(blue contours) with a user-defined safety margin level setl.
+In this C-space formulation, the robot is treated as a point
+xi. The barrier function is defined by the BP-SDF of the
+C-space at the robot’s position:
+hobs
+i (xi) = ˆSOC(xi) = Ψ(xi)⊤wo (17)
+Because the Bernstein polynomial approximation is in-
+herently smooth and continuously differentiable, evaluat-
+ing ˆSOC(xi)guarantees a smooth CBF everywhere in the
+workspace.
+D. Multi-robot Geometry-aware Control Barrier Certificates
+We continue to extend our Geometry-aware Control Bar-
+rier Function in (12) for the multi-robot collision avoidance
+case. Consider a team ofNrobots, similarly to (11), for
+any pair of robotsiandj, one can calculate the closest
+pointp∗
+i,j on the boundaryjto roboti. Then for any pair-
+wise collision avoidance in the robot team, the safety of
+x={x 1,···,x i,···,x N}is defined as:
+h(xi,x j) =F i(xi,p∗
+i,j),∀i̸=j(18)
+With this,h(x i,x j)≥0indicates that, from roboti’ view,
+the robotjis sufficiently away from roboti. Accordingly,
+the safe set is defined as
+Hi,j =
+
+x∈R dN|h(x i,x j)≥0
+	
+,∀i̸=j.(19)
+Proposition 5(Multi-robot Geometry-aware Control Bar-
+rier Certificates).Considering a team ofNrobots moving
+in the same workspace, each robot has its own robot-
+specific SDF approximated by Bernstein polynomials.u=
+{u1,···,u N}is the joint control of theNrobots. As shown
+in Fig. 1(d), for any pair of robotsiandj, the optimal
+pointp∗
+i,j moves along the surface of robotj. By taking the
+time derivative of the boundary constraintF j(xj,p∗
+i,j) = 0
+and applying the KKT conditions, the inter-robot collision
+avoidance can be enforced using the followingMulti-robot
+Geometry-aware Control Barrier Certificates:
+Brobots
+u =
+
+u∈U|a i(xi,p∗
+i,j) +a j(xj,p∗
+i,j)
++A i(xi,p∗
+i,j)ui +A j(xj,p∗
+i,j)uj
+≥−γh(x i,x j)
+	
+(20)
+wherea j(xj,p∗
+i,j) =λ∇ xjFj(xj,p∗
+i,j)⊤fj(xj),
+Aj(xj,p∗
+i,j) =λ∇ xjFj(xj,p∗
+i,j)⊤gj(xj), and the scalar
+multiplierλ=
+∥∇pFi(xi,p∗
+i,j)∥
+∥∇pFj(xj ,p∗
+i,j)∥.
+Proof.Taking the time derivative ofh(x i,x j) =F i(xi,p∗
+i,j)
+yields ˙h(xi,x j) =∇ xiF⊤
+i ˙xi +∇ pF⊤
+i ˙p∗
+i,j. From the KKT
+stationarity conditions, we have∇ pFi =−λ∇ pFj. Substi-
+tuting this gives ˙h(xi,x j) =∇ xiF⊤
+i ˙xi−λ∇ pF⊤
+j ˙p∗
+i,j.
+Becausep ∗
+i,j must remain on the boundary of robotj,
+the constraintF j(xj,p∗
+i,j) = 0is satisfied at all times.
+Differentiating this gives∇ xjF⊤
+j ˙xj +∇pF⊤
+j ˙p∗
+i,j = 0, which
+allows us to substitute out the velocity ˙p∗
+i,j, yielding:
+˙h(xi,x j) =∇ xiFi(xi,p∗
+i,j)⊤ ˙xi +λ∇ xjFj(xj,p∗
+i,j)⊤ ˙xj
+(21)
+Following Lemma 1, one can obtain the safe control space
+for the multi-robot system in (20).□
+With this, one can define the following safe controlleru ∗
+for the team of robots by minimally modifying their nominal
+controlu nom with the following QP:
+u∗ = arg min
+u
+||u−u nom||2 (22)
+s.t.a i(xi,p∗
+i,j) +a j(xj,p∗
+i,j) +A i(xi,p∗
+i,j)ui
++A j(xj,p∗
+i,j)uj≥−γh(x i,x j),∀i̸=j
+||ui||≤u max
+i ,∀i= 1,...,N
+Remark 1.While it has been proven that a minimum dis-
+tance function between two convex sets is a smooth function
+[23], the learned SDFs are approximations, and some SDF
+level sets can be non-convex even if the ground truth shape
+is convex. To handle the non-smoothness, one can formulate
+a constrained Quadratic Program (QP) for offline learning
+and strictly enforce convexity on all level sets by constraining
+second-order difference matrix of the Bernstein weightswto
+be positive semi-definite.
+Remark 2.It is possible that the learned SDFs with
+Bernstein polynomials and the method in [16] has a small
+approximation error. A user-defined safety margin level setl
+can be used to guarantee the enclosure of the ground truth
+shape in the learned shape by changing the constraints in
+Eq.(11)asF o(xobs
+o ,p)−l= 0(l≥0∈R).
+Remark 3.It is possible that our method would get into
+a deadlock. Readers can refer to [24]–[26] for single-robot
+and multi-robot deadlock resolution.
+IV. RESULTS
+In this section, we conduct simulations to demonstrate
+the robustness and versatility of the proposed framework.
+By evaluating its performance across diverse environments,
+robot dynamics, and homogeneous as well as heterogeneous
+teams, we establish its broad applicability in ensuring safe
+and reliable multi-robot coordination. Note that the proposed
+algorithm is evaluated underdifferentsystem dynamics,
+including single-integrator and unicycle dynamics.
+Fig. 3:Left: A single BP-SDF (Q = 23) is used to represent five distinct
+static obstacles, and its 0.27-level set is used to enclose the ground-truth
+shapes of the static obstacles. The green line shows the robot trajectory start-
+ing from(3.8,2.7)and visiting the designated goal position(−2.2,−3.5).
+Right: The green line represents the value of the barrier function over time
+steps. The barrier function is obtained from a single CBF constructed using
+a BP-SDF, which compactly encodes all obstacle-related safety constraints
+into one unified condition.
+In the first experiment, we consider a single robot nav-
+igating through an environment populated with multiple
+obstacles of varying shapes. The robot dynamics are modeled
+as a single-integrator system, such that ˙xi =u i, where
+xi∈R 2 denotes the robot position andu i∈R 2 is the control
+input. The navigation objective is to reach the designated
+time-invariant goal position while avoiding collisions with
+obstacles. The nominal task controller isu nom =−k(x i−
+xgoal
+i ), wherekis the control gain. As illustrated in Figure 3,
+the robot starts atx= [3.8,2.7] ⊤ and visits the goal
+xgoal = [−2.2,−3.5]⊤.
+To enforce safety, we construct the control barrier function
+(CBF) as in Eq. (12).p ∗ lies on the0.27-level set (setting
+l= 0.27as stated in Remark. 2) of the signed distance
+field approximated by a Bernstein polynomial with order
+Q= 23. The use of the0.27-level set ensures that all five
+obstacles are fully enclosed within asingleunified BP-SDF.
+In Figure 3, the dashed contours indicate the ground-truth
+obstacle boundaries, while the fading green curve in the left
+subfigure illustrates the robot’s trajectory. The right subfigure
+further depicts the temporal evolution of the barrier function,
+confirming that the safety constraint is satisfied throughout
+the navigation process.
+A. Safe Navigation of Two Robots under Unicycle Dynamics
+In the second set of experiments, we consider robots
+governed by unicycle dynamics:
+˙xi =
+
+
+˙xi
+˙yi
+˙θi
+
+ =
+
+
+cos(θi) 0
+sin(θi) 0
+0 1
+
+
+vi
+ωi
+
+,(23)
+where[x i,y i,θ i]T denotes the state of robotiin the global
+frame,v i is the linear velocity, andω i is the angular velocity.
+The control limits are|v i|≤1m/s and|ω i|≤π/2rad/s.
+Given the robot’s current state(x i,y i,θ i)and its corre-
+sponding time-invariant goal position(x g
+i,y g
+i ), the nominal
+task controller is designed asˆv i =k vρi,ˆωi =k ωαi,where
+kv,k ω >0are proportional gains. Specifically,ρ i denotes
+the Euclidean distance to the goal andα i the heading error,
+given byρ i =
+p
+(xg
+i−x i)2 + (yg
+i−y i)2, θg
+i = atan2(yg
+i−
+yi, xg
+i−x i), αi =θ g
+i−θ i. Alternatively, one may employ
+well-developed unicycle controllers, e.g., [27], to construct
+the nominal controlleru nom and drive the robot toward the
+desired goal. Note that a detailed discussion of such nominal
+controller design is outside the scope of this paper.
+Fig. 4 illustrates the two-robot position-switching task: the
+figures show the robot motions with approximated shapes
+obtained from BP-SDFs. Fig. 5 shows the linear and angular
+velocity inputs and their respective limits, together with the
+evolution of barrier functions. The results confirm that the
+robots complete the task without collision under different
+dynamics, while satisfying both the safety constraint and
+control bounds.
+B. Safe Navigation of Four Heterogeneous Robots
+The robot dynamics and the design of the task-related
+controller in this experiment follow the same formulation
+as in Section. IV-A. In Fig. 6, the heterogeneous example
+involves four robots with distinct geometries approximated
+by its own SDF. Accordingly, four separate control barrier
+functions (h 1,h 2,h 3,h 4) are required. The results in the
+Fig. 4 and Fig. 6 demonstrate that the proposed framework
+extends naturally from homogeneous to heterogeneous multi-
+robot teams while ensuring safety.
+It is worth noting that, as illustrated in Fig. 6, hetero-
+geneous robot shapes are difficult to approximate using
+Minkowski-sum–based approaches, which typically rely on
+conservative simplifications such as bounding circles or
+convex polygons [13]. In contrast, our framework intro-
+duces a new CBF formulation that ensures safety under
+BP-SDF–based modeling of complex and realistic robot
+geometries.
+C. Quantitative Results
+We evaluate our framework on a desktop with 64GB of
+RAM and an AMD Ryzen 9 3900X processor. For each
+obstacle countm∈{1,2,4,6,...,24}, we conducted five
+independent randomized trials, each with adistinctobstacle
+configuration anddifferentstart and goal position pair, and
+report two summary metrics. (i) The average per–timestep
+computation time¯τ(s/step) and (ii) the ground-truth min-
+imum robot–obstacle distanced ⋆ (true set-to-set Euclidean
+distance). Fig. 7 shows mean curves with shaded area: in
+thetoppanel, the band denotes±1standard deviation and¯τ
+shows slow growth asmincreases, indicating the efficiency
+of our proposed method; in thebottompanel, the band
+also denotes±1standard deviation andd ⋆ >0for all
+m, demonstrating collision-free operation and robustness in
+complex environments.
+V. CONCLUSION
+In this paper, we proposed a novel method to define Con-
+trol Barrier Functions using Bernstein-Polynomial Signed
+Distance Field (BP-SDF). This method utilizes Bernstein
+polynomials (BPs) to unify the representation of obstacles
+Fig. 4: Two-robot position-switching under unicycle dynamics. The solid lines and dashed lines represent the approximated shapes by BP-SDFs and ground
+truth shapes of the robots, respectively. Snapshots att= 0,50,100, and150are shown as representative time instances. The visualizations indicate that
+the robots maintain collision-free execution throughout the entire position-switching process.
+Fig. 5: Control input and safety analysis for the two-robot position-switching task.Left: linear velocity inputsv ∗ (solid) compared with nominal task
+inputsˆv(dashed) for both robots, together with the linear velocity limits.Middle: angular velocity inputsω ∗ (solid) compared with nominal task inputs
+ˆω(dashed), with the corresponding angular velocity limits.Right: evolution of the barrier function over time, which remains nonnegative, verifying that
+the safety constraint is satisfied throughout the entire execution.
+Fig. 6: Collision avoidance among four mobile robots with different smooth convex shapes represented by the respective SDF level sets. The right figure
+shows the minimum Euclidean distance between the ground truth shapes remaining positive over time, which validates the safety guarantees as the robots
+move to the designated goal positions (marked by stars with the same colors as the robots).
+and robots. The numerical results across diverse environ-
+ments, robot dynamics, and homogeneous as well as het-
+erogeneous teams verified the effectiveness of the proposed
+method. For future work, we will investigate updating the
+BP-SDF coefficients online using real-time observations, so
+that the geometry model can be refined after the initial offline
+learning stage when the shapes of the obstacles change over
+time.
+REFERENCES
+[1] Y . Ren, F. Zhu, G. Lu, Y . Cai, L. Yin, F. Kong, J. Lin, N. Chen, and
+F. Zhang, “Safety-assured high-speed navigation for mavs,”Science
+Robotics, vol. 10, no. 98, p. eado6187, 2025.
+[2] Y . Zhang, Y . Lyu, S. E. Demir, X. Zhou, Y . Yang, J. Wang, and
+W. Luo, “Courteous mpc for autonomous driving with cbf-inspired
+risk assessment,” in2024 IEEE 27th International Conference on
+Intelligent Transportation Systems (ITSC). IEEE, 2024, pp. 2317–
+2323.
+[3] Y . Lyu, W. Luo, and J. M. Dolan, “Risk-aware safe control for decen-
+tralized multi-agent systems via dynamic responsibility allocation,” in
+Fig. 7:Quantitative results.Curves show means over five trials.Top:
+per–time-step computation time; shaded area denotes±1standard devia-
+tion.Bottom:minimum ground-truth robot–obstacle distance; shaded area
+denotes±1standard deviation.
+2023 IEEE/RSJ International Conference on Intelligent Robots and
+Systems (IROS). IEEE, 2023, pp. 9737–9744.
+[4] T. Kim and D. Panagou, “Visibility-aware rrt* for safety-critical
+navigation of perception-limited robots in unknown environments,”
+IEEE Robotics and Automation Letters, 2025.
+[5] M. W. Otte, S. G. Richardson, J. Mulligan, and G. Grudic, “Path plan-
+ning in image space for autonomous robot navigation in unstructured
+environments,”Journal of Field Robotics, vol. 26, no. 2, pp. 212–240,
+2009.
+[6] S. Wu, Y . Fang, N. Sun, B. Lu, X. Liang, and Y . Zhao, “Optimization-
+free smooth control barrier function for polygonal collision avoidance,”
+IEEE Transactions on Cybernetics, 2025.
+[7] A. D. Ames, S. Coogan, M. Egerstedt, G. Notomista, K. Sreenath,
+and P. Tabuada, “Control barrier functions: Theory and applications,”
+in18th European control conference (ECC). Ieee, 2019, pp. 3420–
+3431.
+[8] L. Wang, A. D. Ames, and M. Egerstedt, “Safety barrier certificates for
+collisions-free multirobot systems,”IEEE Transactions on Robotics,
+vol. 33, no. 3, pp. 661–674, 2017.
+[9] ——, “Safe certificate-based maneuvers for teams of quadrotors using
+differential flatness,” inIEEE International Conference on Robotics
+and Automation (ICRA). IEEE, 2017, pp. 3293–3298.
+[10] W. Xiao, N. Mehdipour, A. Collin, A. Y . Bin-Nun, E. Frazzoli, R. D.
+Tebbens, and C. Belta, “Rule-based optimal control for autonomous
+driving,” inProceedings of the ACM/IEEE 12th International Confer-
+ence on Cyber-Physical Systems, 2021, pp. 143–154.
+[11] Y . Yang, Y . Lyu, and W. Luo, “Minimally constrained multi-robot
+coordination with line-of-sight connectivity maintenance,” in2023
+IEEE International Conference on Robotics and Automation (ICRA).
+IEEE, 2023, pp. 7684–7690.
+[12] Y . Yang, Y . Lyu, Y . Zhang, S. Yi, and W. Luo, “Decentralized Multi-
+Robot Line-of-Sight Connectivity Maintenance under Uncertainty,” in
+Proceedings of Robotics: Science and Systems (RSS), Delft, Nether-
+lands, July 2024.
+[13] Y .-H. Chen, S. Liu, W. Xiao, C. Belta, and M. Otte, “Control
+barrier functions via minkowski operations for safe navigation among
+polytopic sets,” in2025 IEEE 64th Conference on Decision and
+Control (CDC), 2025, pp. 4481–4488.
+[14] M. A. Khan, T. Ibuki, and A. Chatterjee, “Gaussian control barrier
+functions: Non-parametric paradigm to safety,”IEEE Access, vol. 10,
+pp. 99 823–99 836, 2022.
+[15] K. Long, C. Qian, J. Cort ´es, and N. Atanasov, “Learning barrier
+functions with memory for robust safe navigation,”IEEE Robotics
+and Automation Letters, vol. 6, no. 3, pp. 4931–4938, 2021.
+[16] Y . Li, Y . Zhang, A. Razmjoo, and S. Calinon, “Representing robot
+geometry as distance fields: Applications to whole-body manipula-
+tion,” inIEEE International Conference on Robotics and Automation
+(ICRA). IEEE, 2024, pp. 15 351–15 357.
+[17] P. Ong, B. Capelli, L. Sabattini, and J. Cort ´es, “Nonsmooth control
+barrier function design of continuous constraints for network connec-
+tivity maintenance,”Automatica, vol. 156, p. 111209, 2023.
+[18] W. Xiao and C. Belta, “Control barrier functions for systems with
+high relative degree,” in2019 IEEE 58th conference on decision and
+control (CDC). IEEE, 2019, pp. 474–479.
+[19] M. Mukadam, J. Dong, X. Yan, F. Dellaert, and B. Boots, “Continuous-
+time gaussian process motion planning via probabilistic inference,”
+The International Journal of Robotics Research, vol. 37, no. 11, pp.
+1319–1340, 2018.
+[20] S. Calinon, “Mixture models for the analysis, edition, and synthesis
+of continuous time series,” inMixture Models and Applications.
+Springer, 2019, pp. 39–57.
+[21] W. W. Hager, “Updating the inverse of a matrix,”SIAM review, vol. 31,
+no. 2, pp. 221–239, 1989.
+[22] B. Dai, R. Khorrambakht, P. Krishnamurthy, and F. Khorrami, “Sailing
+through point clouds: Safe navigation using point cloud based control
+barrier functions,”IEEE Robotics and Automation Letters, 2024.
+[23] A. Thirugnanam, J. Zeng, and K. Sreenath, “Control barrier func-
+tions for collision avoidance between strongly convex regions,”arXiv
+preprint arXiv:2306.13259, 2025.
+[24] M. F. Reis, A. P. Aguiar, and P. Tabuada, “Control barrier function-
+based quadratic programs introduce undesirable asymptotically stable
+equilibria,”IEEE Control Systems Letters, vol. 5, no. 2, pp. 731–736,
+2020.
+[25] Y . Zhang, Y . Lyu, S. Jo, Y . Yang, and W. Luo, “Adaptive deadlock
+avoidance for decentralized multi-agent systems via cbf-inspired risk
+measurement,” in2025 IEEE International Conference on Robotics
+and Automation (ICRA). IEEE, 2025, pp. 14 917–14 923.
+[26] W. Lee, J. Sim, J. Kim, S. Jo, W. Luo, and C. Nam, “Merry-go-
+round: Safe control of decentralized multi-robot systems with deadlock
+prevention,” in2025 IEEE/RSJ International Conference on Intelligent
+Robots and Systems (IROS), Oct 2025, pp. 4589–4595.
+[27] C. Samson, “Control of chained systems application to path following
+and time-varying point-stabilization of mobile robots,”IEEE transac-
+tions on Automatic Control, vol. 40, no. 1, pp. 64–77, 2002.

@@ -1,0 +1,60 @@
+{
+  "target": "Sampled maximum gap from certified level contour to true polygon <= 10 mm",
+  "warning": "Contour gaps are diagnostics, not a continuous 1-cm clearance certificate.",
+  "training_spacing_m": 0.005,
+  "contour_grid_spacing_m": 0.001,
+  "records": [
+    {
+      "shape_index": 3,
+      "h": 0.08,
+      "patches": 180,
+      "counts": [
+        15,
+        12
+      ],
+      "level_mm": 7.3819452285129685,
+      "sampled_gap_max_mm": 15.599323042834556,
+      "sampled_gap_min_mm": 0.10508226160166971,
+      "accepted": false
+    },
+    {
+      "shape_index": 3,
+      "h": 0.04,
+      "patches": 690,
+      "counts": [
+        30,
+        23
+      ],
+      "level_mm": 2.83437733111315,
+      "sampled_gap_max_mm": 7.879116569717806,
+      "sampled_gap_min_mm": 0.10612075595912848,
+      "accepted": true
+    },
+    {
+      "shape_index": 0,
+      "h": 0.08,
+      "patches": 169,
+      "counts": [
+        13,
+        13
+      ],
+      "level_mm": 4.257361502540828,
+      "sampled_gap_max_mm": 11.799320372972213,
+      "sampled_gap_min_mm": 0.10853308486794433,
+      "accepted": false
+    },
+    {
+      "shape_index": 0,
+      "h": 0.04,
+      "patches": 650,
+      "counts": [
+        25,
+        26
+      ],
+      "level_mm": 1.8537744987366598,
+      "sampled_gap_max_mm": 3.043278584406609,
+      "sampled_gap_min_mm": 0.09395064376988695,
+      "accepted": true
+    }
+  ]
+}

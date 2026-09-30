@@ -1,0 +1,219 @@
+{
+  "link_1_cover_6mm": {
+    "radius_m": 0.005196152422706632,
+    "collar_width_m": 0.010392304845413263,
+    "whole_cell_collar_width_m": 0.012,
+    "bernstein_lower_above_level_m": 0.04521431192080854,
+    "positive": true
+  },
+  "link_2_cover_6mm": {
+    "radius_m": 0.005196152422706632,
+    "collar_width_m": 0.010392304845413263,
+    "whole_cell_collar_width_m": 0.012,
+    "bernstein_lower_above_level_m": 0.04534312483386946,
+    "positive": true
+  },
+  "link_3_cover_6mm": {
+    "radius_m": 0.005196152422706632,
+    "collar_width_m": 0.010392304845413263,
+    "whole_cell_collar_width_m": 0.012,
+    "bernstein_lower_above_level_m": 0.04449447987764337,
+    "positive": true
+  },
+  "link_4_cover_6mm": {
+    "radius_m": 0.005196152422706632,
+    "collar_width_m": 0.010392304845413263,
+    "whole_cell_collar_width_m": 0.012,
+    "bernstein_lower_above_level_m": 0.045283420918043105,
+    "positive": true
+  },
+  "link_5_cover_6mm": {
+    "radius_m": 0.005196152422706632,
+    "collar_width_m": 0.010392304845413263,
+    "whole_cell_collar_width_m": 0.012,
+    "bernstein_lower_above_level_m": 0.04565829087388214,
+    "positive": true
+  },
+  "link_6_cover_6mm": {
+    "radius_m": 0.005196152422706632,
+    "collar_width_m": 0.010392304845413263,
+    "whole_cell_collar_width_m": 0.012,
+    "bernstein_lower_above_level_m": 0.04482771599837103,
+    "positive": true
+  },
+  "link_7_cover_6mm": {
+    "radius_m": 0.005196152422706632,
+    "collar_width_m": 0.010392304845413263,
+    "whole_cell_collar_width_m": 0.012,
+    "bernstein_lower_above_level_m": 0.04391626123647062,
+    "positive": true
+  },
+  "link_8_cover_6mm": {
+    "radius_m": 0.005196152422706632,
+    "collar_width_m": 0.010392304845413263,
+    "whole_cell_collar_width_m": 0.012,
+    "bernstein_lower_above_level_m": 0.045941049277490466,
+    "positive": true
+  },
+  "arch_cover_6mm": {
+    "radius_m": 0.005196152422706632,
+    "collar_width_m": 0.010392304845413263,
+    "whole_cell_collar_width_m": 0.02,
+    "bernstein_lower_above_level_m": 0.1276279663029211,
+    "positive": true
+  },
+  "hook_cover_6mm": {
+    "radius_m": 0.005196152422706632,
+    "collar_width_m": 0.010392304845413263,
+    "whole_cell_collar_width_m": 0.02,
+    "bernstein_lower_above_level_m": 0.12769762077074467,
+    "positive": true
+  },
+  "rack_cover_6mm": {
+    "radius_m": 0.005196152422706632,
+    "collar_width_m": 0.010392304845413263,
+    "whole_cell_collar_width_m": 0.02,
+    "bernstein_lower_above_level_m": 0.12663228241470154,
+    "positive": true
+  },
+  "link_1_cover_12mm": {
+    "radius_m": 0.010392304845413263,
+    "collar_width_m": 0.020784609690826527,
+    "whole_cell_collar_width_m": 0.024,
+    "bernstein_lower_above_level_m": 0.033265506800009906,
+    "positive": true
+  },
+  "link_2_cover_12mm": {
+    "radius_m": 0.010392304845413263,
+    "collar_width_m": 0.020784609690826527,
+    "whole_cell_collar_width_m": 0.024,
+    "bernstein_lower_above_level_m": 0.03343270833032014,
+    "positive": true
+  },
+  "link_3_cover_12mm": {
+    "radius_m": 0.010392304845413263,
+    "collar_width_m": 0.020784609690826527,
+    "whole_cell_collar_width_m": 0.024,
+    "bernstein_lower_above_level_m": 0.03258199476068729,
+    "positive": true
+  },
+  "link_4_cover_12mm": {
+    "radius_m": 0.010392304845413263,
+    "collar_width_m": 0.020784609690826527,
+    "whole_cell_collar_width_m": 0.024,
+    "bernstein_lower_above_level_m": 0.03337221307364025,
+    "positive": true
+  },
+  "link_5_cover_12mm": {
+    "radius_m": 0.010392304845413263,
+    "collar_width_m": 0.020784609690826527,
+    "whole_cell_collar_width_m": 0.024,
+    "bernstein_lower_above_level_m": 0.03372658186515944,
+    "positive": true
+  },
+  "link_6_cover_12mm": {
+    "radius_m": 0.010392304845413263,
+    "collar_width_m": 0.020784609690826527,
+    "whole_cell_collar_width_m": 0.024,
+    "bernstein_lower_above_level_m": 0.032704204088282035,
+    "positive": true
+  },
+  "link_7_cover_12mm": {
+    "radius_m": 0.010392304845413263,
+    "collar_width_m": 0.020784609690826527,
+    "whole_cell_collar_width_m": 0.024,
+    "bernstein_lower_above_level_m": 0.03193915066762767,
+    "positive": true
+  },
+  "link_8_cover_12mm": {
+    "radius_m": 0.010392304845413263,
+    "collar_width_m": 0.020784609690826527,
+    "whole_cell_collar_width_m": 0.024,
+    "bernstein_lower_above_level_m": 0.03392418725747868,
+    "positive": true
+  },
+  "arch_cover_12mm": {
+    "radius_m": 0.010392304845413263,
+    "collar_width_m": 0.020784609690826527,
+    "whole_cell_collar_width_m": 0.04,
+    "bernstein_lower_above_level_m": 0.10764320693524514,
+    "positive": true
+  },
+  "hook_cover_12mm": {
+    "radius_m": 0.010392304845413263,
+    "collar_width_m": 0.020784609690826527,
+    "whole_cell_collar_width_m": 0.04,
+    "bernstein_lower_above_level_m": 0.10771664304253627,
+    "positive": true
+  },
+  "rack_cover_12mm": {
+    "radius_m": 0.010392304845413263,
+    "collar_width_m": 0.020784609690826527,
+    "whole_cell_collar_width_m": 0.04,
+    "bernstein_lower_above_level_m": 0.10663317375768644,
+    "positive": true
+  },
+  "fine_link_1": {
+    "radius_m": 0.005196152422706632,
+    "collar_width_m": 0.010392304845413263,
+    "whole_cell_collar_width_m": 0.012,
+    "bernstein_lower_above_level_m": 0.04696655196594759,
+    "positive": true
+  },
+  "fine_link_2": {
+    "radius_m": 0.005196152422706632,
+    "collar_width_m": 0.010392304845413263,
+    "whole_cell_collar_width_m": 0.012,
+    "bernstein_lower_above_level_m": 0.046879358534003254,
+    "positive": true
+  },
+  "fine_link_3": {
+    "radius_m": 0.005196152422706632,
+    "collar_width_m": 0.010392304845413263,
+    "whole_cell_collar_width_m": 0.012,
+    "bernstein_lower_above_level_m": 0.046306462578980814,
+    "positive": true
+  },
+  "fine_link_4": {
+    "radius_m": 0.005196152422706632,
+    "collar_width_m": 0.010392304845413263,
+    "whole_cell_collar_width_m": 0.012,
+    "bernstein_lower_above_level_m": 0.046593588586175474,
+    "positive": true
+  },
+  "fine_link_5": {
+    "radius_m": 0.005196152422706632,
+    "collar_width_m": 0.010392304845413263,
+    "whole_cell_collar_width_m": 0.012,
+    "bernstein_lower_above_level_m": 0.046860772182781125,
+    "positive": true
+  },
+  "fine_link_6": {
+    "radius_m": 0.005196152422706632,
+    "collar_width_m": 0.010392304845413263,
+    "whole_cell_collar_width_m": 0.012,
+    "bernstein_lower_above_level_m": 0.046451889343136175,
+    "positive": true
+  },
+  "fine_link_7": {
+    "radius_m": 0.005196152422706632,
+    "collar_width_m": 0.010392304845413263,
+    "whole_cell_collar_width_m": 0.012,
+    "bernstein_lower_above_level_m": 0.04631848298322775,
+    "positive": true
+  },
+  "fine_link_8": {
+    "radius_m": 0.005196152422706632,
+    "collar_width_m": 0.010392304845413263,
+    "whole_cell_collar_width_m": 0.012,
+    "bernstein_lower_above_level_m": 0.04700266455108829,
+    "positive": true
+  },
+  "rounded_star": {
+    "radius_m": 0.005196152422706632,
+    "collar_width_m": 0.010392304845413263,
+    "whole_cell_collar_width_m": 0.015,
+    "bernstein_lower_above_level_m": 0.1331235099267239,
+    "positive": true
+  }
+}

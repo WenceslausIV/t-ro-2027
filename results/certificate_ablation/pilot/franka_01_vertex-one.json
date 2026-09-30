@@ -1,0 +1,31 @@
+{
+  "metadata": {
+    "scene": "franka",
+    "geometry_sha256": "a676a509db7e6b45cbe145150d2beda6bafb055c64638093ed21ccd0333404e0",
+    "row_mode": "vertex",
+    "multiplier": "one",
+    "refine_near_m": "inf",
+    "refine_theta": 0.1,
+    "refine_depth": 2,
+    "dt_s": 0.01,
+    "python": "3.13.9",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "threads": 1,
+    "certificate_sha256": "3a8854cc9d89c233a06867d1c53daf94449b64a8541d6f6cd951652afee76706",
+    "trial_zero_based": 1
+  },
+  "metrics": {
+    "steps": 738,
+    "reached_s": 7.38,
+    "min_gap_bound_mm": 4.579778248044047,
+    "distance_scope": "evaluated states; existing mesh lower-bound routine",
+    "min_h_mm": 1.8115338265394187,
+    "slack_steps": 0,
+    "uncertified_gap_states": 0,
+    "control_change_integral": 4.242821070595328,
+    "t_median_ms": 46.00314993876964,
+    "t_p95_ms": 115.5308200395666,
+    "rows_max": 42408,
+    "boxes_max": 5301
+  }
+}

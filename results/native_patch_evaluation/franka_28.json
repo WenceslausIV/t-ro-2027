@@ -1,0 +1,94 @@
+{
+  "metadata": {
+    "scene": "Franka 30 fixed trials",
+    "cover_policy": "native SDF patches, s=h",
+    "refinement_depth": 0,
+    "row_mode": "vertex",
+    "multiplier": "one",
+    "dt_s": 0.01,
+    "geometry_sha256": "8bd89a28ad112acd626498563b62eba4f24c9defd3426b444eeaee5dc73df5e7",
+    "threads": 1,
+    "timing_note": "Background activity not excluded; exploratory timings.",
+    "setup": {
+      "t_setup": 119.82840500003658,
+      "cover_policy": "native patches",
+      "links": [
+        {
+          "link": 1,
+          "l_mm": 2.532891996581976,
+          "n_boxes": 1130,
+          "side_mm": 12.0
+        },
+        {
+          "link": 2,
+          "l_mm": 2.370212598136773,
+          "n_boxes": 1117,
+          "side_mm": 12.0
+        },
+        {
+          "link": 3,
+          "l_mm": 3.2477881154558754,
+          "n_boxes": 956,
+          "side_mm": 12.0
+        },
+        {
+          "link": 4,
+          "l_mm": 2.4111409407245867,
+          "n_boxes": 955,
+          "side_mm": 12.0
+        },
+        {
+          "link": 5,
+          "l_mm": 2.0644309587589293,
+          "n_boxes": 1125,
+          "side_mm": 12.0
+        },
+        {
+          "link": 6,
+          "l_mm": 2.8126826024711717,
+          "n_boxes": 706,
+          "side_mm": 12.0
+        },
+        {
+          "link": 7,
+          "l_mm": 3.7891433302819615,
+          "n_boxes": 387,
+          "side_mm": 12.0
+        },
+        {
+          "link": 8,
+          "l_mm": 1.7561842508497454,
+          "n_boxes": 471,
+          "side_mm": 12.0
+        }
+      ],
+      "obstacles": {
+        "arch": {
+          "l_mm": 1.99348794002533
+        },
+        "hook": {
+          "l_mm": 1.9234642177813515
+        },
+        "rack": {
+          "l_mm": 2.9041271252872796
+        }
+      }
+    },
+    "trial_zero_based": 28
+  },
+  "metrics": {
+    "steps": 660,
+    "reached_s": 6.6000000000000005,
+    "min_gap_bound_mm": 33.0554926237712,
+    "distance_scope": "evaluated states; existing mesh lower-bound routine",
+    "min_h_mm": 17.671258059422673,
+    "slack_steps": 0,
+    "uncertified_gap_states": 0,
+    "control_change_integral": 3.852230182118402,
+    "t_median_ms": 4.2692499700933695,
+    "t_p95_ms": 9.691834996920079,
+    "rows_max": 472,
+    "boxes_max": 59,
+    "final_gap_bound_mm": null
+  }
+}
