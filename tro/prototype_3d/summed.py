@@ -413,7 +413,9 @@ def solve(u_nom, A, T, C, E, G_in, h_in, z_prev=None, Wc=None):
     With QP_SOLVER = 'clarabel', the sparse solution is accepted only if, after setting a = |E u| and clipping w,
     every row holds exactly in double precision; otherwise the dense solver below decides."""
     if QP_SOLVER == 'clarabel' and len(C) >= QP_SPARSE_MIN_ROWS:
-        res = _solve_sparse(u_nom, A, T, C, E, G_in, h_in, Wc)
+        res = _solve_working_set(u_nom, A, T, C, E, G_in, h_in, Wc, z_prev)   # warm start first
+        if res is None:
+            res = _solve_sparse(u_nom, A, T, C, E, G_in, h_in, Wc)
         if res is not None:
             return res
     T, Wc = _dense(T), (None if Wc is None else _dense(Wc))
@@ -438,6 +440,57 @@ def solve(u_nom, A, T, C, E, G_in, h_in, z_prev=None, Wc=None):
         zp = None
     z, s = solve_ldp_qp(np.r_[u_nom, np.zeros(k + nw)], G, h, len(C), zp)
     return z[:m], s, z
+
+
+def _scaled_sparse(u_nom, A, T, C, E, G_in, h_in, Wc):
+    """Sparse G z >= h of the dense path, in its scaled variables z = (u, sqrt(EPS_T) a, sqrt(EPS_W) (w - 1))."""
+    m, k = len(u_nom), len(E)
+    nw = 0 if Wc is None else Wc.shape[1]
+    se, sw = np.sqrt(EPS_T), np.sqrt(EPS_W)
+    Z = lambda r, c: sp.csr_matrix((r, c))
+    Ik = sp.identity(k, format='csr') / se
+    rows_ = [sp.hstack([sp.csr_matrix(A), sp.csr_matrix(T) / se] + ([sp.csr_matrix(Wc) / sw] if nw else [])),
+             sp.hstack([sp.csr_matrix(-E), Ik] + ([Z(k, nw)] if nw else [])),
+             sp.hstack([sp.csr_matrix(E), Ik] + ([Z(k, nw)] if nw else [])),
+             sp.hstack([sp.csr_matrix(G_in), Z(len(G_in), k + nw)])]
+    h = [-C - (np.asarray(sp.csr_matrix(Wc).sum(axis=1)).ravel() if nw else 0.), np.zeros(2 * k), h_in]
+    if nw:
+        Iw = sp.identity(nw, format='csr')
+        rows_ += [sp.hstack([Z(nw, m + k), Iw]), sp.hstack([Z(nw, m + k), -Iw])]
+        h += [np.full(nw, -sw), np.full(nw, -sw * (W_MAX - 1))]
+    return sp.vstack(rows_, format='csr'), np.concatenate(h), m, k, nw
+
+
+QP_WS = dict(size=200, rounds=10, max_rows=3000, tol=1e-9)
+QP_STATS['working_set'] = 0
+
+
+def _solve_working_set(u_nom, A, T, C, E, G_in, h_in, Wc, z_prev):
+    """The dense path's warm-started constraint generation, on sparse rows and with a bounded working set.
+    A relaxation's minimizer that satisfies all rows (same tolerance as the dense path) is the QP minimizer.
+    Returns None when there is no warm start, the working set does not converge or grows too large, or a
+    relaxation is infeasible; the caller then uses the interior-point or dense solver."""
+    from sdf_cbf_utils import _ldp
+    G, h, m, k, nw = _scaled_sparse(u_nom, A, T, C, E, G_in, h_in, Wc)
+    n = m + k + nw
+    if z_prev is None or len(z_prev) < m:
+        return None
+    zp = z_prev if len(z_prev) == n else np.r_[z_prev[:m], np.zeros(k + nw)]
+    z0 = np.r_[u_nom, np.zeros(k + nw)]
+    work = np.zeros(len(h), dtype=bool)
+    work[np.argsort(G @ zp - h)[:QP_WS['size']]] = True
+    for _ in range(QP_WS['rounds']):
+        z = _ldp(z0, G[work].toarray(), h[work])
+        if z is None:
+            return None
+        viol = G @ z - h < -QP_WS['tol'] * np.maximum(1.0, np.abs(h))
+        if not viol.any():
+            QP_STATS['working_set'] += 1
+            return z[:m], 0., z
+        work |= viol
+        if work.sum() > QP_WS['max_rows']:
+            return None
+    return None
 
 
 def _solve_sparse(u_nom, A, T, C, E, G_in, h_in, Wc):

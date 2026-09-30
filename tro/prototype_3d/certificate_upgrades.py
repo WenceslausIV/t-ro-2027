@@ -98,6 +98,7 @@ def main():
     p.add_argument('--fallback', choices=('slack', 'zero'), default='slack')
     p.add_argument('--trials', nargs=2, type=int, default=[0, 30])
     p.add_argument('--reverse', action='store_true', help='run the trial range in descending order')
+    p.add_argument('--tag', default='', help='suffix of the output folder (default: the QP solver)')
     p.add_argument('--qp', choices=('nnls', 'clarabel'), default='nnls',
                    help='QP solver: dense least-distance NNLS, or sparse interior point with exact acceptance test')
     p.add_argument('--field', choices=('12mm', '6mm'), default='12mm',
@@ -106,7 +107,7 @@ def main():
     configure(a.variant)
     S.QP_SOLVER = a.qp
     out = OUT / (a.variant + ('_zero' if a.fallback == 'zero' else '') + ('_6mm' if a.field == '6mm' else '')
-                 + ('_clarabel' if a.qp == 'clarabel' else ''))
+                 + ('_' + a.tag if a.tag else ('_clarabel' if a.qp == 'clarabel' else '')))
     out.mkdir(parents=True, exist_ok=True)
     if a.field == '6mm':
         links, obst, info = F.build(cache_path=ROOT / 'results' / 'fine_native_6mm_trial' / 'cache_franka_6mm.npz')
