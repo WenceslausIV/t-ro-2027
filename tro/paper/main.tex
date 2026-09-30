@@ -629,14 +629,12 @@ on its surface portion, which is all Theorem~\ref{thm:invariance} requires of an
 Domain padding alone is not a certificate: if the collar bound fails, the box needs an
 alternative certified treatment. Clusters that leave the domain are checked box by box.
 
-\emph{Optional refinement.} The default uses native patches and performs no online refinement.
-Where the field varies rapidly, $\frac12M_Br^2$ can exceed
-$\norm{\nabla\phi_B}$: the bound then fails to resolve the gradient direction and can reject useful
-motion, causing a stall. An active box
-with $\frac12M_Br^2>\vartheta$ is therefore replaced online by those of its $2^n$ half-size boxes whose
-bounds of $\phi_A-l_A$ bracket zero; they cover the same part of $\mathcal S_A$.
-For unchanged derivative bounds, halving $r$ quarters the gradient remainder and reduces the
-value remainder by a factor of eight. The subdivided implementation uses $\vartheta=0.1$ and at most two halvings.
+\emph{Optional refinement.} The default performs no online refinement. Where the field varies
+rapidly, $\frac12M_Br^2$ can exceed $\norm{\nabla\phi_B}$, so the bound no longer resolves the
+gradient direction and can stall useful motion. An active box with $\frac12M_Br^2>\vartheta$ can then
+be replaced online by its half-size boxes whose bounds of $\phi_A-l_A$ bracket zero, which cover
+the same part of $\mathcal S_A$ and quarter the gradient remainder. The subdivided implementation
+uses $\vartheta=0.1$ and at most two halvings.
 The original experiments additionally limit refinement to boxes whose lower bound of $\tilde h$
 is below 1~cm, except for the tube scene; the common distance-independent rule is evaluated
 in the certificate comparison below.
@@ -808,12 +806,10 @@ one CPU thread per process; the Franka trials run in concurrent batches, with ot
 activity not excluded. The timings are separate from the isolated timings
 of the subdivided implementation.
 
-In the docking scene of Sec.~\ref{sec:exp-dock}, the vehicle's 10-mm SDF patches give 772 cover
-boxes. Over the same 9-s horizon, the nose seats to a depth of 0.691~m, with a minimum polygon gap
-of 9.1~mm and no slack. At most 192 boxes contribute 768 constraints; median/p95 filter time is
-3.08/3.67~ms. The subdivided 5-mm version seats to 0.698~m with a 1.7-mm gap
-(Table~\ref{tab:dock-base}). Thus the native-patch default docks with fewer constraints but leaves
-more clearance in this scene.
+In the docking scene of Sec.~\ref{sec:exp-dock}, the vehicle's 772 native 10-mm patches seat the
+nose to 0.691~m over the same 9~s, with a minimum polygon gap of 9.1~mm, no slack, at most 768
+constraints, and 3.08/3.67~ms median/p95 filter time; the subdivided 5-mm version seats to 0.698~m
+with a 1.7-mm gap (Table~\ref{tab:dock-base}).
 
 In a two-robot crossing with the 4-cm fields of Fig.~\ref{fig:overview}, 87 native patches and
 718 boxes of 5~mm both avoid collision without slack over 12~s (rigid-motion audits confirm positive
@@ -970,10 +966,8 @@ exact non-convex boundaries can hook where round surrogates slide past. On the 1
 by all methods, our mean path length is within 1\% of each baseline and our mean arrival time
 within 10\%, ours being the
 slowest because its remainders restrict the speed of bodies that slide close to each other: the
-benefit of exact geometry appears in tight interactions such as docking. Ours lets the robots pass
-within 0.6~mm, and the certified lower bounds of its lifted barriers stay nonnegative; it uses up to
-255 active boxes (1020 constraints) at 2.0~ms per step (median; maximum 10.2~ms). The offline cost
-for these half-size bodies is 14.5~s in total, about 3~s per body.
+benefit of exact geometry appears in tight interactions such as docking. The offline cost for these
+half-size bodies is 14.5~s in total, about 3~s per body.
 
 \subsection{Static Obstacles}\label{sec:exp-static}
 A rocket-shaped robot (0.54~m long, nose, fuselage, two fins) escapes a curved maze (Fig.~\ref{fig:static}). The passage is our own design: three horizontal passes,
@@ -1075,13 +1069,10 @@ margin-free sphere/sample runs and KKT; negative values are not penetration dept
 (Python, AMD Ryzen~9 3900X).}
 \end{table}
 
-In all 30 trials, our filtered arm has positive saved-state mesh-distance lower bounds
-(Table~\ref{tab:franka}), with a minimum of 1.1~mm between meshes and obstacles
-(median over trials 5.7~mm); no step
-requires slack, and the certified lower bounds of the lifted barriers stay nonnegative. Each certified
-level is a bound on field values at the mesh surface, not a physical offset distance. The local
-fitting error therefore allows the meshes to come closer than the sum of the two levels
-(at least 3.7~mm). Barriers at the box corners that
+In all 30 trials, our filtered arm keeps positive saved-state mesh-distance lower bounds
+(Table~\ref{tab:franka}; minimum 1.1~mm), no step requires slack, and the certified lower bounds of
+the lifted barriers stay nonnegative. The levels bound field values at the mesh surface, not physical
+offsets, so local fitting error lets the meshes come closer than the sum of two levels ($\ge3.7$~mm). Barriers at the box corners that
 bound $\phi_O$ alone kept 8.4~mm in the same trials. Within the 10-s horizon, the arm reaches the goal in 17 trials, against
 23 with those corner barriers: close to an obstacle, the remainders of~\eqref{eq:coef} slow the links
 that slide along it, and in the other trials the arm stops in front of an obstacle. The filter needs

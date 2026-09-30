@@ -1,5 +1,8 @@
 {
  "unit (historical, 12 mm)": {
+  "pooled_median_ms": 10.5350500671193,
+  "pooled_p95_ms": 16.677124914713204,
+  "pooled_over_10ms_percent": null,
   "trials": 30,
   "reached": 6,
   "reached_trials": [
@@ -24,7 +27,10 @@
   "mean_arrival_s": 6.8500000000000005
  },
  "free": {
-  "trials": 22,
+  "pooled_median_ms": 10.738596000010148,
+  "pooled_p95_ms": 38.15138200002366,
+  "pooled_over_10ms_percent": 53.05984229113251,
+  "trials": 23,
   "reached": 6,
   "reached_trials": [
    4,
@@ -39,15 +45,18 @@
   "zero_input_trials": 0,
   "zero_input_steps": 0,
   "min_gap_bound_mm": 14.155026424275492,
-  "median_trial_min_gap_mm": 21.21349679066973,
+  "median_trial_min_gap_mm": 20.122180603813693,
   "nonpositive_gap_states": 0,
-  "median_of_trial_median_ms": 11.199869499705528,
+  "median_of_trial_median_ms": 11.129413999697135,
   "max_trial_p95_ms": 826.90022945012,
   "rows_max": 9045,
   "boxes_max": 335,
   "mean_arrival_s": 6.118333333333333
  },
  "sampled_zero": {
+  "pooled_median_ms": 9.47576199996547,
+  "pooled_p95_ms": 30.92080489941509,
+  "pooled_over_10ms_percent": 45.62114733159327,
   "trials": 19,
   "reached": 5,
   "reached_trials": [
@@ -71,6 +80,9 @@
   "mean_arrival_s": 8.014000000000001
  },
  "sampled_zero_6mm": {
+  "pooled_median_ms": 53.72648799948365,
+  "pooled_p95_ms": 631.0944465003558,
+  "pooled_over_10ms_percent": 68.50168787327966,
   "trials": 4,
   "reached": 2,
   "reached_trials": [
@@ -91,6 +103,9 @@
   "mean_arrival_s": 9.255
  },
  "unit": {
+  "pooled_median_ms": 8.236215500119215,
+  "pooled_p95_ms": 14.354573699984018,
+  "pooled_over_10ms_percent": 17.3841059602649,
   "trials": 5,
   "reached": 1,
   "reached_trials": [

@@ -1,0 +1,30 @@
+{
+ "trial": 22,
+ "variant": "free",
+ "fallback": "slack",
+ "metrics": {
+  "steps": 1000,
+  "reached_s": null,
+  "slack_steps": 0,
+  "zero_steps": 0,
+  "min_gap_bound_mm": 15.985255459322241,
+  "nonpositive_gap_states": 0,
+  "min_h_mm": -4.0769839758928,
+  "t_median_ms": 10.837225499997771,
+  "t_p95_ms": 16.648228749996008,
+  "active_t_median_ms": 11.084895999999844,
+  "active_t_p95_ms": 17.111024099983744,
+  "rows_max": 2376,
+  "boxes_max": 88,
+  "w_range": [
+   -6.861178292183467e-14,
+   1.0191168845508833
+  ]
+ },
+ "cover": "native SDF patches (12mm), no refinement",
+ "dt_s": 0.01,
+ "gamma": 5.0,
+ "eta_m": 0.03,
+ "sampled": null,
+ "note": "Saved-state mesh lower bounds include the final state. One thread; this machine."
+}
