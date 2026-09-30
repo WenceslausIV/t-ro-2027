@@ -396,10 +396,11 @@ def rows(bodyA, idx, RbA, yc, fB, lB, M3B, Jc, W, Sb, eta, umax, auxmax, gamma=G
     return Acoef[need], Tcoef[need], C[need], n_box, h_low, first
 
 
-QP_SOLVER = os.environ.get('SUMMED_QP', 'nnls')  # 'nnls': dense least-distance program; 'clarabel': sparse IPM
+QP_SOLVER = os.environ.get('SUMMED_QP', 'nnls')  # 'nnls': dense least-distance program; 'clarabel': sparse IPM;
+                                                 # 'daqp': constraint generation with a dual active-set solver
 QP_MARGIN = 1e-7                  # rows and input bounds are tightened by this much (conservative only)
 QP_SPARSE_MIN_ROWS = int(os.environ.get('SUMMED_QP_MIN_ROWS', 2000))   # smaller QPs stay with the dense solver
-QP_STATS = dict(sparse=0, fallback=0, infeasible=0, rejected=0, rescued=0)
+QP_STATS = dict(sparse=0, fallback=0, infeasible=0, rejected=0, rescued=0, active_set=0, active_set_rounds=0)
 
 
 def _dense(X):
@@ -428,8 +429,13 @@ def solve(u_nom, A, T, C, E, G_in, h_in, z_prev=None, Wc=None):
     No solver is trusted: the returned slack is the exact violation of the returned input (function violation),
     zero only if every row and input bound holds in double precision. A rejected solution of the dense
     least-distance solver (its NNLS can return an infeasible point without notice) is retried with the sparse
-    interior-point solver. With QP_SOLVER = 'clarabel', large QPs go to the sparse solvers first."""
+    interior-point solver. With QP_SOLVER = 'clarabel', large QPs go to the sparse solvers first; with
+    QP_SOLVER = 'daqp', every QP goes to _solve_active_set first."""
     tried_sparse = False
+    if QP_SOLVER == 'daqp':
+        res = _solve_active_set(u_nom, A, T, C, E, G_in, h_in, Wc, z_prev)
+        if res is not None and violation(res[0], res[2], A, T, C, E, G_in, h_in, Wc) == 0.:
+            return res
     if QP_SOLVER == 'clarabel' and len(C) >= QP_SPARSE_MIN_ROWS:
         res = _solve_working_set(u_nom, A, T, C, E, G_in, h_in, Wc, z_prev)   # warm start first
         if res is None:
@@ -448,6 +454,83 @@ def solve(u_nom, A, T, C, E, G_in, h_in, z_prev=None, Wc=None):
             QP_STATS['rescued'] += 1
             return res
     return u, max(v, s), z
+
+
+QP_AS = dict(size=150, add=200, rounds=50, tol=1e-9, primal_tol=1e-10)
+
+
+def _solve_active_set(u_nom, A, T, C, E, G_in, h_in, Wc, z_prev):
+    """The same QP by constraint generation: DAQP (dual active set) solves it on a working set of rows,
+    starting from the rows closest to tight at the previous input; rows violated at its minimizer are added
+    (most violated first) and the dual solution warm-starts the next round. A relaxation's minimizer that
+    satisfies all rows is the minimizer of the full QP. Two exact reductions keep each relaxation small:
+      * identical rows of E (the same link twist, or s >= |u|, repeated in several pair blocks) share one
+        auxiliary variable weighted by their count: T <= 0 and the objective drive every copy to |E_i u|, so
+        both problems have the same minimizer;
+      * a multiplier whose box has no row in the working set is fixed at its minimizer 1 of the relaxation.
+    Returns (u, 0, z) with the warm-start vector z of the dense path, or None (relaxation infeasible, solver
+    failure, or no convergence); the caller then uses the other solvers, and every returned input is checked
+    exactly."""
+    import daqp
+    from ctypes import c_int
+    m, k = len(u_nom), len(E)
+    nw = 0 if Wc is None else Wc.shape[1]
+    Eu, inv, cnt = np.unique(E, axis=0, return_inverse=True, return_counts=True)
+    inv = np.asarray(inv).ravel()
+    ku = len(Eu)
+    P = sp.csr_matrix((np.ones(k), (np.arange(k), inv)), shape=(k, ku))
+    Tu = sp.csr_matrix(T) @ P
+    Z = lambda r, c: sp.csr_matrix((r, c))
+    Ik = sp.identity(ku, format='csr')
+    L = sp.vstack([sp.hstack([sp.csr_matrix(A), Tu] + ([sp.csr_matrix(Wc)] if nw else [])),
+                   sp.hstack([sp.csr_matrix(-Eu), Ik] + ([Z(ku, nw)] if nw else [])),
+                   sp.hstack([sp.csr_matrix(Eu), Ik] + ([Z(ku, nw)] if nw else [])),
+                   sp.hstack([sp.csr_matrix(G_in), Z(len(G_in), ku + nw)])], format='csr')
+    lb = np.r_[-C + QP_MARGIN, np.zeros(2 * ku), h_in + QP_MARGIN]
+    nb = m + ku                                              # variables always present: u and shared a
+    hd = np.r_[np.full(m, 2.), 2 * EPS_T * cnt, np.full(nw, 2 * EPS_W)]
+    f = np.r_[-2 * u_nom, np.zeros(ku), np.full(nw, -2 * EPS_W)]
+    bu_x = np.r_[np.full(nb, 1e30), np.full(nw, W_MAX)]
+    bl_x = np.r_[np.full(nb, -1e30), np.zeros(nw)]
+    box = np.full(len(lb), -1)                               # the multiplier column of each row, if any
+    if nw:
+        Wo = sp.csr_matrix(Wc).tocoo()
+        box[Wo.row] = Wo.col
+    u0 = z_prev[:m] if z_prev is not None and len(z_prev) >= m else u_nom
+    xf = np.r_[u0, np.abs(Eu @ u0), np.ones(nw)]
+    r = L @ xf - lb
+    work = np.zeros(len(lb), bool)
+    work[np.argsort(r)[:min(len(lb), QP_AS['size'])]] = True
+    lam_x, lam_r = np.zeros(nb + nw), None
+    for rnd in range(QP_AS['rounds']):
+        wi = np.flatnonzero(work)
+        bw = np.unique(box[wi][box[wi] >= 0])
+        cols = np.r_[np.arange(nb), nb + bw]
+        kw = dict(primal_tol=QP_AS['primal_tol'])
+        if lam_r is not None:
+            kw['dual_start'] = np.r_[lam_x[cols], lam_r[wi]]
+        x, _, flag, info = daqp.solve(np.diag(hd[cols]), f[cols], L[wi][:, cols].toarray(),
+                                      np.r_[bu_x[cols], np.full(len(wi), 1e30)], np.r_[bl_x[cols], lb[wi]],
+                                      np.zeros(len(cols) + len(wi), dtype=c_int), **kw)
+        if flag < 0:
+            return None
+        lam = np.asarray(info['lam'])
+        lam_x[:] = 0.
+        lam_x[cols] = lam[:len(cols)]
+        lam_r = np.zeros(len(lb))
+        lam_r[wi] = lam[len(cols):]
+        xf = np.r_[x[:nb], np.ones(nw)]
+        xf[nb + bw] = x[nb:]
+        r = L @ xf - lb
+        viol = (r < -QP_AS['tol'] * np.maximum(1., np.abs(lb))) & ~work
+        if not viol.any():
+            QP_STATS['active_set'] += 1
+            QP_STATS['active_set_rounds'] += rnd + 1
+            u, a = xf[:m], xf[m:nb][inv]
+            return u, 0., np.r_[u, np.sqrt(EPS_T) * a, np.sqrt(EPS_W) * (xf[nb:] - 1)]
+        idx = np.flatnonzero(viol)
+        work[idx[np.argsort(r[idx])[:QP_AS['add']]]] = True
+    return None
 
 
 def _solve_dense(u_nom, A, T, C, E, G_in, h_in, z_prev=None, Wc=None):

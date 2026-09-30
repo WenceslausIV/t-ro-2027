@@ -99,8 +99,8 @@ def main():
     p.add_argument('--trials', nargs=2, type=int, default=[0, 30])
     p.add_argument('--reverse', action='store_true', help='run the trial range in descending order')
     p.add_argument('--tag', default='', help='suffix of the output folder (default: the QP solver)')
-    p.add_argument('--qp', choices=('nnls', 'clarabel'), default='nnls',
-                   help='QP solver: dense least-distance NNLS, or sparse interior point with exact acceptance test')
+    p.add_argument('--qp', choices=('nnls', 'clarabel', 'daqp'), default='nnls',
+                   help='QP solver: dense least-distance NNLS, sparse interior point, or DAQP constraint generation')
     p.add_argument('--field', choices=('12mm', '6mm'), default='12mm',
                    help='link SDF cells; 6mm uses the refitted fields of results/fine_native_6mm_trial')
     a = p.parse_args()
