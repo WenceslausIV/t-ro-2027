@@ -181,7 +181,18 @@ def _velocity_rows(val, g, H, m3, Jc, W, Sb, s, r, R, dim, gamma):
 ROW_MODE = os.environ.get('SUMMED_ROW', 'vertex')
 MULT_MODE = os.environ.get('SUMMED_MULT', 'one')
 ROW_MODES = ('vertex', 'bernstein', 'single')
-MULT_MODES = ('one', 'norm', 'proj')
+MULT_MODES = ('one', 'norm', 'proj', 'free')
+W_MAX = 3.                         # 'free' multipliers: one variable w in [0, W_MAX] per active box
+EPS_W = 1e-3                       # QP weight of (w - 1)
+
+
+def split_values(D, val, s, r, dim):
+    """Split the Bernstein coefficients of the unit-lift value bound into the part of phi_A - l_A (with its
+    remainder, which scales with the multiplier) and the part of phi_B - l_B (with its remainder)."""
+    TK, QT = TABLES[dim]
+    valA = ((D['vA'] - D['m3A'] * r ** 3 / 6)[:, None] + s * D['gA'] @ TK.T
+            + .5 * s ** 2 * np.einsum('kab,nab->nk', QT, D['HA']))
+    return valA, val - valA
 
 
 def multiplier_weights(gA, gB_local, mode):
@@ -191,8 +202,8 @@ def multiplier_weights(gA, gB_local, mode):
     Projection weights may be negative; their Taylor error MUST use abs(w).
     No cancellation or second-order claim is made for the full CBF residual.
     """
-    if mode not in MULT_MODES:
-        raise ValueError(f'Unknown multiplier mode: {mode}')
+    if mode not in MULT_MODES or mode == 'free':
+        raise ValueError(f'Multiplier mode {mode} has no fixed weights')
     if mode == 'one':
         return np.ones(len(gA))
     aa = np.einsum('ni,ni->n', gA, gA) + 1e-12
@@ -274,8 +285,26 @@ def _children(D, bodyA, s, r, R, W, dim):
     return {k: x[has] for k, x in C.items()}
 
 
+def sampled_tightening(yc, g, rbar, r, sd):
+    """Per-box coefficients of the sampled-data tightening (Theorem sampled of the paper) on the auxiliary
+    variables (a_V, a_Omega, s): with the input held for dt, every box point satisfies
+        |ydot| <= sigma = 1.a_V + rbar 1.a_Omega + dt c2 nu 1.s <= sigma_bar,   |yddot| <= c2 nu 1.s,
+    where c2 = 1.5 D (D bounds the lever arms of the link), nu >= |u|_1 and the twist caps are enforced in the
+    QP, so |d^2/dt^2 phi_B(y)| <= H sigma_bar sigma + G c2 nu 1.s with H, G bounding |Hess phi_B|, |grad phi_B|
+    on the swept ball of radius r + travel. The row is tightened by dt/2 times this bound."""
+    dt, V, Om, nu, c2, travel, m = sd['dt'], sd['V'], sd['Om'], sd['nu'], sd['c2'], sd['travel'], sd['m']
+    P3 = yc if yc.shape[1] == 3 else np.c_[yc, np.zeros(len(yc))]
+    Hq = sd['M2'].eval(P3)
+    Gq = np.linalg.norm(g, axis=1) + Hq * (r + travel)
+    sbar = V + rbar * Om + dt * c2 * nu * nu
+    k = Hq * sbar
+    dim = yc.shape[1]
+    return .5 * dt * np.c_[np.repeat(k[:, None], dim, axis=1), np.repeat((k * rbar)[:, None], dim, axis=1),
+                           np.repeat((k * dt * c2 * nu + Gq * c2 * nu)[:, None], m, axis=1)]
+
+
 def rows(bodyA, idx, RbA, yc, fB, lB, M3B, Jc, W, Sb, eta, umax, auxmax, gamma=GAMMA_DEFAULT, prune_rows=True,
-         theta=None, depth=None, near=None, row_mode=None, mult_mode=None):
+         theta=None, depth=None, near=None, row_mode=None, mult_mode=None, sd=None):
     """Coefficient rows for the boxes idx of A (centers yc in B's frame, rotation RbA: A frame -> B frame).
     Jc: (n, m, dim) center velocity per input (B frame); W: (m, dim, dim) rotation generators (B frame).
     Sb: (n, k) speed coefficients, |ydot(x)| <= Sb . a on the box for auxiliary variables a >= |E u|
@@ -284,7 +313,8 @@ def rows(bodyA, idx, RbA, yc, fB, lB, M3B, Jc, W, Sb, eta, umax, auxmax, gamma=G
     An active box whose gradient remainder M3_B r^2 / 2 exceeds theta is replaced by its half-size boxes that
     meet S_A (at most `depth` times); they cover the same part of the surface.
     Returns A (N, m), T (N, k), C (N,) with rows A u + T a + C >= 0, the number of boxes with rows, the
-    minimum over those boxes of the certified lower bound of h~, and the indices (into idx) of the active boxes."""
+    minimum over those boxes of the certified lower bound of h~, and the indices (into idx) of the active boxes.
+    sd (optional): sampled-data data (see sampled_tightening); the auxiliary vector is then (a, s) with s >= |u|."""
     theta = REFINE_THETA if theta is None else theta
     depth = REFINE_DEPTH if depth is None else depth
     near = REFINE_NEAR if near is None else near
@@ -307,7 +337,21 @@ def rows(bodyA, idx, RbA, yc, fB, lB, M3B, Jc, W, Sb, eta, umax, auxmax, gamma=G
         refine = (active & (.5 * m3 * r ** 2 > theta) & (val.min(axis=1) < near) if level_ < depth
                   else np.zeros_like(active))
         final = active & ~refine
-        if final.any():
+        if final.any() and mult_mode == 'free':
+            # joint certificate with a per-box multiplier w (a QP variable): the rows
+            #   b_k(velocity part)(u) + gamma w beta_k^A + gamma beta_k^B - remainders(a) >= 0
+            # are affine in (u, a, w); beta^A carries -M3_A r^3/6, so the remainder scales with w >= 0.
+            valA, valB = split_values({k: x[final] for k, x in D.items()}, val[final], s, r, dim)
+            Ar_, Tr_, Cr_ = _velocity_rows(valB, g[final], H[final], m3[final], D['Jc'][final], W,
+                                           D['Sb'][final], s, r, R, dim, gamma)
+            K = valA.shape[1]
+            if sd is not None:
+                Tr_ = np.c_[Tr_, np.zeros((len(Tr_), sd['m']))] - np.repeat(
+                    sampled_tightening(D['yc'][final], g[final], D['Sb'][final][:, -1], r, sd), K, axis=0)
+            out.append((Ar_, Tr_, Cr_, gamma * valA.ravel(), np.repeat(n_box + np.arange(len(valA)), K)))
+            n_box += int(final.sum())
+            h_low = min(h_low, float(val[final].min()))
+        elif final.any():
             cert_val = weighted_values(val[final], {k: x[final] for k, x in D.items()},
                                        g[final], R, s, r, dim, mult_mode)
             if row_mode == 'vertex':
@@ -319,6 +363,12 @@ def rows(bodyA, idx, RbA, yc, fB, lB, M3B, Jc, W, Sb, eta, umax, auxmax, gamma=G
             else:
                 out.append(_velocity_rows(cert_val, g[final], H[final], m3[final], D['Jc'][final], W,
                                           D['Sb'][final], s, r, R, dim, gamma))
+            if sd is not None:
+                Ar_, Tr_, Cr_ = out[-1]
+                per = len(Cr_) // int(final.sum())
+                Tr_ = np.c_[Tr_, np.zeros((len(Tr_), sd['m']))] - np.repeat(
+                    sampled_tightening(D['yc'][final], g[final], D['Sb'][final][:, -1], r, sd), per, axis=0)
+                out[-1] = (Ar_, Tr_, Cr_)
             n_box += int(final.sum())
             h_low = min(h_low, float(val[final].min()))
         if not refine.any():
@@ -329,22 +379,44 @@ def rows(bodyA, idx, RbA, yc, fB, lB, M3B, Jc, W, Sb, eta, umax, auxmax, gamma=G
         return None
     Acoef, Tcoef, C = (np.vstack([o[0] for o in out]), np.vstack([o[1] for o in out]),
                        np.concatenate([o[2] for o in out]))
+    if mult_mode == 'free':
+        wcol, bid = np.concatenate([o[3] for o in out]), np.concatenate([o[4] for o in out])
+        worst = C + np.minimum(0., wcol * W_MAX)           # the row's minimum over w in [0, W_MAX]
+    else:
+        worst = C
     if prune_rows:                                        # rows that some admissible input can violate
-        need = C < np.abs(Acoef) @ umax - Tcoef @ auxmax
+        need = worst < np.abs(Acoef) @ umax - Tcoef @ auxmax
     else:
         need = np.ones(len(C), bool)
+    if mult_mode == 'free':
+        Wc = np.zeros((int(need.sum()), n_box))
+        Wc[np.arange(len(Wc)), bid[need]] = wcol[need]
+        return Acoef[need], Tcoef[need], C[need], n_box, h_low, first, Wc
     return Acoef[need], Tcoef[need], C[need], n_box, h_low, first
 
 
-def solve(u_nom, A, T, C, E, G_in, h_in, z_prev=None):
-    """min |u - u_nom|^2 + EPS_T |a|^2  s.t.  A u + T a + C >= 0,  a >= |E u|,  G_in u >= h_in.
+def solve(u_nom, A, T, C, E, G_in, h_in, z_prev=None, Wc=None):
+    """min |u - u_nom|^2 + EPS_T |a|^2 (+ EPS_W |w - 1|^2)  s.t.  A u + T a (+ Wc w) + C >= 0,  a >= |E u|,
+    G_in u >= h_in (and 0 <= w <= W_MAX for 'free' multipliers, one per column of Wc).
     The feasible set in u equals that of A u + T |E u| + C >= 0 (T <= 0). Returns u, slack, z (warm start)."""
     from sdf_cbf_utils import solve_ldp_qp
     m, k = len(u_nom), len(E)
-    se = np.sqrt(EPS_T)
+    nw = 0 if Wc is None else Wc.shape[1]
+    se, sw = np.sqrt(EPS_T), np.sqrt(EPS_W)
     I = np.eye(k)
-    G = np.vstack([np.c_[A, T / se], np.c_[-E, I / se], np.c_[E, I / se], np.c_[G_in, np.zeros((len(G_in), k))]])
-    h = np.r_[-C, np.zeros(2 * k), h_in]
-    zp = z_prev if z_prev is not None and len(z_prev) == m + k else None
-    z, s = solve_ldp_qp(np.r_[u_nom, np.zeros(k)], G, h, len(C), zp)
+    pad = lambda X, c: np.c_[X, np.zeros((len(X), c))]
+    G = np.vstack([np.c_[A, T / se] if nw == 0 else np.c_[A, T / se, Wc / sw],
+                   pad(np.c_[-E, I / se], nw), pad(np.c_[E, I / se], nw), pad(G_in, k + nw)])
+    h = np.r_[-C if nw == 0 else -C - Wc.sum(axis=1), np.zeros(2 * k), h_in]
+    if nw:                                  # scaled variable sw (w - 1): w >= 0 and w <= W_MAX
+        Iw = np.eye(nw)
+        G = np.vstack([G, np.c_[np.zeros((nw, m + k)), Iw], np.c_[np.zeros((nw, m + k)), -Iw]])
+        h = np.r_[h, np.full(nw, -sw), np.full(nw, -sw * (W_MAX - 1))]
+    if z_prev is not None and len(z_prev) == m + k + nw:
+        zp = z_prev
+    elif nw and z_prev is not None and len(z_prev) >= m:   # the numbers of pairs and boxes changed
+        zp = np.r_[z_prev[:m], np.zeros(k + nw)]
+    else:
+        zp = None
+    z, s = solve_ldp_qp(np.r_[u_nom, np.zeros(k + nw)], G, h, len(C), zp)
     return z[:m], s, z

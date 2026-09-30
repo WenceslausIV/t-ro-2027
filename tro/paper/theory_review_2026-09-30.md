@@ -208,3 +208,19 @@ $\mathbf u_k=\mathbf 0$, $e$ is constant. Induction over $k$ concludes.
   이론적으로 뒷받침하는 가장 좋은 경로다.
 - §4.1, §4.2의 새 명제/정리: 방법·구현이 바뀌고 재실험이 필요하므로 초안만 제시.
 - 그림, 안전집합 정의, SDF 사용: CLAUDE.md의 제약대로 불변.
+
+---
+
+## 6. 후속: 제안 §4.1, §4.2 구현 (2026-09-30, 사용자 요청 “다 고쳐”)
+
+- 원고: Prop. `prop:second`(2차 정확도), 자유 multiplier 문단, Thm `thm:sampled`, Cor. `cor:sampled` 추가.
+  Limitations의 두 문단을 “Closed loop and sampling” 하나로 통합. 인증서 비교 절은 고정 multiplier 4행을
+  한 문장(λ≈1 해석)으로 압축.
+- 코드: `summed.py`(mult_mode `free`, `sampled_tightening`, `solve(..., Wc)`), `summed3d.py`(`pair_rows(..., sd)`,
+  `stack`), 새 파일 `sampled_data.py`, `certificate_upgrades.py`, `certificate_upgrades_report.py`.
+  기본 경로(`vertex`/`one`)는 바뀌지 않았고, 기존 native 결과가 비트 단위로 재현됨을 확인.
+- 수치 검증(증명 아님): 행의 실현가능 경계에서 7.2e5개 상자 점 모두 F+γw g_A > 0; sampled 곡률 상한은
+  관측 |e''|의 8.5배 이상, 이동 상한은 관측 이동의 2.5배 이상.
+- 첫 관찰: 역사적 native trial 18(1000 스텝 전부 slack)은 단위 lift의 상자 하한이 시작부터 음수(−1.66 mm)였기
+  때문이며, 자유 multiplier로는 slack 0 — 2차 정확도 명제가 예측한 효과.
+- 30회 결과: `results/certificate_upgrades/summary.md`.

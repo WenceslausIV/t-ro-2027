@@ -45,7 +45,7 @@ def skew(w):
     return W - np.swapaxes(W, -1, -2)
 
 
-def pair_rows(A, RA, pA, B, RB, pB, joints, eta, umax, gamma=F.GAMMA):
+def pair_rows(A, RA, pA, B, RB, pB, joints, eta, umax, gamma=F.GAMMA, sd=None):
     """Rows of link A (world pose RA, pA) against the field of B (world pose RB, pB).
     joints: list of (Z (k,3), O (k,3), n_moving, sign, column offset) describing which inputs move A (+) and B (-).
     Returns (A_rows, T_rows, C, n_boxes, h_low) or None."""
@@ -92,10 +92,26 @@ def pair_rows(A, RA, pA, B, RB, pB, joints, eta, umax, gamma=F.GAMMA):
         E[3:, off:off + nmov] = sign * Z[:nmov].T
     rho = np.linalg.norm(cw - pA, axis=1) + r
     Sb = np.c_[np.ones((len(sub), 3)), np.repeat(rho[:, None], 3, axis=1)]
-    res = S.rows(sb, sub, RbA, C, fB, lB, M3B, Jc, W, Sb, eta, umax, np.abs(E) @ umax, gamma)
+    if sd is not None:                              # sampled data: auxiliary (a, s) with s >= |u|, and caps
+        sd = dict(sd, M2=B['M2_sd'], m=m)
+        E = np.r_[E, np.eye(m)]
+    res = S.rows(sb, sub, RbA, C, fB, lB, M3B, Jc, W, Sb, eta, umax, np.abs(E) @ umax, gamma, sd=sd)
     if res is None:
         return None
-    Ar, Tr, Cr, nbox, hlow, _ = res
+    if sd is not None:                              # 1.a_V <= V, 1.a_Omega <= Om, 1.s <= nu
+        k = len(E)
+        Tcap = np.zeros((3, k))
+        Tcap[0, :3], Tcap[1, 3:6], Tcap[2, 6:] = -1., -1., -1.
+        res = list(res)
+        res[0] = np.r_[res[0], np.zeros((3, m))]
+        res[1] = np.r_[res[1], Tcap]
+        res[2] = np.r_[res[2], [sd['V'], sd['Om'], sd['nu']]]
+        if len(res) == 7:
+            res[6] = np.r_[res[6], np.zeros((3, res[6].shape[1]))]
+        res = tuple(res)
+    Ar, Tr, Cr, nbox, hlow = res[:5]
+    if len(res) == 7:                               # 'free' multipliers: one column per active box
+        return Ar, Tr, Cr, nbox, hlow, E, res[6]
     return Ar, Tr, Cr, nbox, hlow, E
 
 
@@ -110,8 +126,16 @@ def stack(results, m):
     for r in res:
         T[i:i + len(r[2]), j:j + len(r[5])] = r[1]
         i += len(r[2]); j += len(r[5])
-    return (np.vstack([r[0] for r in res]), T, np.concatenate([r[2] for r in res]),
-            sum(r[3] for r in res), min(r[4] for r in res), np.vstack([r[5] for r in res]))
+    out = (np.vstack([r[0] for r in res]), T, np.concatenate([r[2] for r in res]),
+           sum(r[3] for r in res), min(r[4] for r in res), np.vstack([r[5] for r in res]))
+    if len(res[0]) == 7:                            # block-diagonal multiplier columns of all pairs
+        Wc = np.zeros((len(out[2]), sum(r[6].shape[1] for r in res)))
+        i = j = 0
+        for r in res:
+            Wc[i:i + len(r[2]), j:j + r[6].shape[1]] = r[6]
+            i += len(r[2]); j += r[6].shape[1]
+        return out + (Wc,)
+    return out
 
 
 # ---------------------------------------------------------------------------------------------
