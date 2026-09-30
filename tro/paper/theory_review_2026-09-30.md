@@ -224,3 +224,7 @@ $\mathbf u_k=\mathbf 0$, $e$ is constant. Induction over $k$ concludes.
 - 첫 관찰: 역사적 native trial 18(1000 스텝 전부 slack)은 단위 lift의 상자 하한이 시작부터 음수(−1.66 mm)였기
   때문이며, 자유 multiplier로는 slack 0 — 2차 정확도 명제가 예측한 효과.
 - 30회 결과: `results/certificate_upgrades/summary.md`.
+- 최종 결과(`results/certificate_upgrades/README.md`): 12-mm unit 6/30(slack 2회) → free 8/30(slack 0) →
+  sampled 7/30(u=0 대체 0). 6-mm sampled 13/28(대체 0, 최소 4.3 mm). 6-mm의 trial 16, 19는 계산 비용
+  (dense NNLS QP, 활성 상자 1260–1490개) 때문에 사용자 결정으로 중단했고, 논문 표 IV 주석에 명시.
+  두 trial은 어떤 방법도 도착하지 못한 trial이라 같은 28회 기준 비교(subdivided 17)는 불변.

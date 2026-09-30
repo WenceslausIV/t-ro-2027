@@ -914,3 +914,17 @@ Applied to main.tex (theory text only; method, experiments, figures unchanged; b
   cell size h -> Delta, rho (cover) -> r-bar, Q (Prop tight) -> N, a/b (comparison) -> nu_A/nu_B, J (input modification) -> D.
 Proposed, not applied (need code and reruns; user decision): free per-box multiplier as a QP variable with a
 second-order accuracy proposition, and a sampled-data theorem whose tightening is quadratic in the input.
+
+---
+
+## Batch 19 - 2026-09-30 (Claude): optimized multipliers and sampled-data certificate implemented and evaluated
+
+- main.tex: Prop. second (second-order accuracy with optimized multipliers), Thm. sampled and Cor. sampled
+  (held-input controller certified between samples; zero-input fallback removes feasibility and existence
+  assumptions), rewritten Sec. native (moved after the dual-arm section) with Table IV, updated abstract (198 words),
+  contributions, intro, limitations, conclusion. Build: 13 pages, no warnings.
+- Code: summed.py ('free' multipliers, sampled tightening, QP columns), summed3d.py, sampled_data.py,
+  certificate_upgrades.py, certificate_upgrades_report.py. Default paths unchanged (historical runs reproduce exactly).
+- Results: results/certificate_upgrades/README.md. 6-mm run stopped at 28 trials by user decision; the stopped
+  trials 16 and 19 are reached by no method and are disclosed in the Table IV note.
+- Open for the next run: sparse QP solver, cluster-shared multipliers, local gradient bounds for the activation threshold.

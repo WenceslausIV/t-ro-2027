@@ -108,12 +108,11 @@ multipliers, without closest-point optimization; optimized multipliers make the 
 quadratic in the patch size. A tightening that vanishes at rest, with a zero-input fallback,
 certifies the sampled-data controller between samples without feasibility assumptions. The
 construction applies to planar and spatial, rigid and articulated bodies, with one field per body.
-It docked where bounding circles could not. In 30 Franka Panda trials whose
-unfiltered motions collide, the certified sampled-data controller with native 6-mm patches reached
-@6R@ goals at a high computational cost; subdivided covers without that certificate reached 17.
-Without margins, sphere and surface-sample barriers collided in 13 and 15 trials and a
-closest-point baseline in 5; with 1-cm margins, the primitives avoided detected collisions and
-reached more goals.
+It docked where bounding circles could not. In 30 Franka Panda trials whose unfiltered motions
+collide, margin-free sphere and surface-sample barriers collided in 13 and 15 trials, a
+closest-point barrier in 5; with 1-cm margins, the primitives avoided detected collisions and reached
+more goals. On 28 of these trials, the certified sampled-data controller with native 6-mm patches
+reached 13 goals at high cost, and subdivided covers without it 17.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -864,9 +863,8 @@ violates its constraint by 0.9~mm; the circles stop the nose 8~cm in front of th
 
 \subsection{Multiple Robots}\label{sec:exp-five}
 Five shapes are generated as star-shaped radial Fourier series with hull-area ratios below 0.9,
-and scaled to radii of 0.85--1.08~m. Each body needs one field: the five tightest levels
-(0.29--0.35~mm) and covers (1240--1426 boxes), with the Taylor data of the boxes, take 50~s in total,
-an offline cost linear in the number of bodies. The robots move to the
+and scaled to radii of 0.85--1.08~m. With one field per body, the five levels (0.29--0.35~mm) and
+covers (1240--1426 boxes) take 50~s offline, linear in the number of bodies. The robots move to the
 antipodal positions on a circle of radius 4~m under $SE(2)$ single-integrator dynamics, with start
 and goal angles perturbed by up to $9^\circ$ and $20^\circ$ to avoid the central deadlock of exactly
 antipodal goals. All robots reach their goals after 12.5~s (Fig.~\ref{fig:five}); the minimum
@@ -1120,19 +1118,21 @@ constraints, and median filter times of 1.81 and 3.31~ms.
 \setlength{\tabcolsep}{2.2pt}
 \begin{tabular}{llcccc}
 \toprule
-link fields & certificate & reached & infeasible & min.\ [mm] & rows, max.\\
+fields & certificate & reached & infeasible & min.\ [mm] & rows\\
 \midrule
 12~mm & unit lift, slack & 6 & 1497 (2) & 15.3 & 2064\\
 12~mm & optimized $w$, slack & 8 & 0 & 12.5 & 9045\\
-12~mm & opt.\ $w$, sampled, $\mathbf u{=}\mathbf 0$ & 7 & 0 & 12.3 & 16{,}857\\
-6~mm & opt.\ $w$, sampled, $\mathbf u{=}\mathbf 0$ & @6R@ & @6Z@ & @6G@ & @6ROWS@\\
+12~mm & optimized $w$, sampled & 7 & 0 & 12.3 & 16{,}857\\
+6~mm & optimized $w$, sampled & 13$^\ast$ & 0 & 4.3 & 70{,}425\\
 \bottomrule
 \end{tabular}
 \\[3pt]
 \parbox{\columnwidth}{\footnotesize Native patches, no refinement; obstacle fields, controller, and
 trials as in Table~\ref{tab:franka}. Infeasible: steps with slack or zero input (trials). Min.:
-saved-state mesh-distance lower bound, final states included. The last two rows are certified between
-samples (Corollary~\ref{cor:sampled}). 6~mm: refitted link fields with 26{,}182 native patches.}
+saved-state mesh-distance lower bound, final states included. Sampled: rows of
+Theorem~\ref{thm:sampled} with the zero-input fallback, certified between samples
+(Corollary~\ref{cor:sampled}). 6~mm: refitted link fields with 26{,}182 native patches.
+$^\ast$Of 28 trials (all but 16 and 19).}
 \end{table}
 
 On the 30 Franka trials (Table~\ref{tab:native}), native 12-mm patches with unit lifts reach the goal
@@ -1145,9 +1145,10 @@ and the QP was feasible at every step, so the fallback never acted. On trials 0-
 machine, median/p95 filter time grows from 8.2/14.4~ms with unit lifts to 13.0/42.5~ms with optimized
 multipliers and 12.5/42.7~ms with sampled data. Refitting the link fields at 6~mm (levels
 0.95--1.66~mm) and using their cells as the cover, without a separate cover resolution, the certified
-controller reaches @6R@ of 30 goals, against 17 for the subdivided covers of Table~\ref{tab:franka},
-which lack the between-sample certificate; its median/p95 filter time of @6T@~ms, however, is far
-above the 10-ms step.
+controller reaches 13 of 28 goals, against 17 on the same trials for the subdivided covers of
+Table~\ref{tab:franka}, which lack the between-sample certificate, and never needs the fallback.
+Its cost is high, 29/734~ms median/p95 filter time with up to 2608 active boxes, almost entirely in
+our dense QP solver.
 
 % -----------------------------------------------------------------------------
 \subsection{Comparison of Finite Certificates}\label{sec:cert-comparison}
@@ -1187,12 +1188,9 @@ activity not excluded, rather than the isolated timings of Table~\ref{tab:franka
 15-s experiment above has a different timing distribution.}
 \end{table}
 
-The joint unit-weight certificate reduces tube input modification by about 4\%, at the cost
-of increasing the maximum row count from 26{,}440 to 89{,}424. These cases therefore
-support retaining the unit-weight vertex reduction as the economical implementation, while
-the joint coefficient condition provides a direct alternative when the additional cost is
-acceptable. Fixed multipliers cannot follow the input; optimized multipliers
-(Proposition~\ref{prop:second}) are evaluated with native patches in Sec.~\ref{sec:native}.
+The joint unit-weight certificate reduces tube input modification by about 4\% but raises the
+maximum row count from 26{,}440 to 89{,}424, so the vertex reduction remains the economical choice
+for unit lifts; optimized multipliers, which follow the input, are evaluated in Sec.~\ref{sec:native}.
 
 On six saved Franka trials (three that reached and three that stalled originally), both unit-weight
 certificates with the same refinement reach in four and need no slack; the joint one shortens one
@@ -1238,7 +1236,7 @@ one field per body. Optimized multipliers make the enforcement loss quadratic in
 a curvature tightening that vanishes at rest, together with a zero-input fallback, certifies the
 executed sampled-data controller without feasibility assumptions. The construction never collided in
 the planar experiments, unlike a closest-point barrier, docked where bounding circles cannot, and
-certified a Franka Panda's motion between samples while reaching @6R@ of 30 goals with native 6-mm
+certified a Franka Panda's motion between samples while reaching 13 of 28 goals with native 6-mm
 patches. Faster enforcement near contact, deadlock resolution, and hardware validation are the next
 steps.
 

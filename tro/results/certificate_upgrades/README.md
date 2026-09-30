@@ -33,3 +33,23 @@ the travel bound the observed travel by at least 2.5x along the saved native tra
 Saved-state mesh lower bounds use `franka3d.real_gap` at every executed state and the final state.
 Timings: one thread per process, several processes concurrently on an Intel Xeon @ 2.1 GHz, not isolated.
 All arithmetic is double precision without outward rounding.
+
+## Final status (2026-09-30)
+
+| Variant | Trials | Reached | Slack / zero-input steps | Min. saved-state bound | Pooled median/p95 filter time | Max rows |
+|---|---:|---:|---:|---:|---:|---:|
+| 12 mm, unit lift, slack (historical `native_patch_evaluation`) | 30 | 6 | 1497 (2 trials) | 15.3 mm | 10.5/16.7 ms | 2064 |
+| `free/` | 30 | 8 | 0 | 12.5 mm | 11.5/42.0 ms | 9045 |
+| `sampled_zero/` | 30 | 7 | 0 | 12.3 mm | 10.8/38.9 ms | 16,857 |
+| `sampled_zero_6mm/` | 28 | 13 | 0 | 4.3 mm | 29.4/733.8 ms | 70,425 |
+
+`sampled_zero_6mm/` stops at 28 trials by decision: trials 16 and 19 were stopped after about 1.7 h and 0.8 h
+(steps 870 and 408 of 1000) because profiling showed 92--100% of the time in the dense NNLS least-distance QP
+with 1260--1490 active boxes (one multiplier variable each). No method reaches these two trials (historical
+subdivided, unit lift, free, sampled 12 mm), so the reach counts of all other variants are unchanged on the
+same 28 trials (subdivided: 17). No partial output of the stopped trials is stored.
+On trials 0--4 rerun on this machine, pooled median/p95 filter time is 8.2/14.4 ms (unit lift), 13.0/42.5 ms (free),
+and 12.5/42.7 ms (sampled, 12 mm). Trial 18, which needed slack at all 1000 steps with the unit lift, reaches in
+4.99 s with optimized multipliers.
+Planned before rerunning: a sparse QP solver, multipliers shared per cluster, and local instead of global
+gradient bounds in the activation threshold.
