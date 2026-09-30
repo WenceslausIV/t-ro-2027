@@ -9,10 +9,10 @@ __pycache__/
 *.gif
 
 # Over GitHub's 100 MB file limit (compiled C-space field of the removed tabulated method)
-cache/dock_craft_T.npz
+tro/cache/dock_craft_T.npz
 
 # LaTeX build outputs
-tro/build*/
+tro/paper/build*/
 *.aux
 *.blg
 *.bbl
