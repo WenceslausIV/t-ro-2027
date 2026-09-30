@@ -103,7 +103,8 @@ def franka_rows(q, links, obst, state, eta=F.ACT):
     state.caps = caps
     out = S3.stack(res, F.DOF)
     if len(out) == 6:                    # no active pair: keep the 'free' signature
-        out = out + (np.zeros((0, 0)),)
+        import scipy.sparse as sp
+        out = out + (sp.csr_matrix((0, 0)),)
     return out
 
 

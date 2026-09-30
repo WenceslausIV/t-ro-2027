@@ -107,7 +107,8 @@ def pair_rows(A, RA, pA, B, RB, pB, joints, eta, umax, gamma=F.GAMMA, sd=None):
         res[1] = np.r_[res[1], Tcap]
         res[2] = np.r_[res[2], [sd['V'], sd['Om'], sd['nu']]]
         if len(res) == 7:
-            res[6] = np.r_[res[6], np.zeros((3, res[6].shape[1]))]
+            import scipy.sparse as sp
+            res[6] = sp.vstack([res[6], sp.csr_matrix((3, res[6].shape[1]))], format='csr')
         res = tuple(res)
     Ar, Tr, Cr, nbox, hlow = res[:5]
     if len(res) == 7:                               # 'free' multipliers: one column per active box
@@ -121,20 +122,20 @@ def stack(results, m):
     if not res:
         return np.zeros((0, m)), np.zeros((0, 0)), np.zeros(0), 0, np.inf, np.zeros((0, m))
     k = sum(len(r[5]) for r in res)
-    T = np.zeros((sum(len(r[2]) for r in res), k))
-    i = j = 0
-    for r in res:
-        T[i:i + len(r[2]), j:j + len(r[5])] = r[1]
-        i += len(r[2]); j += len(r[5])
-    out = (np.vstack([r[0] for r in res]), T, np.concatenate([r[2] for r in res]),
-           sum(r[3] for r in res), min(r[4] for r in res), np.vstack([r[5] for r in res]))
-    if len(res[0]) == 7:                            # block-diagonal multiplier columns of all pairs
-        Wc = np.zeros((len(out[2]), sum(r[6].shape[1] for r in res)))
+    if len(res[0]) == 7:                            # 'free' multipliers: block-diagonal T kept sparse
+        import scipy.sparse as sp
+        T = sp.block_diag([sp.csr_matrix(r[1]) for r in res], format='csr')
+    else:
+        T = np.zeros((sum(len(r[2]) for r in res), k))
         i = j = 0
         for r in res:
-            Wc[i:i + len(r[2]), j:j + r[6].shape[1]] = r[6]
-            i += len(r[2]); j += r[6].shape[1]
-        return out + (Wc,)
+            T[i:i + len(r[2]), j:j + len(r[5])] = r[1]
+            i += len(r[2]); j += len(r[5])
+    out = (np.vstack([r[0] for r in res]), T, np.concatenate([r[2] for r in res]),
+           sum(r[3] for r in res), min(r[4] for r in res), np.vstack([r[5] for r in res]))
+    if len(res[0]) == 7:                            # block-diagonal multiplier columns of all pairs (sparse)
+        import scipy.sparse as sp
+        return out + (sp.block_diag([sp.csr_matrix(r[6]) for r in res], format='csr'),)
     return out
 
 

@@ -20,6 +20,7 @@ import itertools
 import os
 
 import numpy as np
+import scipy.sparse as sp
 
 from proto3d import Spline3
 
@@ -388,17 +389,34 @@ def rows(bodyA, idx, RbA, yc, fB, lB, M3B, Jc, W, Sb, eta, umax, auxmax, gamma=G
         need = worst < np.abs(Acoef) @ umax - Tcoef @ auxmax
     else:
         need = np.ones(len(C), bool)
-    if mult_mode == 'free':
-        Wc = np.zeros((int(need.sum()), n_box))
-        Wc[np.arange(len(Wc)), bid[need]] = wcol[need]
+    if mult_mode == 'free':                          # one nonzero per row: its box's multiplier
+        nr = int(need.sum())
+        Wc = sp.csr_matrix((wcol[need], (np.arange(nr), bid[need])), shape=(nr, n_box))
         return Acoef[need], Tcoef[need], C[need], n_box, h_low, first, Wc
     return Acoef[need], Tcoef[need], C[need], n_box, h_low, first
+
+
+QP_SOLVER = os.environ.get('SUMMED_QP', 'nnls')  # 'nnls': dense least-distance program; 'clarabel': sparse IPM
+QP_MARGIN = 1e-7                  # rows are tightened by this much for the sparse solver (conservative only)
+QP_SPARSE_MIN_ROWS = int(os.environ.get('SUMMED_QP_MIN_ROWS', 2000))   # smaller QPs stay with the dense solver
+QP_STATS = dict(sparse=0, fallback=0, infeasible=0)
+
+
+def _dense(X):
+    return X.toarray() if sp.issparse(X) else X
 
 
 def solve(u_nom, A, T, C, E, G_in, h_in, z_prev=None, Wc=None):
     """min |u - u_nom|^2 + EPS_T |a|^2 (+ EPS_W |w - 1|^2)  s.t.  A u + T a (+ Wc w) + C >= 0,  a >= |E u|,
     G_in u >= h_in (and 0 <= w <= W_MAX for 'free' multipliers, one per column of Wc).
-    The feasible set in u equals that of A u + T |E u| + C >= 0 (T <= 0). Returns u, slack, z (warm start)."""
+    The feasible set in u equals that of A u + T |E u| + C >= 0 (T <= 0). Returns u, slack, z (warm start).
+    With QP_SOLVER = 'clarabel', the sparse solution is accepted only if, after setting a = |E u| and clipping w,
+    every row holds exactly in double precision; otherwise the dense solver below decides."""
+    if QP_SOLVER == 'clarabel' and len(C) >= QP_SPARSE_MIN_ROWS:
+        res = _solve_sparse(u_nom, A, T, C, E, G_in, h_in, Wc)
+        if res is not None:
+            return res
+    T, Wc = _dense(T), (None if Wc is None else _dense(Wc))
     from sdf_cbf_utils import solve_ldp_qp
     m, k = len(u_nom), len(E)
     nw = 0 if Wc is None else Wc.shape[1]
@@ -420,3 +438,53 @@ def solve(u_nom, A, T, C, E, G_in, h_in, z_prev=None, Wc=None):
         zp = None
     z, s = solve_ldp_qp(np.r_[u_nom, np.zeros(k + nw)], G, h, len(C), zp)
     return z[:m], s, z
+
+
+def _solve_sparse(u_nom, A, T, C, E, G_in, h_in, Wc):
+    """Sparse interior-point solution of the same QP (Clarabel). Returns (u, 0, z) if the applied variables
+    satisfy every row exactly, (zeros, inf, None) if the solver certifies primal infeasibility (the caller's
+    dense path then handles slack), and None to defer to the dense solver."""
+    import clarabel
+    m, k = len(u_nom), len(E)
+    nw = 0 if Wc is None else Wc.shape[1]
+    n = m + k + nw
+    P = sp.diags(np.r_[np.full(m, 2.), np.full(k, 2 * EPS_T), np.full(nw, 2 * EPS_W)]).tocsc()
+    q = np.r_[-2 * u_nom, np.zeros(k), np.full(nw, -2 * EPS_W)]
+    Tm = sp.csr_matrix(T)
+    blocks = [[sp.csr_matrix(A), Tm] + ([sp.csr_matrix(Wc)] if nw else [])]
+    Ik = sp.identity(k, format='csr')
+    Z = lambda r, c: sp.csr_matrix((r, c))
+    rows_ = [sp.hstack(blocks[0]),
+             sp.hstack([sp.csr_matrix(-E), Ik] + ([Z(k, nw)] if nw else [])),
+             sp.hstack([sp.csr_matrix(E), Ik] + ([Z(k, nw)] if nw else [])),
+             sp.hstack([sp.csr_matrix(G_in), Z(len(G_in), k + nw)])]
+    h = [-C + QP_MARGIN, np.zeros(2 * k), h_in + QP_MARGIN]
+    if nw:
+        Iw = sp.identity(nw, format='csr')
+        rows_ += [sp.hstack([Z(nw, m + k), Iw]), sp.hstack([Z(nw, m + k), -Iw])]
+        h += [np.zeros(nw), np.full(nw, -W_MAX)]
+    G = sp.vstack(rows_).tocsc()
+    b = -np.concatenate(h)
+    st = clarabel.DefaultSettings()
+    st.verbose = False
+    sol = clarabel.DefaultSolver(P, q, -G, b, [clarabel.NonnegativeConeT(G.shape[0])], st).solve()
+    status = str(sol.status)
+    if 'Infeasible' in status and 'Almost' not in status:
+        QP_STATS['infeasible'] += 1
+        return None
+    if 'Solved' not in status:
+        QP_STATS['fallback'] += 1
+        return None
+    z = np.asarray(sol.x)
+    u = z[:m]
+    if len(G_in) and np.any(G_in @ u < h_in):
+        QP_STATS['fallback'] += 1
+        return None
+    a = np.abs(E @ u)                                # the smallest admissible epigraph values
+    w = np.clip(z[m + k:], 0., W_MAX) if nw else None
+    r = A @ u + (Tm @ a) + C + ((sp.csr_matrix(Wc) @ w) if nw else 0.)
+    if r.min() < 0.:                                  # exact acceptance test of the applied variables
+        QP_STATS['fallback'] += 1
+        return None
+    QP_STATS['sparse'] += 1
+    return u, 0., np.r_[u, np.sqrt(EPS_T) * a, (np.sqrt(EPS_W) * (w - 1)) if nw else np.zeros(0)]

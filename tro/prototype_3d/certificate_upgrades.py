@@ -98,11 +98,15 @@ def main():
     p.add_argument('--fallback', choices=('slack', 'zero'), default='slack')
     p.add_argument('--trials', nargs=2, type=int, default=[0, 30])
     p.add_argument('--reverse', action='store_true', help='run the trial range in descending order')
+    p.add_argument('--qp', choices=('nnls', 'clarabel'), default='nnls',
+                   help='QP solver: dense least-distance NNLS, or sparse interior point with exact acceptance test')
     p.add_argument('--field', choices=('12mm', '6mm'), default='12mm',
                    help='link SDF cells; 6mm uses the refitted fields of results/fine_native_6mm_trial')
     a = p.parse_args()
     configure(a.variant)
-    out = OUT / (a.variant + ('_zero' if a.fallback == 'zero' else '') + ('_6mm' if a.field == '6mm' else ''))
+    S.QP_SOLVER = a.qp
+    out = OUT / (a.variant + ('_zero' if a.fallback == 'zero' else '') + ('_6mm' if a.field == '6mm' else '')
+                 + ('_clarabel' if a.qp == 'clarabel' else ''))
     out.mkdir(parents=True, exist_ok=True)
     if a.field == '6mm':
         links, obst, info = F.build(cache_path=ROOT / 'results' / 'fine_native_6mm_trial' / 'cache_franka_6mm.npz')
@@ -121,7 +125,8 @@ def main():
         log = simulate(q0, np.asarray(qg), links, obst, a.variant, a.fallback)
         rec = dict(trial=i, variant=a.variant, fallback=a.fallback, metrics=summarize(log),
                    cover=f'native SDF patches ({a.field}), no refinement', dt_s=F.DT, gamma=F.GAMMA, eta_m=F.ACT,
-                   sampled=SD.describe() if a.variant == 'sampled' else None,
+                   sampled=SD.describe() if a.variant == 'sampled' else None, qp_solver=a.qp,
+                   qp_stats=dict(S.QP_STATS),
                    note='Saved-state mesh lower bounds include the final state. One thread; this machine.')
         path.write_text(json.dumps(rec, indent=1))
         np.savez_compressed(out / f'franka_{i:02d}.npz', q=np.asarray(log['q']), t=np.asarray(log['t']),
