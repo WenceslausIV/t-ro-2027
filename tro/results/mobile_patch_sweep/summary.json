@@ -25,6 +25,32 @@
   "over_10ms_percent": 0.24734752327019463,
   "max_rows": 1
  },
+ "disk40": {
+  "method": "disk40",
+  "disks": [
+   296,
+   271
+  ],
+  "disk_radius_mm": [
+   28.2842712474619,
+   28.2842712474619
+  ],
+  "setup_s": 0.04010738399983893,
+  "scenarios": 20,
+  "both_goals": 1,
+  "mean_arrival_s": 5.98,
+  "collision_runs": 0,
+  "min_gap_mm": 56.26692268755222,
+  "median_min_gap_mm": 79.41618937074863,
+  "slack_runs": 0,
+  "mean_input_modification": 14.72168709831914,
+  "t_median_ms": 5.310393499939892,
+  "t_p95_ms": 7.640953950203765,
+  "t_p99_ms": 9.09749988992643,
+  "t_max_ms": 54.453129999728844,
+  "over_10ms_percent": 0.6410804342251475,
+  "max_rows": 4912
+ },
  "patch10": {
   "method": "patch10",
   "cell_mm": 10.0,
