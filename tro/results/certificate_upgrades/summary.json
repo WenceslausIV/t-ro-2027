@@ -27,10 +27,10 @@
   "mean_arrival_s": 6.8500000000000005
  },
  "free": {
-  "pooled_median_ms": 10.738596000010148,
-  "pooled_p95_ms": 38.15138200002366,
-  "pooled_over_10ms_percent": 53.05984229113251,
-  "trials": 23,
+  "pooled_median_ms": 11.151504999986628,
+  "pooled_p95_ms": 37.70088950000172,
+  "pooled_over_10ms_percent": 55.02745604725209,
+  "trials": 24,
   "reached": 6,
   "reached_trials": [
    4,
@@ -45,9 +45,9 @@
   "zero_input_trials": 0,
   "zero_input_steps": 0,
   "min_gap_bound_mm": 14.155026424275492,
-  "median_trial_min_gap_mm": 20.122180603813693,
+  "median_trial_min_gap_mm": 21.010502235108074,
   "nonpositive_gap_states": 0,
-  "median_of_trial_median_ms": 11.129413999697135,
+  "median_of_trial_median_ms": 11.199869499705528,
   "max_trial_p95_ms": 826.90022945012,
   "rows_max": 9045,
   "boxes_max": 335,
