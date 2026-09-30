@@ -238,6 +238,9 @@ def make_summed_fn(fS, MS, lS, bodyC, bounds=None, eta=ACT, umax=(1., 1., 2., 1.
         res = SM.rows(bodyC, sub, Ri.T @ Rj, cb, fS, lS, M3S, Jc, Wg, Sb, eta, umax, np.abs(E) @ umax)
         if res is None:
             return None
+        if len(res) == 7:                           # optimized multipliers: also the multiplier columns
+            A6, Tk, C6, nbox, hl, _, Wc = res
+            return A6, Tk, C6, nbox, hl, E, Wc
         A6, Tk, C6, nbox, hl, _ = res
         return A6, Tk, C6, nbox, hl, E
 
