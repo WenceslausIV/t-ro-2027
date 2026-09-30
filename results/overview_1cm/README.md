@@ -14,6 +14,6 @@ The same seed-3 shapes, 5-mm fitting sample spacing, cubic basis and ridge param
 In the updated visualization, dashed blue squares explicitly show the 4-cm parent SDF patches near the surface. Small solid/faint boxes show the separate 5-mm surface cover. A legend distinguishes these two sizes; changing the SDF resolution does not automatically change the surface-cover box size.
 
 Reproduce selection: `python prototype_3d/overview_resolution.py`.
-Reproduce the paper figure: `python make_paper_figs.py overview`.
+Reproduce the paper figure: `python planar/make_paper_figs.py overview`.
 
 `overview_before.png` preserves the previous paper figure; `overview.png` is the replacement, also saved to `tro/figs/overview.png`. The caption in `tro/main.tex` records the illustration's new resolution. Other experiments retain their existing resolutions. The manuscript compiled successfully to 11 pages.

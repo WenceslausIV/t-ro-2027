@@ -1,6 +1,6 @@
 """Shared maze simulation and the archived branched-wall setup.
 
-Run: python maze_escape.py [--rebuild] (current reference-image maze).
+Run: python planar/maze_escape.py [--rebuild] (current reference-image maze).
 The original obstacle-count study in results/static.json remains a separate experiment.
 """
 import argparse
@@ -20,7 +20,7 @@ import cspace_sdf_cbf_compare as C
 import cspace_experiments as E
 from sdf_cbf_utils import solve_ldp_qp
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / 'results' / 'maze_escape'
 FIG = ROOT / 'tro' / 'figs'
 DOMAIN = 6.2

@@ -2,8 +2,8 @@
 Five robots with random non-convex shapes swap positions on a circle,
 using pairwise C-space B-spline SDF CBFs with certified enclosures. No deadlock resolution.
 
-    python cspace_cbf_5robots.py                 # five random shapes
-    python make_paper_figs.py five               # regenerate the corresponding paper figure
+    python planar/cspace_cbf_5robots.py                 # five random shapes
+    python planar/make_paper_figs.py five               # regenerate the corresponding paper figure
 
 Pipeline (all offline except the last line):
   1. ground-truth shape  G_i : random radial Fourier polygon
@@ -188,7 +188,7 @@ def five_robot_setup(seed=3, scale=1.0, radius=2.6, jitter_seed=None, jitter=(0.
     shapes, offsets = [s for s, _ in fits], [o for _, o in fits]
     for i, (s, off) in enumerate(fits):
         print(f'robot {i}: {counts[i]} controls, enclosure passed, offset {off:.3f} m, rho {s.rho:.3f}', flush=True)
-    root = FilePath(__file__).resolve().parent
+    root = FilePath(__file__).resolve().parents[1]
     digest = hashlib.sha256(b'five-random-v1;96;100;0.0625;48;0.002')
     for s in shapes:
         digest.update(s.ctrl.tobytes())
@@ -345,7 +345,7 @@ def main():
     print(f"online CBF+QP per step, median / max    : {1e3 * np.median(log['t']):.2f} / "
           f"{1e3 * log['t'].max():.2f} ms")
 
-    result_dir = FilePath(__file__).resolve().parent / 'results'
+    result_dir = FilePath(__file__).resolve().parents[1] / 'results'
     result_dir.mkdir(exist_ok=True)
     stem = 'five_random'
     np.savez(result_dir / f'{stem}_trajectory.npz', **log, final=x, goals=goals, dt=dt,

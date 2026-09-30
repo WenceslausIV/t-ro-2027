@@ -2,10 +2,10 @@
 
 **Superseded:** the current Fig. 8 uses the supplied curved-maze reference.
 See [the current experiment](../reference_maze/README.md). This folder retains
-the earlier branched-wall results only; `python maze_escape.py` now runs the
+the earlier branched-wall results only; `python planar/maze_escape.py` now runs the
 reference-maze experiment.
 
-Run `python maze_escape.py` from the repository root. Use `--rebuild` to
+Run `python planar/maze_escape.py` from the repository root. Use `--rebuild` to
 regenerate the cached field. A geometry signature prevents reuse of a field
 with different walls, robot control points, domain, or grid settings.
 
@@ -61,7 +61,7 @@ avoidance demonstration, not a global planner or a deadlock benchmark.
   dark wall curves show the exposed cubic enclosing boundary, with internal beam
   seams omitted. Robot outlines are placed every 1.65 m of arc length.
 - `layout_preview.png`: geometry/waypoint preview only; generate with
-  `python maze_escape.py --layout-only`. Its dashed route is not simulation data.
+  `python planar/maze_escape.py --layout-only`. Its dashed route is not simulation data.
 - `clearance.png`: physical clearance and barrier histories for auditing.
 - `field.npz` and `field.json`: reusable fitted field and certification metadata.
 - `tro/maze_results.tex`: generated numerical macros used by the manuscript.

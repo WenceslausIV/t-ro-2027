@@ -23,6 +23,7 @@ import franka3d as F
 from proto3d import Spline3, surface_boxes
 
 sys.path.insert(0, os.path.dirname(F.HERE))
+sys.path.insert(0, os.path.join(os.path.dirname(F.HERE), 'planar'))  # planar modules
 import cspace_sdf_cbf_compare as C                                      # noqa: E402
 from cspace_experiments import DOCK2_GOAL, DOCK2_START, simulate_team   # noqa: E402
 from dock_shapes import MOUTH_X, NOSE_TIP_X, SEAT_DEPTH, craft_body, station_body   # noqa: E402

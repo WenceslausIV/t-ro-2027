@@ -1,3 +1,4 @@
+from pathlib import Path
 """Flame-free rocket silhouette traced from the user's reference illustration.
 
 The dense polygon is the physical ground truth; all decorative patches are
@@ -116,4 +117,4 @@ if __name__=='__main__':
     fig,ax=plt.subplots(figsize=(4,4))
     draw(ax,np.array([0.,0.,3*np.pi/4]),gt,robot)
     ax.set(xlim=(-.32,.32),ylim=(-.32,.32),aspect='equal');ax.axis('off')
-    fig.savefig('results/rocket_geometry_preview.png',dpi=200,bbox_inches='tight')
+    fig.savefig(str(Path(__file__).resolve().parents[1] / 'results' / 'rocket_geometry_preview.png'),dpi=200,bbox_inches='tight')

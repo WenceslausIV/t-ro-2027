@@ -9,7 +9,7 @@ $env:OMP_NUM_THREADS='1'
 $env:MKL_NUM_THREADS='1'
 $env:OPENBLAS_NUM_THREADS='1'
 $env:SUMMED_REFINE_DEPTH='2'
-python -u maze_cover.py --side 5 --symmetric-ports
+python -u planar/maze_cover.py --side 5 --symmetric-ports
 ```
 
 The wall SDF and certified level were recomputed for the revised geometry. The run reached the exit in 32.42 s over 3242 steps with no slack, no collision intervals, and no unresolved intervals. The minimum saved-state gap is 4.69356 mm and the audited interval lower bound is 0.594399 mm. Filter median/p95 are 1.9058/3.7056 ms on one CPU thread; background activity was not excluded, so these are not isolated timings. Full measurements and geometry metadata are in results.json.

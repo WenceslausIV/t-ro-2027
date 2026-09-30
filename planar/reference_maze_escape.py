@@ -1,6 +1,6 @@
 """Curved maze (our own designed passage): vector geometry, one SE(2) field, and CBF escape.
 
-python reference_maze_escape.py [--layout-only] [--rebuild]
+python planar/reference_maze_escape.py [--layout-only] [--rebuild]
 """
 import argparse
 import hashlib
@@ -24,7 +24,7 @@ from maze_escape import simulate
 import maze_reference_geometry as G
 import rocket_geometry as Rocket
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT/'results'/'reference_maze_rocket'
 FIG = ROOT/'tro'/'figs'
 DOMAIN, KXY, KTH = 6., 160, 48

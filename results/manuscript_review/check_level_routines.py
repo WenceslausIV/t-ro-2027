@@ -11,6 +11,7 @@ from types import SimpleNamespace
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'prototype_3d'))
 sys.path.insert(0, str(ROOT))
+sys.path.insert(0, os.path.join(str(ROOT), 'planar'))  # planar modules
 import franka3d as F
 from dock_cover import tight_level_2d
 from maze_cover import tight_level_curves

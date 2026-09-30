@@ -7,7 +7,7 @@ curve, and corner barriers against the wall field with the C^2 curvature majoran
 pruning (prototype_3d/dock_cover.make_cover_fn). Same passage, waypoints, nominal controller, gains,
 step, and interval audit as the tabulated run.
 
-    python maze_cover.py [--redraw] [--side MM] [--wall-cell MM] [--robot-cell MM]
+    python planar/maze_cover.py [--redraw] [--side MM] [--wall-cell MM] [--robot-cell MM]
 
 Results: results/reference_maze_cover/{results.json, trajectory.npz, field.npz}; with the default
 rocket_maze_cover.png there (copied to tro/figs/rocket_maze.png by hand if chosen for the paper).
@@ -23,7 +23,7 @@ import numpy as np
 from scipy.ndimage import maximum_filter
 from scipy.spatial import cKDTree
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'prototype_3d'))
 import franka3d as F                                                    # noqa: E402
 from proto3d import Spline3                                             # noqa: E402

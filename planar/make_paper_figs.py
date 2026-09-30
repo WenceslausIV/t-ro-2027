@@ -1,7 +1,7 @@
 """
 Publication figures for tro/main.tex (replace the GIF screenshots).
 
-    python make_paper_figs.py        -> tro/figs/dock_paper.png, tro/figs/five_paper.png
+    python planar/make_paper_figs.py        -> tro/figs/dock_paper.png, tro/figs/five_paper.png
 
 Uses cached certified fields and the shared five_robot_setup for the five random shapes.
 The statistical experiments use the original cache/shapes5.* cache.
@@ -18,11 +18,28 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt                                          # noqa: E402
 from matplotlib.patches import Circle, Polygon                           # noqa: E402
+from matplotlib.colors import to_rgb                                    # noqa: E402
 
 plt.rcParams.update({'font.size': 8, 'axes.titlesize': 8, 'axes.labelsize': 8,
                      'legend.fontsize': 7, 'xtick.labelsize': 7, 'ytick.labelsize': 7,
                      'font.family': 'serif', 'mathtext.fontset': 'dejavuserif'})
 BLUE, ORANGE = '#1f77b4', '#ff7f0e'
+AMBER = '#c17b39'  # warm complement to BLUE for the second body / fixed module
+COVER_GREEN = '#4b9275'
+
+
+def body_fill(color):
+    """A light tint of the same hue as the certified boundary."""
+    return .24 * np.asarray(to_rgb(color)) + .76
+
+
+def save_paper_figure(fig, filename, **kwargs):
+    """Keep render intermediates out of figs and replace open previews atomically."""
+    temporary_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'results', 'figure_style')
+    os.makedirs(temporary_dir, exist_ok=True)
+    temporary = os.path.join(temporary_dir, filename)
+    fig.savefig(temporary, dpi=300, **kwargs)
+    os.replace(temporary, os.path.join(FIGS, filename))
 
 
 def bezier_ab_field(A, B):
@@ -41,7 +58,8 @@ def bezier_ab_field(A, B):
 def draw_pose(ax, shape, gt, x, color, alpha=1.0, fill=True, zorder=None):
     kw = {} if zorder is None else dict(zorder=zorder)
     if fill:
-        ax.add_patch(Polygon(gt @ C.rot(x[2]).T + x[:2], closed=True, color='0.6', alpha=alpha, lw=0, **kw))
+        ax.add_patch(Polygon(gt @ C.rot(x[2]).T + x[:2], closed=True,
+                             facecolor=body_fill(color), edgecolor='none', alpha=alpha, **kw))
     ax.add_patch(Polygon(shape.world(x), closed=True, fill=False, ec=color, lw=1.0, alpha=alpha, **kw))
 
 
@@ -124,7 +142,7 @@ def fig_dock2():
     GA, GB, A, B, fields, meta = dock2_setup()
     # surface cover (prototype_3d/dock_cover.py): fields of the ground-truth polygons, tightest levels,
     # 5-mm boxes on the craft's certified curve
-    sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'prototype_3d'))
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'prototype_3d'))
     import franka3d as F3
     from dock_cover import body_field, tight_level_2d, cover_2d, make_summed_fn
     import summed as SM
@@ -154,15 +172,20 @@ def fig_dock2():
 
     certS, certC = Level(level_curve(fS, lS)), Level(level_curve(fC, lC, .001))
     runs = {}
-    # categorical palette in fixed order (blue, orange, aqua, red); line styles as secondary encoding
-    STYLE = {'ours, surface cover': dict(lw=1.4, ls='-'), 'ours, compiled field': dict(lw=1.1, ls='--'),
-             'closest point': dict(lw=1.1, ls='-.'), 'circle': dict(lw=1.2, ls=':')}
-    for name, method, kind, col in (('ours, surface cover', 'summed', 'cover', '#2a78d6'),
-                                    ('ours, compiled field', 'cspace', 'bspline', '#eb6834'),
+    # entity colors as before (ours blue, closest point aqua, circle red); line styles as secondary encoding
+    STYLE = {'ours': dict(lw=1.4, ls='-'), 'closest point': dict(lw=1.1, ls='-.'), 'circle': dict(lw=1.2, ls=':')}
+    for name, method, kind, col in (('ours', 'summed', 'cover', BLUE),
                                     ('closest point', 'closest', 'bspline', '#1baf7a'),
                                     ('circle', 'circle', 'bspline', '#e34948')):
-        L = simulate_team([GA, GB], [A, B], {(0, 1): fields[kind]}, DOCK2_START, DOCK2_GOAL, method,
-                          steps=900, v_max=np.array([0.0, 1.0]), w_max=np.array([0.0, 2.0]), record=True)
+        if name == 'ours':
+            # Reuse the paper's saved run: rendering must not change its refinement policy.
+            with np.load(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'prototype_3d',
+                                     'dock_summed_traj_5.npz')) as saved:
+                assert len(saved['traj']) == 900 and np.allclose(saved['traj'][0], DOCK2_START)
+                L = dict(traj=saved['traj'], h_t=saved['h'])
+        else:
+            L = simulate_team([GA, GB], [A, B], {(0, 1): fields[kind]}, DOCK2_START, DOCK2_GOAL, method,
+                              steps=900, v_max=np.array([0.0, 1.0]), w_max=np.array([0.0, 2.0]), record=True)
         traj = np.array(L['traj'])
         tip = traj[:, 1, :2] + np.stack([np.cos(traj[:, 1, 2]), np.sin(traj[:, 1, 2])], axis=1) * NOSE_TIP_X
         runs[name] = (L, traj, MOUTH_X - tip[:, 0], col)
@@ -170,14 +193,14 @@ def fig_dock2():
 
     fig = plt.figure(figsize=(7.16, 3.7))
     gs = fig.add_gridspec(2, 2, height_ratios=[1, 0.85], wspace=0.2, hspace=0.5)
-    for k, name in enumerate(('ours, surface cover', 'circle')):
+    for k, name in enumerate(('ours', 'circle')):
         L, traj, _, col = runs[name]
-        SA, SB = (certS, certC) if name == 'ours, surface cover' else (A, B)   # certified boundaries
+        SA, SB = (certS, certC) if name == 'ours' else (A, B)   # certified boundaries
         ax = fig.add_subplot(gs[0, k])
         for j in range(0, len(traj), 60):
             ax.add_patch(Polygon(SB.world(traj[j, 1]), closed=True, fill=False, ec=col, lw=0.6, alpha=0.3))
-        ax.add_patch(Polygon(GA, closed=True, color='0.6', lw=0))
-        ax.add_patch(Polygon(SA.dense, closed=True, fill=False, ec='k', lw=0.9))
+        ax.add_patch(Polygon(GA, closed=True, facecolor='0.85', edgecolor='none'))
+        ax.add_patch(Polygon(SA.dense, closed=True, fill=False, ec='0.35', lw=1.0))
         draw_pose(ax, SB, GB, traj[-1, 1], col)
         ax.plot(traj[:, 1, 0], traj[:, 1, 1], color=col, lw=0.7)
         if name == 'circle':                                   # minimum enclosing circles of the barrier
@@ -218,7 +241,7 @@ def fig_dock2():
     axd.set_ylabel('nose depth [m]')
     axd.set_title('(d) depth of the nose tip past the mouth')
     axd.legend(loc='lower right', frameon=False, fontsize=6, ncol=2, columnspacing=1.0, handlelength=1.5)
-    fig.savefig(os.path.join(FIGS, 'dock_paper.png'), dpi=300, bbox_inches='tight')
+    save_paper_figure(fig, 'dock_paper.png', bbox_inches='tight')
     plt.close(fig)
     print('>>> tro/figs/dock_paper.png')
 
@@ -228,7 +251,7 @@ def fig_five(construction='cover'):
     from cspace_cbf_5robots import five_robot_setup
     # configuration chosen by five_jitter_search.py (2x shapes, perturbed antipodal swap)
     # paper version: single integrators, perturbed antipodal swap (five_jitter_si.json)
-    cfg = json.load(open(os.path.join(os.path.dirname(__file__), 'results', 'five_jitter_si.json')))
+    cfg = json.load(open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'results', 'five_jitter_si.json')))
     GT, shapes, fields, starts, goals, _ = five_robot_setup(
         scale=cfg['scale'], radius=cfg['radius'], jitter_seed=cfg['chosen']['jitter_seed'],
         jitter=tuple(cfg['jitter']), goal_shift=cfg.get('goal_shift'), n_robots=cfg.get('n_robots', 5))
@@ -237,7 +260,7 @@ def fig_five(construction='cover'):
         starts, goals = np.array(cfg['starts']), np.array(cfg['goals'])
     N = len(shapes)
     # Reuse the exact GIF run when its geometry, poses, and control horizon match.
-    saved_path = os.path.join(os.path.dirname(__file__), 'results', 'five_random_trajectory.npz')
+    saved_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'results', 'five_random_trajectory.npz')
     L = None
     if os.path.exists(saved_path):
         with np.load(saved_path, allow_pickle=False) as saved:
@@ -250,12 +273,13 @@ def fig_five(construction='cover'):
                 L = dict(traj=saved['x'], h_t=saved['h'], d_t=saved['d'], min_gt=saved['d'].min())
     # surface-cover run of the same swap (prototype_3d/five_cover.py swap): trajectory, min h, min distance;
     # colored outlines are then the certified level curves of the bodies' fields
-    cover_path = os.path.join(os.path.dirname(__file__), 'results', 'five_cover_swap_summed_5.npz')
+    cover_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'results', 'five_cover_swap_summed_5.npz')
     if construction == 'cover':
         with np.load(cover_path) as z:
             assert np.allclose(z['traj'][0], starts) and np.allclose(z['goals'], goals)
-            L = dict(traj=z['traj'], h_t=z['h'], d_t=z['d'], min_gt=z['d'].min())
-        sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'prototype_3d'))
+            L = dict(traj=z['traj'], h_t=z['h'], d_t=z['d'], min_gt=z['d'].min(),
+                     nb=z['nb'] if 'nb' in z.files else None)
+        sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'prototype_3d'))
         import franka3d as F3
         from dock_cover import body_field, tight_level_2d
 
@@ -281,21 +305,51 @@ def fig_five(construction='cover'):
     print(f"five ({construction}): min GT {L['min_gt']:+.4f} min h {np.nanmin(L['h_t']):+.5f}")
     traj = np.array(L['traj'])
     cols = plt.cm.tab10(np.arange(N))
-    fig = plt.figure(figsize=(3.5, 4.3))
-    gs = fig.add_gridspec(2, 1, height_ratios=[3.0, 1.0], hspace=0.62)
-    ax = fig.add_subplot(gs[0])
+    cols[1, :3] = to_rgb(AMBER)
+    t = np.arange(len(L['d_t'])) * 0.01
+    # the moment the five meet: most active constraints (or, without that record, the closest approach)
+    nb = L.get('nb')
+    km = int(np.argmax(nb)) if nb is not None and len(nb) else int(np.argmin(L['d_t']))
+    print(f'five: meeting at t = {t[km]:.2f} s')
+    # layout in inches: (c) spans the width; (a) and (b) are equal squares whose outer edges align with
+    # (c)'s axes, separated by room for (b)'s y tick labels
+    FW, FH = 3.5, 3.75
+    CL, CR, CB, CH = .50, 3.43, .42, 1.05                # (c): left, right, bottom, height
+    GAP = .30
+    SQ = (CR - CL - GAP) / 2
+    TB = CB + CH + .58                                   # bottom of (a), (b): above (c)'s title and legend
+    fig = plt.figure(figsize=(FW, FH))
+    box = lambda x, y, w, h: [x / FW, y / FH, w / FW, h / FH]
+    # (a) the meeting, zoomed: paths up to that moment (faint to strong), robots at that moment
+    axm = fig.add_axes(box(CL, TB, SQ, SQ))
+    P = np.concatenate([shapes[i].world(traj[km, i]) for i in range(N)])
+    c0, half = (P.min(0) + P.max(0)) / 2, (P.max(0) - P.min(0)).max() / 2 + .25
+    for i in range(N):
+        fading_path(axm, traj[:km + 1, i, :2], cols[i], lw=1.4, zorder=2)
+        draw_pose(axm, shapes[i], GT[i], traj[km, i], cols[i], zorder=3)
+    axm.set_xlim(c0[0] - half, c0[0] + half)
+    axm.set_ylim(c0[1] - half, c0[1] + half)
+    axm.set_aspect('equal')
+    axm.set_xticks([]); axm.set_yticks([])
+    for sp in axm.spines.values():
+        sp.set_color('0.6'); sp.set_linewidth(0.6)
+    axm.set_title(f'(a) meeting, $t={t[km]:.1f}$ s', fontsize=8)
+    # (b) whole swap
+    ax = fig.add_axes(box(CL + SQ + GAP, TB, SQ, SQ))
     for i in range(N):                              # layers: faded start < fading paths < solid final poses
         draw_pose(ax, shapes[i], GT[i], traj[0, i], cols[i], alpha=0.35, zorder=1)
-        fading_path(ax, traj[:, i, :2], cols[i], lw=1.8, zorder=2)
+        fading_path(ax, traj[:, i, :2], cols[i], lw=1.4, zorder=2)
         draw_pose(ax, shapes[i], GT[i], traj[-1, i], cols[i], zorder=3)
+    ax.add_patch(plt.Rectangle(c0 - half, 2 * half, 2 * half, fill=False, ec='0.45', lw=0.6, ls='--',
+                               zorder=4))                    # the region shown in (a)
     ax.set_xlim(-lim, lim)
     ax.set_ylim(-lim, lim)
     ax.set_aspect('equal')
-    ax.set_xlabel('$x$ [m]')
-    ax.set_ylabel('$y$ [m]')
-    ax.set_title('(a) start (faded) and final poses')
-    axd = fig.add_subplot(gs[1])
-    t = np.arange(len(L['d_t'])) * 0.01
+    ax.set_xticks([-4, 0, 4]); ax.set_yticks([-4, 0, 4])
+    ax.tick_params(labelsize=6, pad=1)
+    ax.set_title('(b) start (faded), final', fontsize=8)
+    axd = fig.add_axes(box(CL, CB, CR - CL, CH))
+    axd.axvline(t[km], color='0.6', lw=0.6, ls=':', zorder=0)   # the moment of (a)
     axd.axhline(0, color='0.75', lw=0.6, zorder=0)
     axd.plot(t, 1e3 * np.minimum(np.array(L['d_t']), 1.0), color='#2b2b2b', lw=1.2, label='min. true distance')
     axd.plot(t, 1e3 * np.array(L['h_t']), color='#119c99', lw=1.2, ls='--', label='min. active $h$')
@@ -304,49 +358,37 @@ def fig_five(construction='cover'):
     axd.set_xlim(0, t[-1])
     axd.set_xlabel('$t$ [s]')
     axd.set_ylabel('[mm]')
-    axd.set_title('(b) safety margins', pad=13)
+    axd.set_title('(c) safety margins', pad=13)
     axd.legend(loc='lower right', bbox_to_anchor=(1.0, 1.0), ncol=2, frameon=False, fontsize=6, handlelength=2.2, borderaxespad=0.2, columnspacing=1.0)
-    fig.savefig(os.path.join(FIGS, 'five_paper.png'), dpi=300, bbox_inches='tight')
+    save_paper_figure(fig, 'five_paper.png', bbox_inches='tight')
     plt.close(fig)
     print('>>> tro/figs/five_paper.png')
 
 
 def fig_overview():
-    """(a) first contact of the two bodies, (b) the surface cover of B_i's certified curve near B_j,
-    (c) the tabulated construction: stacked C-space slices with the certified level set."""
+    """(a) first contact of the two bodies, (b) the surface cover of B_i's certified curve near B_j
+    (column width; the version with a third panel for the compiled C-space field is in
+    make_paper_figs_includingcspace.py)."""
     import torch
     from cspace_experiments import closest_pair
-    fig = plt.figure(figsize=(7.16, 2.5))
+    fig = plt.figure(figsize=(3.5, 2.0))
     # (a) two random non-convex bodies (as in the multi-robot experiments): slide B_i (rotated by 60 deg)
     # towards B_j along -x until first contact
-    from cspace_cbf_5robots import five_robot_setup, pair_field
-    rGT, rshapes, _, _, _, _ = five_robot_setup(scale=1.0)
-    Ai, Bj = rshapes[3], rshapes[0]
-    # (c) uses the certified configuration-space field of this same pair (B_i moving relative to B_j), cached
-    A, B = Ai, Bj
-    cache = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'cache', 'overview_pair_3_0.npz')
-    if os.path.exists(cache):
-        z = np.load(cache)
-        D, l_star = float(z['D']), float(z['l'])
-        f = C.Field3D('bspline', D, int(z['Kxy']), int(z['Kth']))
-        f.set_W(z['W'])
-    else:
-        f, D, l_star, ok, info = pair_field(A, B)
-        assert ok, info
-        np.savez(cache, W=f.W, D=D, l=l_star, Kxy=f.bx.K, Kth=f.bt.K)
-    print(f'overview pair: D {D}, l* {l_star:+.4f}')
-    # three equal panels; titles on one baseline. Colors: gray = reference / ground truth (thin, on top),
-    # orange = certified level set and the contact point (complementary to the blue body)
-    REF, CERT = '0.3', '#eb6834'
-    W3, TY = 1. / 3, .93
-    ax = fig.add_axes([.01, .05, W3 - .02, .82])
+    from cspace_cbf_5robots import random_shape, enclose
+    rng = np.random.default_rng(3)
+    rGT = [random_shape(rng) for _ in range(5)]
+    Ai, Bj = enclose(rGT[3], K=24)[0], enclose(rGT[0], K=24)[0]
+    # two equal panels; titles on one baseline. B_j: pale amber fill, amber outline; B_i: light-blue fill,
+    # blue outline; contact point: crimson star
+    W2, TY = .5, .93
+    ax = fig.add_axes([0., .03, W2 - .01, .84])
     th, ty = np.pi / 3, 0.5          # offset chosen so that the first contact is a single point
     tx = next(x for x in np.arange(2.2, 0.0, -0.001)
               if C.true_distance(Ai.world(np.array([x, ty, th])), Bj.dense) < 1e-3)
     xa = np.array([tx, ty, th])
     _, pa, pb, _ = closest_pair(torch.as_tensor(Ai.world(xa), device=C.DEV), torch.as_tensor(Bj.dense, device=C.DEV))
-    ax.add_patch(Polygon(Bj.dense, closed=True, fc='0.85', ec='0.35', lw=1.0))
-    ax.add_patch(Polygon(Ai.world(xa), closed=True, fc='#c6dbef', ec=BLUE, lw=1.0))
+    ax.add_patch(Polygon(Bj.dense, closed=True, fc=body_fill(AMBER), ec=AMBER, lw=1.0))
+    ax.add_patch(Polygon(Ai.world(xa), closed=True, fc=body_fill(BLUE), ec=BLUE, lw=1.0))
     ax.plot(*pb, marker='*', color='crimson', ms=9, zorder=5)
     lo = np.minimum(Bj.dense.min(0), Ai.world(xa).min(0)) - .1
     hi = np.maximum(Bj.dense.max(0), Ai.world(xa).max(0)) + .1
@@ -355,7 +397,7 @@ def fig_overview():
     # stops where the gap between them has opened); the label box does not overlap either body
     from matplotlib.path import Path as MPath
     bodies = [Bj.dense, Ai.world(xa)]
-    CLR, LW_, LH_ = .04, .72, .09                       # clearance (incl. line widths); label width, height [m]
+    CLR, LW_, LH_ = .04, .95, .11                       # clearance (incl. line widths); label width, height [m]
 
     def seg_clear(p, q):
         s = np.linspace(0, 1, 300)[:, None] * (q - p) + p
@@ -384,26 +426,29 @@ def fig_overview():
     stop, side, tail, tip = best
     print(f'overview (a): label {side}, arrow stops {100 * stop:.0f} cm from the contact point')
     ax.annotate(r'$b(\tau)=\mathbf{t}+\mathbf{R}(\theta)a(\sigma)$', xy=tip, xytext=tail, ha='center',
-                va='top' if side == 'below' else 'bottom', fontsize=7,
+                va='top' if side == 'below' else 'bottom', fontsize=6,
                 arrowprops=dict(arrowstyle='->', lw=0.6, relpos=(0.5, 1.0 if side == 'below' else 0.0),
                                 shrinkA=0, shrinkB=0))
-    ax.text(*(Bj.dense.mean(0) - [0.1, 0.05]), '$\\mathcal{B}_j$', fontsize=8)
+    ax.text(*(Bj.dense.mean(0) - [0.1, 0.05]), '$\\mathcal{B}_j$', fontsize=8, color=AMBER)
     ax.text(*(Ai.world(xa).mean(0) - [0.05, 0.05]), '$\\mathcal{B}_i$', fontsize=8, color=BLUE)
     ax.set_xlim(lo[0], hi[0])
     ax.set_ylim(*((lo[1] - .3, hi[1]) if side == 'below' else (lo[1], hi[1] + .2)))
     ax.set_aspect('equal')
     ax.set_axis_off()
-    fig.text(W3 / 2, TY, '(a) first contact', ha='center')
+    fig.text(W2 / 2, TY, '(a) first contact', ha='center')
     # (b) surface cover (Sec. IV): B_i moved 3 cm back from the contact of (a), zoom on the contact region.
     #     One field per body fitted to its ground-truth polygon, tightest certified levels (Prop. 1), and the
-    #     true 5-mm Bernstein cover of B_i's certified curve S_i; dots: boxes whose coefficient constraints are active.
-    sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'prototype_3d'))
+    #     native-patch Bernstein cover of B_i's certified curve S_i (uniform green fill).
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'prototype_3d'))
     import franka3d as F3
     from dock_cover import body_field, tight_level_2d, cover_2d, CORNERS2
-    fi, fj = body_field(rGT[3], .01, .1), body_field(rGT[0], .01, .1)
+    # Coarser SDFs for this illustration: 690 / 650 patches. The sampled
+    # certified-contour gaps are 7.9 / 3.1 mm (results/overview_1cm).
+    fi = body_field(rGT[3], .04, .1, training_spacing=.005)
+    fj = body_field(rGT[0], .04, .1, training_spacing=.005)
     Mi, Mj = F3.hessian_majorant(fi), F3.hessian_majorant(fj)
     li, lj = tight_level_2d(fi, Mi, rGT[3]), tight_level_2d(fj, Mj, rGT[0])
-    PC, sz = cover_2d(fi, li, .005)
+    PC, sz = cover_2d(fi, li, fi.h)
     print(f'overview (b): levels {1e3 * li:.2f} / {1e3 * lj:.2f} mm, {len(PC)} boxes of {1e3 * sz:g} mm')
     # first contact of the ground truths along the same approach, then 3 cm back
     Gi_w = lambda x: rGT[3] @ C.rot(th).T + np.array([x, ty])
@@ -422,60 +467,41 @@ def fig_overview():
         plt.close(cs.axes.figure)
         return segs
 
-    ax = fig.add_axes([W3 + .01, .05, W3 - .02, .82])
-    ax.add_patch(Polygon(rGT[0], closed=True, fc='0.85', ec='none'))
-    ax.add_patch(Polygon(rGT[3] @ Rb.T + xb[:2], closed=True, fc='#c6dbef', ec='none'))
+    ax = fig.add_axes([W2 + .03, .07, W2 - .05, .77])
+    ax.add_patch(Polygon(rGT[0], closed=True, fc=body_fill(AMBER), ec='none'))
+    ax.add_patch(Polygon(rGT[3] @ Rb.T + xb[:2], closed=True, fc=body_fill(BLUE), ec='none'))
+    # B_j's certified level set uses the same amber outline as in (a).
     for seg in level_curve(fj, lj, cen - HW - .02, cen + HW + .02):
-        ax.plot(seg[:, 0], seg[:, 1], color=CERT, lw=1.2)
-    for seg in level_curve(fi, li, fi.lo[:2], (fi.lo + fi.K * fi.h)[:2]):
-        w_ = seg @ Rb.T + xb[:2]
-        ax.plot(w_[:, 0], w_[:, 1], color=BLUE, lw=0.8)
+        ax.plot(seg[:, 0], seg[:, 1], color=AMBER, lw=1.0)
     Cw = PC @ Rb.T + xb[:2]
-    vis = np.flatnonzero(np.all(np.abs(Cw - cen) < HW + .01, axis=1))
     r_ = sz * np.sqrt(2) / 2
+    vis = np.flatnonzero(np.all(np.abs(Cw - cen) < HW + r_, axis=1))
+    # The safe set is the continuous certified curve S_i, drawn on top.
+    # Each retained SDF knot patch is one cover box; no subdivision.
     for k in vis:
         corners = (PC[k] + CORNERS2[[0, 2, 3, 1]] * sz) @ Rb.T + xb[:2]
-        ax.add_patch(Polygon(corners, closed=True, fill=False, ec=BLUE, lw=0.35))
-    # dots: centers of the boxes whose Bernstein coefficient constraints are active (lower bound of the lifted
-    # barrier below eta = 5 cm; summed-field barriers, prototype_3d/summed.py)
-    import summed as SM
-    body_i = SM.prepare_body(fi, li, PC, sz, 2)
-    res = SM.rows(body_i, vis, Rb, Cw[vis], fj, lj, SM.field_bound(fj, r_), np.zeros((len(vis), 1, 2)),
-                  np.zeros((1, 2, 2)), np.zeros((len(vis), 3)), .05, np.zeros(1), np.zeros(3), prune_rows=False,
-                  depth=0)
-    act = Cw[vis[res[5]]]
-    ax.plot(act[:, 0], act[:, 1], 'o', color='0.15', ms=0.9, mew=0)
+        ax.add_patch(Polygon(corners, closed=True, fc=COVER_GREEN, ec=COVER_GREEN, lw=0.6,
+                             alpha=0.25, zorder=2))
+    for seg in level_curve(fi, li, fi.lo[:2], (fi.lo + fi.K * fi.h)[:2]):
+        w_ = seg @ Rb.T + xb[:2]
+        ax.plot(w_[:, 0], w_[:, 1], color=BLUE, lw=1.8, zorder=3)
     ax.set_xlim(cen[0] - HW, cen[0] + HW)
     ax.set_ylim(cen[1] - HW, cen[1] + HW)
     ax.set_aspect('equal')
     ax.set_xticks([]); ax.set_yticks([])
     for sp in ax.spines.values():
         sp.set_color('0.6'); sp.set_linewidth(0.6)
-    ax.text(cen[0] - HW + .01, cen[1] - HW + .01, r'$\mathcal{B}_j$', fontsize=8)
+    ax.text(cen[0] - HW + .01, cen[1] - HW + .01, r'$\mathcal{B}_j$', fontsize=8, color=AMBER)
     ax.text(cen[0] + HW - .025, cen[1] + HW - .03, r'$\mathcal{B}_i$', fontsize=8, color=BLUE)
-    fig.text(1.5 * W3, TY, r'(b) cover of $\mathcal{S}_i$ (zoom, 5-mm boxes)', ha='center')
-    # (c) compiled construction: stacked C-space slices
-    ax = fig.add_axes([2 * W3 - .025, .12, W3 - .01, .8], projection='3d')   # room for the theta label
-    ax.computed_zorder = False                  # thin reference drawn over the wider certified curve
-    xs = np.linspace(-D, D, 200)
-    X, Y = np.meshgrid(xs, xs, indexing='ij')
-    for thk in np.linspace(0, TWO_PI, 8, endpoint=False):
-        g, S = C.cspace_sdf_slices(A, B, [thk], D, res=0.01)
-        Z = f.eval(np.column_stack([X.ravel(), Y.ravel(), np.full(X.size, thk)])).reshape(X.shape)
-        for field, xx, lev, col, lw in ((S[0], g, 0.0, REF, 0.6), (Z, xs, l_star, CERT, 1.5)):
-            cs = plt.figure().add_subplot().contour(xx, xx, field.T if field is S[0] else field.T, levels=[lev])
-            for seg in cs.allsegs[0]:
-                ax.plot(seg[:, 0], seg[:, 1], np.full(len(seg), np.degrees(thk)), color=col, lw=lw,
-                        zorder=2 if col == REF else 1)
-            plt.close(cs.axes.figure)
-    ax.set_xlabel('$t_x$', labelpad=-8)
-    ax.set_ylabel('$t_y$', labelpad=-8)
-    ax.set_zlabel(r'$\theta$ [deg]', labelpad=-6)
-    ax.set_zticks([0, 100, 200, 300])
-    ax.tick_params(pad=-3)
-    ax.view_init(elev=22, azim=-60)
-    fig.text(2.5 * W3, TY, r'(c) compiled field over $SE(2)$', ha='center')
-    fig.savefig(os.path.join(FIGS, 'overview.png'), dpi=300)
+    from matplotlib.patches import Patch
+    ax.legend(handles=[Patch(facecolor=COVER_GREEN, edgecolor=COVER_GREEN, alpha=.25,
+                             label='SDF patch = cover box: 4 cm')],
+              loc='upper center', bbox_to_anchor=(.5, -.025), fontsize=4,
+              ncol=2, frameon=False, borderpad=0, handlelength=1.7,
+              columnspacing=1)
+    fig.text(1.5 * W2, TY, r'(b) $\mathcal{S}_i$ and its cover (zoom)', ha='center')
+    # Write a new file before replacing the image that may be open in a preview.
+    save_paper_figure(fig, 'overview.png')
     plt.close(fig)
     print('>>> tro/figs/overview.png')
 

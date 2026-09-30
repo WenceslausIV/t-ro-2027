@@ -2,15 +2,15 @@
 %  T-RO extension of "Geometry-Aware Control Barrier Functions for Collision
 %  Avoidance via Bernstein Polynomial Approximations" (ICRA 2026, arXiv:2605.30696)
 %
-%  Numbers come from the scripts in the parent folder:
-%     cspace_experiments.py (planar simulator, closest-point and circle baselines)
-%     prototype_3d/dock_cover.py, prototype_3d/five_cover.py, maze_cover.py     (planar, surface cover)
+%  Numbers come from the scripts in the parent folder (run from there):
+%     planar/cspace_experiments.py (planar simulator, closest-point and circle baselines)
+%     prototype_3d/dock_cover.py, prototype_3d/five_cover.py, planar/maze_cover.py (planar, surface cover)
 %     prototype_3d/summed.py, summed3d.py: summed-field barriers with Bernstein coefficient constraints
 %       (Sec. V; checks: summed_check.py, summed_check2d.py). The previous corner barriers (safe set
 %       depending on the boxes) remain available with --corner / method 'corner'; their results are in
 %       *_corner.json, results/reference_maze_cover/, and tro/figs_corner_backup/.
-%     make_patch_pipeline.py                                               (Fig. 1)
-%     make_paper_figs.py overview|dock2|five, reference_maze_escape.py         (Figs. 2-5)
+%     planar/make_patch_pipeline.py                                        (Fig. 1)
+%     planar/make_paper_figs.py overview|dock2|five, planar/maze_cover.py    (Figs. 2-5)
 %     prototype_3d/franka3d.py, prototype_3d/franka_fig.py                     (Franka experiments)
 %  Raw results: ../results/*.json, ../prototype_3d/franka_results.json
 %  Planar timings: one CPU thread (OMP/MKL/OPENBLAS_NUM_THREADS=1), nothing else running.
@@ -26,7 +26,7 @@
 %  Native-patch default (2026-09-29): s=h, no online subdivision.
 %  New evaluations: ../results/native_patch_evaluation/; prior subdivided results are preserved.
 %  Review audits: ../results/manuscript_review/; discussion: claude_review_dialogue.md and
-%  ../review_claude_codex.md. Corrected baseline collision counts: 13/15/5 (sphere/sample/KKT).
+%  review_claude_codex.md. Reference PDFs: refs/. Corrected baseline collision counts: 13/15/5 (sphere/sample/KKT).
 %  Historical JSON files retain their original counters; franka_collision_summary.json records
 %  the witness/adaptive-triangle recheck and source hashes. Current runners default to native
 %  patches; reproducing historical subdivided runs requires their recorded cover/refinement settings.

@@ -1,6 +1,6 @@
 # Reference-image curved maze (current Fig. 8)
 
-Run `python reference_maze_escape.py` (or `python maze_escape.py`).
+Run `python planar/reference_maze_escape.py` (or `python planar/maze_escape.py`).
 Use `--layout-only` to preview geometry and the planned route, or `--rebuild`
 to regenerate the field. The paper files are `tro/figs/reference_maze_tight.pdf`,
 `tro/figs/reference_maze_tight.png`, and the generated metrics `tro/maze_results.tex`.

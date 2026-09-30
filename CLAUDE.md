@@ -10,12 +10,21 @@
   - Guarantees hold on the continuous surface, never on samples.
   - Do not change figure visuals (color theme, style) unless asked.
   - Keep SDF fields; no scene-specific special treatment.
-- Core code: `prototype_3d/summed.py`, `prototype_3d/summed3d.py`; experiments in `prototype_3d/`
-  (Franka, dual arm, star tube) and the repo root (planar docking, five robots, maze).
-- Review history: `review_claude_codex.md` (items C-01..C-35, with a status summary),
-  `tro/claude_review_dialogue.md`, audits in `results/manuscript_review/`.
-- `prototype_3d/RDF` (Franka meshes/kinematics, github.com/idiap/RDF) is a git submodule; after
-  cloning run `git submodule update --init` before running the Franka/dual-arm/star scripts.
-- Scripts, notes, and outputs that the paper no longer uses are in `archive/` (see `archive/README.md`); reference
-  PDFs are in `refs/`.
-- Excluded from git: `*.gif`, `cache/dock_craft_T.npz` (> 100 MB), LaTeX build outputs.
+
+## Layout
+
+- `tro/`: manuscript, bibliography, `figs/`, reference PDFs (`tro/refs/`), and the review record
+  (`tro/review_claude_codex.md`, items C-01..C-35 with a status summary; `tro/claude_review_dialogue.md`).
+- `planar/`: planar experiments and paper figures (docking, five robots, maze, Figs. 1-5).
+  Run from the repository root, e.g. `python planar/make_paper_figs.py dock2`.
+- `prototype_3d/`: the surface-cover barrier core (`summed.py`, `summed3d.py`), the Franka / dual-arm /
+  star-tube experiments, and the planar surface-cover runners (`dock_cover.py`, `five_cover.py`).
+  `prototype_3d/RDF` (Franka meshes/kinematics, github.com/idiap/RDF) is a git submodule; after cloning run
+  `git submodule update --init`.
+- `results/`: result JSON/NPZ and audit scripts (`results/manuscript_review/`).
+- `cache/`: cached fields.
+- `archive/`: old notes and outputs (see `archive/README.md`).
+- `swarm/`: a separate earlier swarm / B-spline prototype, unrelated to the T-RO paper.
+- Excluded from git: `*.gif`, `cache/dock_craft_T.npz` (> 100 MB), LaTeX build outputs, logs.
+- Scripts in `planar/` and `prototype_3d/` locate the repository root from their own file location, so
+  moving a single script out of its folder breaks its paths.

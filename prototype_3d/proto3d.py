@@ -33,6 +33,7 @@ from skimage import measure
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(HERE))
+sys.path.insert(0, os.path.join(os.path.dirname(HERE), 'planar'))  # planar modules
 from sdf_cbf_utils import Q_B2B, solve_ldp_qp  # noqa: E402
 
 # ---------------------------------------------------------------------------------------------

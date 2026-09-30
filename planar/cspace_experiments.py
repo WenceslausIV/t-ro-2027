@@ -1,12 +1,12 @@
 """
 Experiments for the T-RO draft (tro/main.tex).
 
-    python cspace_experiments.py cache      # 5 random shapes + 10 certified pair fields (seed 3)
-    python cspace_experiments.py repr       # representations incl. the global Bernstein polynomial
-    python cspace_experiments.py stats      # random start/goal trials: ours vs closest-point vs circle
-    python cspace_experiments.py unicycle   # unicycle dynamics, 2 and 4 robots
-    python cspace_experiments.py static     # one field for a robot among m static obstacles
-    python cspace_experiments.py all
+    python planar/cspace_experiments.py cache      # 5 random shapes + 10 certified pair fields (seed 3)
+    python planar/cspace_experiments.py repr       # representations incl. the global Bernstein polynomial
+    python planar/cspace_experiments.py stats      # random start/goal trials: ours vs closest-point vs circle
+    python planar/cspace_experiments.py unicycle   # unicycle dynamics, 2 and 4 robots
+    python planar/cspace_experiments.py static     # one field for a robot among m static obstacles
+    python planar/cspace_experiments.py all
 
 Results go to results/*.json, figures to tro/figs/*.png.
 """
@@ -28,7 +28,7 @@ import cspace_sdf_cbf_compare as C
 from cspace_cbf_5robots import enclose, pair_field, random_shape
 from sdf_cbf_utils import polygon_sdf, solve_ldp_qp
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CACHE = os.path.join(HERE, 'cache')
 RES = os.path.join(HERE, 'results')
 FIGS = os.path.join(HERE, 'tro', 'figs')
@@ -973,7 +973,7 @@ def exp_dock2(steps=900):
     out = dict(setup=meta)
     # surface cover (prototype_3d/dock_cover.py): fields of the ground-truth polygons, tightest levels,
     # 5-mm boxes on the craft's certified curve
-    sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'prototype_3d'))
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'prototype_3d'))
     import franka3d as F3
     from dock_cover import body_field, tight_level_2d, cover_2d, make_cover_fn
     fS, fC = body_field(GA, .0125, .15), body_field(GB, .01, .06)

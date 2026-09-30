@@ -14,6 +14,7 @@ import time
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+sys.path.insert(0, os.path.join(str(ROOT), 'planar'))  # planar modules
 import numpy as np
 import matplotlib
 matplotlib.use('Agg')

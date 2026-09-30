@@ -24,6 +24,7 @@ from dock_cover import body_field, cover_2d, make_cover_fn, make_summed_fn, tigh
 import summed as SM
 
 sys.path.insert(0, os.path.dirname(F.HERE))
+sys.path.insert(0, os.path.join(os.path.dirname(F.HERE), 'planar'))  # planar modules
 import cspace_experiments as E                                          # noqa: E402
 
 RES = os.path.join(os.path.dirname(F.HERE), 'results')

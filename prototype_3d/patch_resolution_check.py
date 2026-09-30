@@ -18,6 +18,7 @@ from matplotlib.path import Path as PolygonPath
 from scipy.spatial import cKDTree
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+sys.path.insert(0, os.path.join(str(Path(__file__).resolve().parents[1]), 'planar'))  # planar modules
 from cspace_cbf_5robots import random_shape
 from dock_cover import refine, seg_distance, tight_level_2d, body_field
 from proto3d import Spline3, _b

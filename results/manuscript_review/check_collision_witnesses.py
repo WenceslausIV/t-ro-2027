@@ -16,6 +16,7 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'prototype_3d'))
 sys.path.insert(0, str(ROOT))
+sys.path.insert(0, os.path.join(str(ROOT), 'planar'))  # planar modules
 import franka3d as F
 import franka_baselines as B
 from proto3d import sdf_boxes

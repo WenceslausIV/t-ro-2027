@@ -1,6 +1,6 @@
 """Introductory figure from an actual fitted SDF and its native Bernstein cover.
 
-Run: python make_patch_pipeline.py
+Run: python planar/make_patch_pipeline.py
 The dense display grid is for rendering only; cover selection uses spline coefficients.
 """
 import os
@@ -19,7 +19,7 @@ from matplotlib.patches import Polygon, Rectangle, FancyArrowPatch
 from matplotlib.path import Path as PolygonPath
 from matplotlib.lines import Line2D
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'prototype_3d'))
 from cspace_cbf_5robots import random_shape
 from dock_cover import tight_level_2d, cover_2d, seg_distance, refine

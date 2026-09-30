@@ -1,6 +1,6 @@
 # Rocket escape through the curved maze
 
-Run `python reference_maze_escape.py` (or `python maze_escape.py`).
+Run `python planar/reference_maze_escape.py` (or `python planar/maze_escape.py`).
 The paper exports are `tro/figs/rocket_maze.png` and `.pdf`.
 
 The user-supplied rocket is manually reconstructed as a planar body in
