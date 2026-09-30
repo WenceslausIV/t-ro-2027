@@ -78,3 +78,30 @@ No step fell back to the dense solver. Single-step replay (`qp_solver_benchmark.
 19.8--115.5 s dense and 1.9--3.8 s with Clarabel. Row assembly alone takes up to about 70 ms at these steps, and
 the row count jumps between about 1e3 and 5e4 from step to step as the speed-dependent activation threshold
 (up to 8 cm with the global gradient bound 2.68) grows and shrinks; reducing the rows is the next step.
+
+## Audit of the executed inputs (2026-09-30, after the runs above)
+
+`python prototype_3d/certificate_audit.py <folder> <variant> <field>` rebuilds the rows at every saved state and
+checks the executed input exactly (a = |E u|, some multiplier in [0, W_MAX] per box, input bounds); results in
+`audit/`. Two implementation gaps were found; both are fixed in the code, and the runs above predate the fixes.
+
+| Run set | Steps | Steps violating barrier rows | Steps violating sampled-data caps |
+|---|---:|---:|---:|
+| `native_patch_evaluation` (unit lift, historical) | 28,110 | 1505: 1497 recorded slack (trials 18, 22) + 8 unreported (trials 10, 16, 21, 22) | -- |
+| `free/` | 26,927 | 0 | -- |
+| `sampled_zero/` | 28,612 | 2 (trials 4, 7) | 1743 (all 30 trials) |
+| `sampled_zero_6mm/` | 24,270 | 4 (trials 4, 11, 26) | 2651 (all 28 trials) |
+
+1. Unreported barrier violations: the dense least-distance solver (SciPy NNLS; reproduced with SciPy 1.17.1)
+   can return an infeasible point without notice, and the input was applied with zero slack; in historical
+   trial 16 it even exceeded the input bound (|u| = 1.99). A cold re-solve of these steps gives a certified
+   input. Fix: `sdf_cbf_utils._ldp` checks G z >= h and re-solves with Clarabel (BVLS last); `summed.solve`
+   checks every returned input exactly and reports the measured violation as slack. Saved-state mesh bounds
+   stayed positive in all runs, so no collision occurred, but these steps were not certified.
+2. Sampled-data caps: the caps were enforced only through pairs with active boxes, while the skip threshold
+   max(eta, G travel) and the domain collar rely on them for every link. Fix: cap-only rows for links without
+   active boxes (`sampled_data.franka_rows`).
+
+Consequences: the sampled-data rows of Table IV (12 mm and 6 mm) must be rerun with the fixed code before the
+between-sample certificate can be claimed for them; the other experiments of the paper use the same dense
+solver and have not been audited, so they should be rerun with the checked solver before submission.

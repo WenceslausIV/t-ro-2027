@@ -1,0 +1,224 @@
+{
+ "folder": "certificate_upgrades/free",
+ "variant": "free",
+ "field": "12mm",
+ "solver_at_run_time": "dense NNLS least-distance QP without exact check",
+ "per_trial": {
+  "0": {
+   "steps": 1000,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 0,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "1": {
+   "steps": 1000,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 0,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "2": {
+   "steps": 1000,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 0,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "3": {
+   "steps": 1000,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 0,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "4": {
+   "steps": 540,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 0,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "5": {
+   "steps": 1000,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 0,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "6": {
+   "steps": 1000,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 0,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "7": {
+   "steps": 1000,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 0,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "8": {
+   "steps": 1000,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 0,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "9": {
+   "steps": 666,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 0,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "10": {
+   "steps": 1000,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 0,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "11": {
+   "steps": 1000,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 0,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "12": {
+   "steps": 1000,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 0,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "13": {
+   "steps": 345,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 0,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "14": {
+   "steps": 664,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 0,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "15": {
+   "steps": 1000,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 0,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "16": {
+   "steps": 1000,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 0,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "17": {
+   "steps": 1000,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 0,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "18": {
+   "steps": 499,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 0,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "19": {
+   "steps": 1000,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 0,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "20": {
+   "steps": 957,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 0,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "21": {
+   "steps": 1000,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 0,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "22": {
+   "steps": 1000,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 0,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "23": {
+   "steps": 1000,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 0,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "24": {
+   "steps": 1000,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 0,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "25": {
+   "steps": 1000,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 0,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "26": {
+   "steps": 642,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 0,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "27": {
+   "steps": 1000,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 0,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "28": {
+   "steps": 614,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 0,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "29": {
+   "steps": 1000,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 0,
+   "input_bad_steps": 0,
+   "first_bad": null
+  }
+ },
+ "total": {
+  "steps": 26927,
+  "barrier_bad_steps": 0,
+  "cap_bad_steps": 0,
+  "input_bad_steps": 0
+ }
+}

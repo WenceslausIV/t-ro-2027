@@ -1,0 +1,230 @@
+{
+ "folder": "certificate_upgrades/sampled_zero",
+ "variant": "sampled",
+ "field": "12mm",
+ "solver_at_run_time": "dense NNLS least-distance QP without exact check",
+ "per_trial": {
+  "0": {
+   "steps": 1000,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 11,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "1": {
+   "steps": 1000,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 75,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "2": {
+   "steps": 1000,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 110,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "3": {
+   "steps": 1000,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 30,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "4": {
+   "steps": 781,
+   "barrier_bad_steps": 1,
+   "cap_bad_steps": 91,
+   "input_bad_steps": 1,
+   "first_bad": [
+    440,
+    139
+   ]
+  },
+  "5": {
+   "steps": 1000,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 71,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "6": {
+   "steps": 1000,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 115,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "7": {
+   "steps": 1000,
+   "barrier_bad_steps": 1,
+   "cap_bad_steps": 83,
+   "input_bad_steps": 0,
+   "first_bad": [
+    50,
+    7
+   ]
+  },
+  "8": {
+   "steps": 1000,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 63,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "9": {
+   "steps": 946,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 138,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "10": {
+   "steps": 1000,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 104,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "11": {
+   "steps": 1000,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 13,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "12": {
+   "steps": 1000,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 143,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "13": {
+   "steps": 489,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 99,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "14": {
+   "steps": 853,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 116,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "15": {
+   "steps": 1000,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 29,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "16": {
+   "steps": 1000,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 85,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "17": {
+   "steps": 1000,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 35,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "18": {
+   "steps": 938,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 34,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "19": {
+   "steps": 1000,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 5,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "20": {
+   "steps": 1000,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 42,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "21": {
+   "steps": 1000,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 33,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "22": {
+   "steps": 1000,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 7,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "23": {
+   "steps": 1000,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 27,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "24": {
+   "steps": 1000,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 3,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "25": {
+   "steps": 1000,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 22,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "26": {
+   "steps": 851,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 18,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "27": {
+   "steps": 1000,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 4,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "28": {
+   "steps": 754,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 52,
+   "input_bad_steps": 0,
+   "first_bad": null
+  },
+  "29": {
+   "steps": 1000,
+   "barrier_bad_steps": 0,
+   "cap_bad_steps": 85,
+   "input_bad_steps": 0,
+   "first_bad": null
+  }
+ },
+ "total": {
+  "steps": 28612,
+  "barrier_bad_steps": 2,
+  "cap_bad_steps": 1743,
+  "input_bad_steps": 1
+ }
+}
