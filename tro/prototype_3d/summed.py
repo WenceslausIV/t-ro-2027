@@ -159,21 +159,22 @@ def _layer(D, s, r, R, fB, lB, M3B, dim, gamma):
     m3 = M3B.eval(P3)
     g, H = g[:, :dim], H[:, :dim, :dim]
     b = D['gA'] + g @ R                                                 # value part in A's box coordinates
-    Q = .5 * (D['HA'] + np.einsum('ai,nab,bj->nij', R, H, R))
+    Q = .5 * (D['HA'] + R.T @ H @ R)
     val = ((D['vA'] + v - lB - (D['m3A'] + m3) * r ** 3 / 6)[:, None]
-           + s * b @ TK.T + s ** 2 * np.einsum('kab,nab->nk', QT, Q))    # (n, K)
+           + s * b @ TK.T + s ** 2 * (Q.reshape(len(Q), -1) @ QT.reshape(len(QT), -1).T))    # (n, K)
     return val, g, H, m3
 
 
 def _velocity_rows(val, g, H, m3, Jc, W, Sb, s, r, R, dim, gamma):
     TK, QT = TABLES[dim]
-    lin = np.einsum('nab,nmb->nma', H, Jc) + np.einsum('mba,nb->nma', W, g)            # (n, m, dim), in d
-    quad = np.einsum('nab,mbc->nmac', H, W)
+    lin = (Jc @ H.transpose(0, 2, 1)) + np.tensordot(g, W, axes=([1], [1]))          # (n, m, dim), in d
+    quad = H[:, None] @ W[None]
     quad = .5 * (quad + quad.transpose(0, 1, 3, 2))
     lin = lin @ R                                                                       # -> e coordinates
-    quad = np.einsum('ai,nmab,bj->nmij', R, quad, R)
-    Acoef = (np.einsum('nd,nmd->nm', g, Jc)[:, None, :] + s * np.einsum('kd,nmd->nkm', TK, lin)
-             + s ** 2 * np.einsum('kab,nmab->nkm', QT, quad))                            # (n, K, m)
+    quad = R.T @ quad @ R
+    n_, m_ = quad.shape[:2]
+    Acoef = (np.einsum('nd,nmd->nm', g, Jc)[:, None, :] + s * (lin @ TK.T).transpose(0, 2, 1)
+             + s ** 2 * (quad.reshape(n_, m_, -1) @ QT.reshape(len(QT), -1).T).transpose(0, 2, 1))   # (n, K, m)
     n, K, m = Acoef.shape
     Tcoef = np.repeat(-.5 * (m3 * r ** 2)[:, None] * Sb, K, axis=0)                   # (n*K, k)
     return Acoef.reshape(-1, m), Tcoef, (gamma * val).ravel()

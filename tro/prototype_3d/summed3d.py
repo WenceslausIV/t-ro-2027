@@ -116,6 +116,22 @@ def pair_rows(A, RA, pA, B, RB, pB, joints, eta, umax, gamma=F.GAMMA, sd=None):
     return Ar, Tr, Cr, nbox, hlow, E
 
 
+def _block_diag(blocks):
+    """Sparse block-diagonal matrix of dense or sparse blocks (same entries as scipy.sparse.block_diag)."""
+    import scipy.sparse as sp
+    rows, cols, vals, i, j = [], [], [], 0, 0
+    for B in blocks:
+        if sp.issparse(B):
+            Bc = B.tocoo()
+            r_, c_, v_ = Bc.row, Bc.col, Bc.data
+        else:
+            r_, c_ = np.nonzero(B)
+            v_ = B[r_, c_]
+        rows.append(r_ + i); cols.append(c_ + j); vals.append(v_)
+        i += B.shape[0]; j += B.shape[1]
+    return sp.csr_matrix((np.concatenate(vals), (np.concatenate(rows), np.concatenate(cols))), shape=(i, j))
+
+
 def stack(results, m):
     """Stack the rows of several pairs; each pair has its own block of 6 auxiliary variables."""
     res = [r for r in results if r is not None]
@@ -123,8 +139,7 @@ def stack(results, m):
         return np.zeros((0, m)), np.zeros((0, 0)), np.zeros(0), 0, np.inf, np.zeros((0, m))
     k = sum(len(r[5]) for r in res)
     if len(res[0]) == 7:                            # 'free' multipliers: block-diagonal T kept sparse
-        import scipy.sparse as sp
-        T = sp.block_diag([sp.csr_matrix(r[1]) for r in res], format='csr')
+        T = _block_diag([r[1] for r in res])
     else:
         T = np.zeros((sum(len(r[2]) for r in res), k))
         i = j = 0
@@ -134,8 +149,7 @@ def stack(results, m):
     out = (np.vstack([r[0] for r in res]), T, np.concatenate([r[2] for r in res]),
            sum(r[3] for r in res), min(r[4] for r in res), np.vstack([r[5] for r in res]))
     if len(res[0]) == 7:                            # block-diagonal multiplier columns of all pairs (sparse)
-        import scipy.sparse as sp
-        return out + (sp.block_diag([sp.csr_matrix(r[6]) for r in res], format='csr'),)
+        return out + (_block_diag([r[6] for r in res]),)
     return out
 
 

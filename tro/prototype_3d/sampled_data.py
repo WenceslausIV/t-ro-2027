@@ -67,8 +67,8 @@ class State:
         return self.caps
 
 
-def _link_twist_map(q, L):
-    T, Z, O = F.fk(q)
+def _link_twist_map(q, L, fk=None):
+    T, Z, O = F.fk(q) if fk is None else fk
     n, p = L['n_joints'], T[L['frame']][:3, 3]
     E = np.zeros((6, F.DOF))
     E[:3, :n] = np.cross(Z[:n], p - O[:n]).T
@@ -76,8 +76,8 @@ def _link_twist_map(q, L):
     return E
 
 
-def caps_for(q, L, u_prev):
-    tw = _link_twist_map(q, L) @ u_prev
+def caps_for(q, L, u_prev, E=None):
+    tw = (_link_twist_map(q, L) if E is None else E) @ u_prev
     V = GROW * np.abs(tw[:3]).sum() + FLOOR_V
     Om = GROW * np.abs(tw[3:]).sum() + FLOOR_OM
     nu = GROW * np.abs(u_prev).sum() + FLOOR_NU
@@ -88,9 +88,9 @@ def caps_for(q, L, u_prev):
     return dict(dt=F.DT, V=V, Om=Om, nu=nu, c2=c2, travel=F.DT * speed)
 
 
-def _cap_block(q, L, sd):
+def _cap_block(EL, sd):
     """Caps of a link without active boxes: 1.a_V <= V, 1.a_Omega <= Om, 1.s <= nu with a >= |E u|, s >= |u|."""
-    E = np.r_[_link_twist_map(q, L), np.eye(F.DOF)]
+    E = np.r_[EL, np.eye(F.DOF)]
     Tc = np.zeros((3, len(E)))
     Tc[0, :3], Tc[1, 3:6], Tc[2, 6:] = -1., -1., -1.
     out = (np.zeros((3, F.DOF)), Tc, np.array([sd['V'], sd['Om'], sd['nu']]), 0, np.inf, E)
@@ -107,7 +107,8 @@ def franka_rows(q, links, obst, state, eta=F.ACT):
     res, caps = [], {}
     for L in links:
         R, p = T[L['frame']][:3, :3], T[L['frame']][:3, 3]
-        sd = caps_for(q, L, state.u)
+        EL = _link_twist_map(q, L, (T, Z, O))
+        sd = caps_for(q, L, state.u, EL)
         caps[L['frame']] = (sd['V'], sd['Om'], sd['nu'], sd['travel'])
         eta_L = max(eta, CONST['G'] * sd['travel'])
         capped = False
@@ -119,7 +120,7 @@ def franka_rows(q, links, obst, state, eta=F.ACT):
             capped |= r is not None             # pair rows carry the caps of L
             res.append(r)
         if not capped:
-            res.append(_cap_block(q, L, sd))
+            res.append(_cap_block(EL, sd))
     state.caps = caps
     out = S3.stack(res, F.DOF)
     if len(out) == 6:                    # no active pair: keep the 'free' signature
