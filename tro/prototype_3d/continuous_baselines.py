@@ -116,7 +116,7 @@ def rows(q, links, obst, prim):
     return np.vstack(A), np.concatenate(C)
 
 
-def simulate(q0, qg, links, obst, prim, steps=1000):
+def simulate(q0, qg, links, obst, prim, steps=1000, audit_every=1):
     q = np.array(q0, float)
     log = dict(t=[], rows=[], gap=[], slack=0, reached=None, q=[q.copy()])
     z, E = None, np.zeros((1, F.DOF))
@@ -128,13 +128,15 @@ def simulate(q0, qg, links, obst, prim, steps=1000):
         log['t'].append(time.perf_counter() - t0)
         log['slack'] += s > 0
         log['rows'].append(len(C))
-        log['gap'].append(F.real_gap(q, links, obst))
+        if audit_every and k % audit_every == 0:
+            log['gap'].append(F.real_gap(q, links, obst))
         q = q + F.DT * u
         log['q'].append(q.copy())
         if np.linalg.norm(qg - q) < .05:
             log['reached'] = (k + 1) * F.DT
             break
-    log['gap'].append(F.real_gap(q, links, obst))
+    if audit_every:
+        log['gap'].append(F.real_gap(q, links, obst))           # final state
     return log
 
 
@@ -145,6 +147,7 @@ def main():
     p.add_argument('--trials', nargs=2, type=int, default=[0, 30])
     p.add_argument('--steps', type=int, default=1000)
     p.add_argument('--spheres', type=int, default=16, help='centers per link for spheres_kmeans')
+    p.add_argument('--audit-every', type=int, default=1, help='mesh audit every N states (+ final); 0: none')
     p.add_argument('--tag', default='')
     a = p.parse_args()
     S.QP_SOLVER = 'daqp'
@@ -154,7 +157,7 @@ def main():
         prim = primitives(links, method, a.edge_mm / 1000, a.spheres)
         out = OUT / (method + (f'{a.spheres}' if method == 'spheres_kmeans' else '') + a.tag)
         out.mkdir(parents=True, exist_ok=True)
-        info = dict(method=method, edge_mm=a.edge_mm, spheres_per_link=a.spheres if method == 'spheres_kmeans' else None,
+        info = dict(method=method, edge_mm=a.edge_mm, audit_every=a.audit_every, spheres_per_link=a.spheres if method == 'spheres_kmeans' else None,
                     primitives=int(sum(len(x[0]) for x in prim)),
                     margin_mm=[1e3 * float(x[1].max()) for x in prim])
         (out / 'setup.json').write_text(json.dumps(info, indent=1))
@@ -164,8 +167,8 @@ def main():
             if path.exists():
                 continue
             q0, qg, _ = trials[i]
-            log = simulate(q0, np.asarray(qg), links, obst, prim, a.steps)
-            t, gaps = 1e3 * np.asarray(log['t']), np.asarray(log['gap'])
+            log = simulate(q0, np.asarray(qg), links, obst, prim, a.steps, a.audit_every)
+            t, gaps = 1e3 * np.asarray(log['t']), np.asarray(log['gap'] or [np.nan])
             m = dict(steps=len(t), reached_s=log['reached'], slack_steps=int(log['slack']),
                      min_gap_bound_mm=1e3 * float(gaps.min()), final_gap_mm=1e3 * float(gaps[-1]),
                      nonpositive_gap_states=int((gaps <= 0).sum()), t_median_ms=float(np.median(t)),

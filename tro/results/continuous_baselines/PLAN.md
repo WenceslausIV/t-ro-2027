@@ -30,7 +30,7 @@ Steps (status):
 1. [done] prototype_3d/continuous_baselines.py written; smoke test trial 2, 100 steps, all OK:
    points_delta 97,835 points, m = 5.8 mm, 15 ms median; capsule m = 60-114 mm, 2.8 ms;
    spheres_enclosing (54) r = 44-92 mm, 2.8 ms; spheres_kmeans16 r <= 40-68 mm, 2.7 ms.
-2. [running since 2026-10-01 via `bash tro/results/continuous_baselines/run_all.sh` (restartable; commits after each
+2. [running (audit every 10th state; parallel outcomes, then isolated timing) via `bash tro/results/continuous_baselines/run_all.sh` (restartable; commits after each
    method)] run B1-B3 on 30 trials, one process, sequential (isolated timing):
    `python prototype_3d/continuous_baselines.py --methods capsule spheres_enclosing spheres_kmeans points_delta`
    then `python prototype_3d/continuous_baselines.py --methods spheres_kmeans --spheres 64`
