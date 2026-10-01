@@ -72,6 +72,40 @@ def witness(q, links, B, RB, pB):
     return w
 
 
+class Audit:
+    """startube_setup.gap (certified whole-mesh lower bound, capped at 5 cm) with per-link reuse: a link's previous
+    bound minus a rigid-motion bound on its displacement (|dt| + |dR|_F r_L, tube frame) is still a lower bound; the
+    link is evaluated again only when that transferred bound falls below the cap, so every bound below the cap is a
+    direct evaluation, identical to tube_gap. The collision witness is evaluated only when the bound is <= 0."""
+    CAP = .05
+
+    def __init__(self, links, B, RB, pB, reuse=None):
+        self.links, self.B, self.RB, self.pB = links, B, RB, pB
+        self.reuse = self.CAP if reuse is None else reuse     # recompute a link when its transferred bound < reuse
+        self.rL = [float(np.linalg.norm(L['gt'], axis=1).max() + L['gt_r'].max()) for L in links]
+        self.prev = [None] * len(links)
+
+    def __call__(self, q):
+        T, _, _ = F.fk(q)
+        B, RB, pB, g = self.B, self.RB, self.pB, self.CAP
+        for j, L in enumerate(self.links):
+            Rl, tl = RB.T @ T[L['frame']][:3, :3], RB.T @ (T[L['frame']][:3, 3] - pB)
+            if self.prev[j] is not None:
+                g0, R0, t0 = self.prev[j]
+                moved = g0 - (np.linalg.norm(tl - t0) + np.linalg.norm(Rl - R0) * self.rL[j])
+                if moved >= self.reuse:                      # still a certified lower bound for this link
+                    g = min(g, moved)
+                    continue
+            P = L['gt'] @ Rl.T + tl
+            outside = np.linalg.norm(np.maximum(np.maximum(B['blo'] - P, P - B['bhi']), 0.), axis=1)
+            m = outside - L['gt_r'] < self.CAP
+            gl = min(self.CAP, float((B['sdf'](P[m]) - L['gt_r'][m]).min())) if m.any() else self.CAP
+            self.prev[j] = (gl, Rl, tl)
+            g = min(g, gl)
+        w = witness(q, self.links, B, RB, pB) if g <= 0 else np.inf
+        return g, w
+
+
 def sample_goal(rng, links, B, RB, pB):
     mid, half = (F.Q_MIN + F.Q_MAX) / 2, (F.Q_MAX - F.Q_MIN) / 2 * .8
     while True:
@@ -239,9 +273,41 @@ def run(method, trials, audit, tag, n_link, n_tube, voxel):
         print(method + tag, i, {k_: (round(v, 2) if isinstance(v, float) else v) for k_, v in m.items()}, flush=True)
 
 
+def _audit_one(args):
+    """Worker: certified mesh-distance lower bounds of one saved trajectory (every state, in order)."""
+    npz, reuse = args
+    if not _W:
+        _W['s'] = scene()
+    q0, links, B, RB, pB = _W['s']
+    A = Audit(links, B, RB, pB, reuse)
+    gw = np.array([A(q) for q in np.load(npz)['q']])
+    return npz, gw[:, 0], gw[:, 1]
+
+
+def audit_folder(folder, reuse, workers):
+    from multiprocessing import Pool
+    d = OUT / folder
+    todo = [str(p) for p in sorted(d.glob('trial_*.npz')) if not (d / p.name.replace('trial_', 'audit_')).exists()]
+    with Pool(workers) as pool:
+        for npz, g, w in pool.imap_unordered(_audit_one, [(p, reuse) for p in todo]):
+            p = Path(npz)
+            np.savez_compressed(p.parent / p.name.replace('trial_', 'audit_'), gap=g, witness=w)
+            js = p.with_suffix('.json')
+            rec = json.loads(js.read_text())
+            rec['metrics'].update(min_gap_bound_mm=1e3 * float(g.min()), collision_witness_states=int((w < 0).sum()),
+                                  min_witness_sdf_mm=1e3 * float(w.min()) if np.isfinite(w.min()) else None,
+                                  audit=f'every state incl. final; certified lower bound, direct below '
+                                        f'{1e3 * reuse:.0f} mm (link-bound reuse above), capped at 50 mm')
+            js.write_text(json.dumps(rec, indent=1))
+            print(folder, p.name, f'min gap {1e3 * g.min():.2f} mm, witness states {(w < 0).sum()}', flush=True)
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument('cmd', choices=('goals', 'run'))
+    p.add_argument('cmd', choices=('goals', 'run', 'audit'))
+    p.add_argument('--folder', default='')
+    p.add_argument('--reuse-mm', type=float, default=20.)
+    p.add_argument('--workers', type=int, default=12)
     p.add_argument('method', nargs='?', choices=('ours', 'spheres'))
     p.add_argument('--trials', nargs=2, type=int, default=[0, N_GOALS])
     p.add_argument('--no-audit', action='store_true')
@@ -252,6 +318,8 @@ def main():
     a = p.parse_args()
     if a.cmd == 'goals':
         make_goals()
+    elif a.cmd == 'audit':
+        audit_folder(a.folder, a.reuse_mm / 1000, a.workers)
     else:
         run(a.method, a.trials, not a.no_audit, a.tag, a.link_spheres, a.tube_spheres, a.voxel_mm / 1000)
 
