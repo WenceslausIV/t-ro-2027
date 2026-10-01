@@ -24,6 +24,8 @@ FAIR = [
     ('ours, 12-mm patches', CU / 'free_fixed', '12mm_free', 'ours_12mm', 'surface cover, rows at samples'),
     ('ours, 6-mm patches', CU / 'free_6mm_fixed', '6mm_free', 'ours_6mm', 'surface cover, rows at samples'),
     ('ours, 8-mm patches', CU / 'free_8mm_fixed', '8mm_free', 'ours_8mm', 'surface cover, rows at samples'),
+    ('ours, 8-mm patches, joint Bernstein (w = 1)', CU / 'joint_8mm_fixed', '8mm_joint', 'ours_8mm',
+     'surface cover, rows at samples'),
     ('ours, 12 mm + one near-contact halving', CU / 'free_fixed_refine1', '12mm_free_refine1', 'ours_12mm',
      'surface cover, rows at samples'),
     ('ours, 6 mm + one near-contact halving', CU / 'free_6mm_fixed_refine1', '6mm_free_refine1', 'ours_6mm',

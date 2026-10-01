@@ -34,12 +34,12 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--fields', nargs='+', default=list(CACHES))
     p.add_argument('--trials', nargs=2, type=int, default=[0, 30])
-    p.add_argument('--variant', choices=('sampled', 'free'), default='sampled',
+    p.add_argument('--variant', choices=('sampled', 'free', 'joint', 'unit'), default='sampled',
                    help='free: rows at the samples only (no sampled-data certificate), like the baselines')
     a = p.parse_args()
     fallback = 'zero' if a.variant == 'sampled' else 'slack'
     refine = int(os.environ.get('SUMMED_REFINE_DEPTH', '0'))
-    suffix = ('' if a.variant == 'sampled' else '_free') + (f'_refine{refine}' if refine else '')
+    suffix = ('' if a.variant == 'sampled' else '_' + a.variant) + (f'_refine{refine}' if refine else '')
     OUT.mkdir(parents=True, exist_ok=True)
     CU.configure(a.variant)
     S.QP_SOLVER = 'daqp'

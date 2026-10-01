@@ -88,13 +88,15 @@ def configure(variant):
     S.REFINE_DEPTH = int(os.environ.get('SUMMED_REFINE_DEPTH', '0'))   # native patches unless refinement is requested
     if variant == 'unit':
         S.ROW_MODE, S.MULT_MODE = 'vertex', 'one'
+    elif variant == 'joint':                     # joint Bernstein certificate with the unit lift (w = 1)
+        S.ROW_MODE, S.MULT_MODE = 'bernstein', 'one'
     else:
         S.ROW_MODE, S.MULT_MODE = 'bernstein', 'free'
 
 
 def main():
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument('--variant', choices=('unit', 'free', 'sampled'), required=True)
+    p.add_argument('--variant', choices=('unit', 'joint', 'free', 'sampled'), required=True)
     p.add_argument('--fallback', choices=('slack', 'zero'), default='slack')
     p.add_argument('--trials', nargs=2, type=int, default=[0, 30])
     p.add_argument('--reverse', action='store_true', help='run the trial range in descending order')
