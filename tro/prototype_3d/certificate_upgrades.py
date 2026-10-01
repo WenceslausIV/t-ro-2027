@@ -85,7 +85,7 @@ def summarize(log):
 
 
 def configure(variant):
-    S.REFINE_DEPTH = 0
+    S.REFINE_DEPTH = int(os.environ.get('SUMMED_REFINE_DEPTH', '0'))   # native patches unless refinement is requested
     if variant == 'unit':
         S.ROW_MODE, S.MULT_MODE = 'vertex', 'one'
     else:
