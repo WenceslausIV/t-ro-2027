@@ -19,15 +19,20 @@ Baselines (all certified on a continuous set that encloses the link mesh; rows e
   vertices (segment on the principal axis, radius = max vertex distance); segment sampled at spacing s,
   h = phi_O(x_j) - l_O - G_loc (r + s/2).
 - B3 `spheres_enclosing` (sphere decomposition, certified): RDF sphere centers, each remeshed vertex assigned to
-  its nearest center, radius = max assigned distance + delta; h = phi_O(c) - l_O - G_loc r.
-G_loc: franka3d.neighborhood_bounds(phi_O, reach) cellwise gradient bound.
+  its nearest center, radius = max assigned distance + delta.
+- B3b `spheres_kmeans16`, `spheres_kmeans64`: same enclosure with 16 / 64 k-means centers per link.
+Implementation choice (favors the baselines): baselines use the EXACT obstacle SDF d_O (union of boxes,
+1-Lipschitz, no fitting error and no level), h = d_O(x) - m. Ours uses the fitted fields with certified levels.
 Ours (existing results): results/certificate_upgrades/{free, sampled_zero_fixed, sampled_zero_6mm_fixed}.
 
 Steps (status):
 0. [done] stop other experiments, write this plan.
-1. [todo] write prototype_3d/continuous_baselines.py, smoke test 1 trial / 100 steps, commit.
+1. [done] prototype_3d/continuous_baselines.py written; smoke test trial 2, 100 steps, all OK:
+   points_delta 97,835 points, m = 5.8 mm, 15 ms median; capsule m = 60-114 mm, 2.8 ms;
+   spheres_enclosing (54) r = 44-92 mm, 2.8 ms; spheres_kmeans16 r <= 40-68 mm, 2.7 ms.
 2. [todo] run B1-B3 on 30 trials, one process, sequential (isolated timing):
-   `python prototype_3d/continuous_baselines.py --methods points_delta capsule spheres_enclosing`
+   `python prototype_3d/continuous_baselines.py --methods capsule spheres_enclosing spheres_kmeans points_delta`
+   then `python prototype_3d/continuous_baselines.py --methods spheres_kmeans --spheres 64`
    -> results/continuous_baselines/<method>/franka_XX.json; commit.
 3. [todo] isolated timing of ours: `python prototype_3d/patch_size_timing.py --fields 12mm 6mm`; commit.
 4. [todo] report table (reached, collisions, min/median gap, stop gap, time median/p95, rows) in
