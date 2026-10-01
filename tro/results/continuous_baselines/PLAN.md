@@ -67,6 +67,20 @@ Status 2026-10-01 (later):
 8. [running in run_final.sh] isolated timing of all baselines and ours, nothing else running.
 9. [todo] `python prototype_3d/continuous_baselines_report.py` (add points_delta_fitted row) and answer the user.
 
+## FAIRNESS REQUIREMENTS (user instruction: the baseline comparison must be fair; check every item before reporting)
+1. Same obstacle information: compare ours only with baselines on OUR fitted obstacle fields (`--obstacle fitted`);
+   exact-SDF baselines are reference rows only, labelled as such.
+2. Same guarantee level: compare like with like. Baselines enforce rows at the 10-ms samples only, so the main
+   comparison uses ours without sampled data (`--variant free`, 12 mm and 6 mm); our sampled-data rows are an extra
+   row labelled "plus between-sample guarantee".
+3. Valid starts only: a baseline trial counts only if h >= 0 at q0 (inside its certified set); report how many trials
+   each method starts outside its set and exclude them from the fair rows.
+4. Same audit: audit every state (or the same subsampling) for all methods before quoting minimum gaps.
+5. Same timing conditions: one process, nothing else running, same machine, filter only (rows + QP).
+6. Tune baselines fairly: try at least a finer point spacing (e.g. --edge-mm 5) and more spheres/capsules per link,
+   as we tried several patch sizes for ours; report the best setting of each method.
+7. Same everything else: trials, nominal, dt, gamma, input bounds, horizon, QP solver with exact check (already so).
+
 ## HANDOFF (2026-10-01, end of this session)
 State: all outcome runs done; isolated timing done for all baselines (*_timing/, 30/30 each).
 Table: results/continuous_baselines/README.md and summary.json (`python prototype_3d/continuous_baselines_report.py`).
