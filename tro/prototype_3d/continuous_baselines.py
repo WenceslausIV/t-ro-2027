@@ -16,7 +16,8 @@ samples, rows only for h < 3 cm (as ours).
   spheres_kmeans     same enclosure with K k-means centers of the remeshed vertices per link (--spheres K).
 Same nominal, dt, gamma, input bounds, horizon, and QP (summed.solve, DAQP, exact check) as
 certificate_upgrades.py. Audit: franka3d.real_gap at every state (outside the timer).
-Writes results/continuous_baselines/<method>/franka_XX.json and .npz.
+--obstacle fitted uses our fitted obstacle fields instead (same obstacle information as ours).
+Writes results/continuous_baselines/<method>[_fitted]/franka_XX.json and .npz.
 """
 import os
 for key in ('OMP_NUM_THREADS', 'MKL_NUM_THREADS', 'OPENBLAS_NUM_THREADS'):
@@ -91,7 +92,21 @@ def sdf_grad(P, boxes, eps=1e-6):
     return d, g
 
 
-def rows(q, links, obst, prim):
+def fitted_terms(W, m, o):
+    """Our fitted obstacle field: h = phi_O(x) - l_O - G m, G a certified bound of |grad phi_O| on the ball of
+    radius m around x (cellwise, over all cells within the largest margin). Points outside the field domain are
+    >= 15 cm from the obstacle's bounding box, more than any margin, so they are skipped (safe)."""
+    f = o['f']
+    ins = np.all((W > o['dlo']) & (W < o['dhi']), axis=1)
+    if not ins.any():
+        return None
+    val, g = f.eval(W[ins], order=1)
+    ci = f.cell_of(W[ins])
+    G = o['G_cb'][ci[:, 0], ci[:, 1], ci[:, 2]]
+    return ins, val - o['l'] - G * m[ins], g
+
+
+def rows(q, links, obst, prim, obstacle='exact'):
     T, Z, O = F.fk(q)
     ZxO = np.cross(Z, O)
     A, C = [], []
@@ -99,6 +114,19 @@ def rows(q, links, obst, prim):
         R, p = T[L['frame']][:3, :3], T[L['frame']][:3, 3]
         W = P @ R.T + p
         for o in obst.values():
+            if obstacle == 'fitted':
+                res = fitted_terms(W, m, o)
+                if res is None:
+                    continue
+                ins, h, g = res
+                act = h < F.ACT
+                if not act.any():
+                    continue
+                x, g, h = W[ins][act], g[act], h[act]
+                row = np.cross(x, g) @ Z.T - g @ ZxO.T
+                row[:, L['n_joints']:] = 0.
+                A.append(row); C.append(F.GAMMA * h)
+                continue
             near = np.all((W > o['blo'] - F.ACT - m[:, None]) & (W < o['bhi'] + F.ACT + m[:, None]), axis=1)
             if not near.any():
                 continue                                  # farther than ACT + m from the obstacle's bounding box
@@ -116,14 +144,14 @@ def rows(q, links, obst, prim):
     return np.vstack(A), np.concatenate(C)
 
 
-def simulate(q0, qg, links, obst, prim, steps=1000, audit_every=1):
+def simulate(q0, qg, links, obst, prim, steps=1000, audit_every=1, obstacle='exact'):
     q = np.array(q0, float)
     log = dict(t=[], rows=[], gap=[], slack=0, reached=None, q=[q.copy()])
     z, E = None, np.zeros((1, F.DOF))
     for k in range(steps):
         u_nom = np.clip(F.KQ * (qg - q), -F.QD_MAX, F.QD_MAX)
         t0 = time.perf_counter()
-        A, C = rows(q, links, obst, prim)
+        A, C = rows(q, links, obst, prim, obstacle)
         u, s, z = S.solve(u_nom, A, np.zeros((len(C), 1)), C, E, F.BOX_G, F.BOX_H, z)
         log['t'].append(time.perf_counter() - t0)
         log['slack'] += s > 0
@@ -148,6 +176,8 @@ def main():
     p.add_argument('--steps', type=int, default=1000)
     p.add_argument('--spheres', type=int, default=16, help='centers per link for spheres_kmeans')
     p.add_argument('--audit-every', type=int, default=1, help='mesh audit every N states (+ final); 0: none')
+    p.add_argument('--obstacle', choices=('exact', 'fitted'), default='exact',
+                   help='exact: analytic obstacle SDF (1-Lipschitz); fitted: our fields phi_O with levels and gradient bounds')
     p.add_argument('--tag', default='')
     a = p.parse_args()
     S.QP_SOLVER = 'daqp'
@@ -155,9 +185,14 @@ def main():
     trials = json.loads((Path(F.HERE) / 'franka_trials.json').read_text())
     for method in a.methods:
         prim = primitives(links, method, a.edge_mm / 1000, a.spheres)
-        out = OUT / (method + (f'{a.spheres}' if method == 'spheres_kmeans' else '') + a.tag)
+        out = OUT / (method + (f'{a.spheres}' if method == 'spheres_kmeans' else '')
+                     + ('_fitted' if a.obstacle == 'fitted' else '') + a.tag)
+        if a.obstacle == 'fitted':
+            reach = max(float(x[1].max()) for x in prim)
+            for o in obst.values():
+                o['G_cb'] = F.neighborhood_bounds(o['f'], reach)[0]
         out.mkdir(parents=True, exist_ok=True)
-        info = dict(method=method, edge_mm=a.edge_mm, audit_every=a.audit_every, spheres_per_link=a.spheres if method == 'spheres_kmeans' else None,
+        info = dict(method=method, obstacle=a.obstacle, edge_mm=a.edge_mm, audit_every=a.audit_every, spheres_per_link=a.spheres if method == 'spheres_kmeans' else None,
                     primitives=int(sum(len(x[0]) for x in prim)),
                     margin_mm=[1e3 * float(x[1].max()) for x in prim])
         (out / 'setup.json').write_text(json.dumps(info, indent=1))
@@ -167,7 +202,7 @@ def main():
             if path.exists():
                 continue
             q0, qg, _ = trials[i]
-            log = simulate(q0, np.asarray(qg), links, obst, prim, a.steps, a.audit_every)
+            log = simulate(q0, np.asarray(qg), links, obst, prim, a.steps, a.audit_every, a.obstacle)
             t, gaps = 1e3 * np.asarray(log['t']), np.asarray(log['gap'] or [np.nan])
             m = dict(steps=len(t), reached_s=log['reached'], slack_steps=int(log['slack']),
                      min_gap_bound_mm=1e3 * float(gaps.min()), final_gap_mm=1e3 * float(gaps[-1]),
