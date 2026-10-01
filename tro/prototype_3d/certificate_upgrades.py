@@ -130,7 +130,9 @@ def main():
         q0, qg, _ = trials[i]
         log = simulate(q0, np.asarray(qg), links, obst, a.variant, a.fallback)
         rec = dict(trial=i, variant=a.variant, fallback=a.fallback, metrics=summarize(log),
-                   cover=f'native SDF patches ({a.field}), no refinement', dt_s=F.DT, gamma=F.GAMMA, eta_m=F.ACT,
+                   cover=f'native SDF patches ({a.field}), '
+                         + (f'online refinement depth {S.REFINE_DEPTH}' if S.REFINE_DEPTH else 'no refinement'),
+                   dt_s=F.DT, gamma=F.GAMMA, eta_m=F.ACT,
                    sampled=SD.describe() if a.variant == 'sampled' else None, qp_solver=a.qp,
                    qp_stats=dict(S.QP_STATS),
                    note='Saved-state mesh lower bounds include the final state. One thread; this machine.')

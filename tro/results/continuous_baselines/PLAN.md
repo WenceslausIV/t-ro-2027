@@ -114,6 +114,28 @@ is ~0, while every motion pays the direction-independent remainder -0.5 M3 r^2 (
 has ~0 normal gain but positive remainder cost, so only u = 0 is admissible: a zero-speed trap, not geometry.
 Candidate fixes: (1) refine only near-contact boxes (remainder ~ r^2), (2) a higher-order model of grad phi_B on the
 box (remainder ~ r^3), (3) bound the remainder with the normal and tangential twist parts separately.
+## LOCAL CONTINUATION (2026-10-01, interactive Claude on the user's machine; branch main)
+The cloud session stopped at 02:00 UTC. All work continues on the user's machine (AMD Ryzen 9 3900X, Windows,
+Python 3.13, DAQP installed), which is also the machine of every other timing in the paper.
+Reproduction check: trial 2 reruns locally identical to the cloud runs (ours sampled_zero_fixed: same steps and
+min gap to 1e-12 mm; points_delta_fitted: same arrival 4.69 s, gap differs 0.01 mm).
+Fairness fixes in this continuation (FAIRNESS REQUIREMENTS items):
+- (1, 3) fair rows use our fitted obstacle fields only; starts outside a method's certified set are excluded.
+- (2) main comparison uses OUR rows at the samples only (`--variant free`, 12 and 6 mm, DAQP, tag `fixed`); the
+  old `free` folder used the pre-DAQP solver and is superseded. Sampled-data rows stay as an extra labelled row.
+- (4) every method audited at EVERY state (baselines rerun with `--audit-every 1`, tag `_audit1`).
+- (5) all isolated timings rerun on this one machine, one process at a time, filter only (tag `_timing_local`;
+  ours via `patch_size_timing.py --variant free|sampled`). The cloud *_timing folders are from another machine and
+  are not used in the fair table.
+- (6) baselines tuned: points edge 5 mm (`_e5`), spheres k-means 128 per link. Multiple capsules per link are
+  not implemented (one capsule per link only); stated as a limitation of the capsule row.
+- Fix candidate (e): ours with one level of near-contact refinement (`SUMMED_REFINE_DEPTH=1`, tag `fixed_refine1`),
+  12 and 6 mm, rows at the samples.
+Runner: `bash tro/results/continuous_baselines/run_fair.sh outcomes` (queue, max 10 parallel jobs; logs in logs/),
+then `... run_fair.sh timing` (refuses to start while another experiment runs). Then update
+`prototype_3d/continuous_baselines_report.py` METHODS and regenerate README.md.
+Status: [running] outcomes.
+
 Fix 1 check (same 16 states, existing online refinement, SUMMED_REFINE_DEPTH = 1): one halving of the near-contact
 boxes frees motion in all 16 (0.03-0.16 rad/s toward the nominal, about 2x rows, no slack); depth 2 gives the same
 (the refinement threshold stops after one level). So the trap is a box-size effect and refinement removes it

@@ -33,9 +33,14 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--fields', nargs='+', default=list(CACHES))
     p.add_argument('--trials', nargs=2, type=int, default=[0, 30])
+    p.add_argument('--variant', choices=('sampled', 'free'), default='sampled',
+                   help='free: rows at the samples only (no sampled-data certificate), like the baselines')
     a = p.parse_args()
+    fallback = 'zero' if a.variant == 'sampled' else 'slack'
+    refine = int(os.environ.get('SUMMED_REFINE_DEPTH', '0'))
+    suffix = ('' if a.variant == 'sampled' else '_free') + (f'_refine{refine}' if refine else '')
     OUT.mkdir(parents=True, exist_ok=True)
-    CU.configure('sampled')
+    CU.configure(a.variant)
     S.QP_SOLVER = 'daqp'
     F.real_gap = lambda *args: 1.0                       # audit excluded (it is not part of the filter)
     trials = json.loads((Path(F.HERE) / 'franka_trials.json').read_text())
@@ -44,24 +49,28 @@ def main():
         c = CACHES[field]
         links, obst, info = F.build(cache_path=c) if c else F.build()
         S3.prep_all(links, obst.values())
-        SD.prepare(links, obst)
+        if a.variant == 'sampled':
+            SD.prepare(links, obst)
         t_all, per = [], {}
         for i in range(*a.trials):
             q0, qg, _ = trials[i]
-            log = CU.simulate(q0, np.asarray(qg), links, obst, 'sampled', 'zero')
+            log = CU.simulate(q0, np.asarray(qg), links, obst, a.variant, fallback)
             t = 1e3 * np.asarray(log['t'])
-            ref = ROOT / 'results' / 'certificate_upgrades' / f'sampled_zero{"" if field == "12mm" else "_" + field}_fixed' / f'franka_{i:02d}.npz'
+            run = (f'{a.variant}{"_zero" if fallback == "zero" else ""}{"" if field == "12mm" else "_" + field}_fixed'
+                   + (f'_refine{refine}' if refine else ''))
+            ref = ROOT / 'results' / 'certificate_upgrades' / run / f'franka_{i:02d}.npz'
             dq = float(np.abs(np.load(ref)['q'] - np.asarray(log['q'])).max()) if ref.exists() and len(np.load(ref)['q']) == len(log['q']) else None
             per[i] = dict(steps=len(t), median_ms=float(np.median(t)), p95_ms=float(np.percentile(t, 95)),
-                          max_ms=float(t.max()), zero_steps=int(log['zero_steps']), max_dq_vs_run=dq)
+                          max_ms=float(t.max()), zero_steps=int(log.get('zero_steps', 0)), max_dq_vs_run=dq)
             t_all.append(t)
             print(field, i, per[i], flush=True)
         t = np.concatenate(t_all)
-        np.savez_compressed(OUT / f'{field}.npz', t_ms=t, trial_lengths=[len(x) for x in t_all])
-        summary[field] = dict(steps=len(t), median_ms=float(np.median(t)), p90_ms=float(np.percentile(t, 90)),
+        np.savez_compressed(OUT / f'{field}{suffix}.npz', t_ms=t, trial_lengths=[len(x) for x in t_all])
+        summary[field + suffix] = dict(steps=len(t), median_ms=float(np.median(t)), p90_ms=float(np.percentile(t, 90)),
                               p95_ms=float(np.percentile(t, 95)), p99_ms=float(np.percentile(t, 99)),
                               max_ms=float(t.max()), mean_ms=float(t.mean()),
                               over_10ms_percent=float(100 * np.mean(t > 10)), trials=per,
+                              variant=a.variant, fallback=fallback, refine_depth=refine,
                               machine=platform.processor() or platform.machine(),
                               note='one process, one thread, no other experiment running; audit excluded')
         (OUT / 'summary.json').write_text(json.dumps(summary, indent=1))
