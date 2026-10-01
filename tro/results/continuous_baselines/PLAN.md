@@ -62,6 +62,7 @@ Status 2026-10-01 (later):
   obstacle (direction-independent), so tangential sliding is slowed; the point/sphere CBFs only constrain the
   normal component.
 - The old *_timing folders were deleted (overlapped with other runs).
-7. [running via `bash tro/results/continuous_baselines/run_final.sh`] points_delta on our fitted fields.
-8. [queued in run_final.sh] isolated timing of all baselines and ours, nothing else running.
+7. [done] points_delta on our fitted fields: 22/30 reached, 0 collisions, min/median gap 9.2/12.8 mm, starts
+   valid in 30/30 (h >= 0 at q0). Ours 6 mm sampled: 10/30, 3.8/10.4 mm; ours 12 mm sampled: 7/30, 12.2/20.9 mm.
+8. [running in run_final.sh] isolated timing of all baselines and ours, nothing else running.
 9. [todo] `python prototype_3d/continuous_baselines_report.py` (add points_delta_fitted row) and answer the user.
