@@ -623,5 +623,41 @@
   ],
   "outside_trials": [],
   "n_outside": 0
+ },
+ "ours_8mm": {
+  "h0_lower_bound_mm": [
+   Infinity,
+   Infinity,
+   Infinity,
+   Infinity,
+   Infinity,
+   Infinity,
+   Infinity,
+   Infinity,
+   Infinity,
+   Infinity,
+   Infinity,
+   Infinity,
+   Infinity,
+   Infinity,
+   Infinity,
+   Infinity,
+   Infinity,
+   20.333887703717313,
+   15.9869133586294,
+   Infinity,
+   Infinity,
+   Infinity,
+   Infinity,
+   Infinity,
+   Infinity,
+   Infinity,
+   Infinity,
+   Infinity,
+   Infinity,
+   19.835364783488966
+  ],
+  "outside_trials": [],
+  "n_outside": 0
  }
 }

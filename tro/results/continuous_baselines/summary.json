@@ -30,6 +30,21 @@
    "guarantee": "surface cover, rows at samples",
    "outcome_folder": "results\\certificate_upgrades\\free_6mm_fixed"
   },
+  "ours, 8-mm patches": {
+   "trials_done": 30,
+   "valid_trials": 30,
+   "reached": 13,
+   "collision_trials": 0,
+   "slack_or_zero_trials": 0,
+   "min_gap_mm": 5.363015031613126,
+   "median_min_gap_mm": 12.685476401567925,
+   "rows_max": 22086,
+   "t_median_ms": 16.090799937956035,
+   "t_p95_ms": 44.72174990223721,
+   "t_max_ms": 101.63570009171963,
+   "guarantee": "surface cover, rows at samples",
+   "outcome_folder": "results\\certificate_upgrades\\free_8mm_fixed"
+  },
   "ours, 12 mm + one near-contact halving": {
    "trials_done": 30,
    "valid_trials": 29,
