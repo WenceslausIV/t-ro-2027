@@ -13,6 +13,7 @@ All methods use OUR fitted obstacle fields (level and gradient bounds), enforce 
 | ours, 12-mm patches | surface cover, rows at samples | - | 29 | 7/29 | 0 | 0 | 12.5 / 20.1 | 12.6 / 23.1 | yes | 9045 |
 | ours, 8-mm patches | surface cover, rows at samples | - | 30 | 13/30 | 0 | 0 | 5.4 / 12.7 | 16.1 / 44.7 | yes | 22086 |
 | ours, 8-mm patches, joint Bernstein (w = 1) | surface cover, rows at samples | - | 30 | 14/30 | 0 | 0 | 7.0 / 20.1 | 13.2 / 22.0 | yes | 16281 |
+| ours, 6-mm patches, vertex certificate (w = 1) | surface cover, rows at samples | - | 30 | 17/30 | 0 | 0 | 6.0 / 18.1 | 14.1 / 26.2 | yes | 8832 |
 | capsule, 1 per link | enclosing capsules | 208 | 18 | 5/18 | 0 | 3 | 47.3 / 47.3 | 3.7 / 6.8 | yes | 33 |
 | spheres, RDF centers (54) | enclosing spheres | 54 | 22 | 15/22 | 0 | 1 | 37.0 / 47.3 | 3.8 / 5.8 | yes | 25 |
 | spheres, k-means 16/link | enclosing spheres | 128 | 23 | 13/23 | 0 | 0 | 47.3 / 47.3 | 4.0 / 6.2 | yes | 13 |
