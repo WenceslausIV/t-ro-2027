@@ -139,7 +139,10 @@ def main():
         'fallback). Every state is audited (certified mesh-distance lower bound). Trials that start outside a '
         "method's certified set (h < 0 at q0; start_validity.json) are excluded and counted under valid starts. "
         'Filter times: rows + QP, one process, one thread, nothing else running, AMD Ryzen 9 3900X. '
-        'Reached/collision/slack counts are over the valid trials.\n\n' + table(fair) + '\n\n'
+        'Reached/collision/slack counts are over the valid trials. Real-time criterion (VLA-style 20-Hz loop): '
+        f'a setting qualifies if its isolated p95 filter time is at most {BUDGET_MS:.0f} ms.\n\n'
+        '### Settings within the 20-Hz budget (the comparison)\n\n' + table(within) + '\n\n'
+        '### Settings over the budget or not yet timed\n\n' + table(over) + '\n\n'
         '## Extra row: ours with the sampled-data certificate (also certifies the motion between samples)\n\n'
         + table(extra) + '\n\n'
         '## Reference only: baselines on the exact obstacle SDF\n\n'

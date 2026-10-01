@@ -141,7 +141,18 @@ showed a 490 ms median in the queue). The point baseline is therefore also run a
 its finest edge within the budget. The report marks every setting with "20-Hz budget: yes/no".
 Bug found and fixed: certificate_upgrades.configure() forced REFINE_DEPTH = 0, so the first *_refine1 runs were
 identical to the unrefined ones; they were deleted and are rerun after the timing phase.
-Status: outcomes done (except refine1, e15, e20: queued after timing); timing phase B running.
+Status 2026-10-01 07:55: ALL DONE (outcomes, every-state audit, start validity, isolated timing). Table: README.md.
+Result within the 20-Hz budget (isolated p95 <= 50 ms; fitted obstacle fields; valid starts only):
+  ours 12 mm 7/29 reached, gap 12.5/20.1 mm, 12.6/23.1 ms; spheres k-means 64 20/27, 33.6/45.8 mm, 4.5/6.6 ms;
+  k-means 128 19/28; spheres RDF 15/22; k-means 16 13/23; capsule 5/18 (12 invalid starts). No collisions anywhere.
+Over the budget: points+delta at every edge (5/10/15/20 mm: p95 541/161/109/88 ms; 22-23/30 reached);
+  ours 6 mm 16/30 (27.7/77.8 ms); ours 12 mm + one halving 9/29 (20.6/71.1); ours 6 mm + one halving 21/30,
+  gap 1.1/7.0 mm (29.8/233.8 ms).
+Reading: within budget the enclosing spheres reach more goals but stay 3-5 cm away; ours gets ~2.5x closer but
+  stalls (zero-speed trap). Refinement removes most of the trap (6 mm + halving: 21/30, close to points 5 mm 23/30
+  at ~10x lower median time), but our medians are within budget while the p95 tails are not (rows up to 153k at
+  contact). Next steps: (1) cap the number of refined boxes / rows per step to bound the tail; (2) the
+  direction-aware remainder bound (normal vs tangential twist) of PLAN item e.
 
 Fix 1 check (same 16 states, existing online refinement, SUMMED_REFINE_DEPTH = 1): one halving of the near-contact
 boxes frees motion in all 16 (0.03-0.16 rad/s toward the nominal, about 2x rows, no slack); depth 2 gives the same

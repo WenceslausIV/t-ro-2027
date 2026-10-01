@@ -1,0 +1,41 @@
+{
+ "trial": 8,
+ "variant": "free",
+ "fallback": "slack",
+ "metrics": {
+  "steps": 893,
+  "reached_s": 8.93,
+  "slack_steps": 0,
+  "zero_steps": 0,
+  "min_gap_bound_mm": 8.05524002656087,
+  "nonpositive_gap_states": 0,
+  "min_h_mm": 5.6190077341160745,
+  "t_median_ms": 51.77429993636906,
+  "t_p95_ms": 184.92175987921655,
+  "active_t_median_ms": 60.45880005694926,
+  "active_t_p95_ms": 189.43267993163306,
+  "rows_max": 28836,
+  "boxes_max": 1068,
+  "w_range": [
+   -1.4654943925052066e-14,
+   1.4540898037153527
+  ]
+ },
+ "cover": "native SDF patches (6mm), online refinement depth 1",
+ "dt_s": 0.01,
+ "gamma": 5.0,
+ "eta_m": 0.03,
+ "sampled": null,
+ "qp_solver": "daqp",
+ "qp_stats": {
+  "sparse": 0,
+  "fallback": 0,
+  "infeasible": 0,
+  "rejected": 0,
+  "rescued": 0,
+  "active_set": 6448,
+  "active_set_rounds": 8950,
+  "working_set": 0
+ },
+ "note": "Saved-state mesh lower bounds include the final state. One thread; this machine."
+}
