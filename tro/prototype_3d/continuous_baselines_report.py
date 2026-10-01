@@ -27,6 +27,7 @@ METHODS = [  # (label, outcome folder, isolated-timing source, guarantee)
     ('spheres k-means 64, fitted field', CB / 'spheres_kmeans64_fitted', None, 'enclosing spheres, our fitted phi_O'),
     ('surface points + delta, fitted field', CB / 'points_delta_fitted', CB / 'points_delta_fitted_timing', 'mesh within delta of points, our fitted phi_O'),
     ('ours 12 mm, continuous-time rows', CU / 'free', None, 'surface cover, fitted fields'),
+    ('ours 6 mm, continuous-time rows', CU / 'free_6mm_fixed', None, 'surface cover, fitted fields'),
     ('ours 12 mm, sampled-data', CU / 'sampled_zero_fixed', '12mm', 'surface cover + between samples'),
     ('ours 6 mm, sampled-data', CU / 'sampled_zero_6mm_fixed', '6mm', 'surface cover + between samples'),
 ]

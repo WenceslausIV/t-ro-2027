@@ -88,3 +88,6 @@ e. Key finding to address in theory: fair comparison (same fitted obstacle field
 Other agent's work: origin/main has tro/paper/concerns.md (non-smooth feedback from box activation); merged here.
 Also see results/certificate_upgrades/README.md (solver/cap bugs fixed and audit), results/mobile_patch_sweep/,
 results/native_patch_sizes/ (18/24-mm refits), prototype_3d/patch_size_timing.py.
+
+Handoff steps a and b launched 2026-10-01 via `bash tro/results/continuous_baselines/run_handoff.sh` (restartable;
+results in results/patch_size_timing/ and results/certificate_upgrades/free_6mm_fixed/). Rerun the same command if it stopped.
