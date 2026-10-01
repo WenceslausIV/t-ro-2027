@@ -46,3 +46,7 @@ gradient bound up to 2.68), so this is not apples-to-apples.
 5. [running via `bash tro/results/continuous_baselines/run_fitted.sh`] fair variant: baselines on OUR fitted obstacle field, h = phi_O(x) - l_O - G_loc m
    (`--obstacle fitted`, folders <method>_fitted). Run capsule, spheres_enclosing, spheres_kmeans 16/64.
 6. [todo] report: `python prototype_3d/continuous_baselines_report.py` (step 4 script, written).
+NOTE: run_all.sh step 2b (timing) started while run_fitted.sh was still running, so the *_timing results and
+step 3 may be contaminated by concurrent load. After everything finishes: check `pgrep -f continuous_baselines`
+is empty, delete results/continuous_baselines/*_timing and results/patch_size_timing, and rerun only the timing
+part of run_all.sh (the loops after "step 2b") alone.
