@@ -23,6 +23,8 @@ OUT = ROOT / 'results' / 'continuous_baselines' / 'start_validity.json'
 CONFIGS = [  # (folder stem, method, obstacle, edge_mm, spheres)
     ('points_delta_fitted', 'points_delta', 'fitted', 10., 16),
     ('points_delta_fitted_e5', 'points_delta', 'fitted', 5., 16),
+    ('points_delta_fitted_e15', 'points_delta', 'fitted', 15., 16),
+    ('points_delta_fitted_e20', 'points_delta', 'fitted', 20., 16),
     ('capsule_fitted', 'capsule', 'fitted', 10., 16),
     ('spheres_enclosing_fitted', 'spheres_enclosing', 'fitted', 10., 16),
     ('spheres_kmeans16_fitted', 'spheres_kmeans', 'fitted', 10., 16),

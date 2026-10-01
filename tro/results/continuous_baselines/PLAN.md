@@ -134,7 +134,14 @@ Fairness fixes in this continuation (FAIRNESS REQUIREMENTS items):
 Runner: `bash tro/results/continuous_baselines/run_fair.sh outcomes` (queue, max 10 parallel jobs; logs in logs/),
 then `... run_fair.sh timing` (refuses to start while another experiment runs). Then update
 `prototype_3d/continuous_baselines_report.py` METHODS and regenerate README.md.
-Status: [running] outcomes.
+Real-time criterion (user, 2026-10-01): only settings that fit the VLA-style 20-Hz loop are compared. A setting
+qualifies if its isolated p95 filter time on this machine is <= 50 ms; each method is reported at its best setting
+within the budget. Parallel-queue times are never used (they are inflated several-fold; e.g. points+delta 5 mm
+showed a 490 ms median in the queue). The point baseline is therefore also run at coarser edges (15, 20 mm) to find
+its finest edge within the budget. The report marks every setting with "20-Hz budget: yes/no".
+Bug found and fixed: certificate_upgrades.configure() forced REFINE_DEPTH = 0, so the first *_refine1 runs were
+identical to the unrefined ones; they were deleted and are rerun after the timing phase.
+Status: outcomes done (except refine1, e15, e20: queued after timing); timing phase B running.
 
 Fix 1 check (same 16 states, existing online refinement, SUMMED_REFINE_DEPTH = 1): one halving of the near-contact
 boxes frees motion in all 16 (0.03-0.16 rad/s toward the nominal, about 2x rows, no slack); depth 2 gives the same

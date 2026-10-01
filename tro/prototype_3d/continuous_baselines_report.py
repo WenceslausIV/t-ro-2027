@@ -17,6 +17,7 @@ CB = ROOT / 'results' / 'continuous_baselines'
 CU = ROOT / 'results' / 'certificate_upgrades'
 PT = ROOT / 'results' / 'patch_size_timing' / 'summary.json'
 VALID = CB / 'start_validity.json'
+BUDGET_MS = 50.   # VLA-style 20-Hz loop: a setting qualifies if its isolated p95 filter time is within the budget
 
 # (label, outcome folder, isolated timing: folder or patch_size_timing key, validity key, guarantee)
 FAIR = [
@@ -30,6 +31,10 @@ FAIR = [
      'points_delta_fitted', 'mesh within delta of points'),
     ('surface points + delta, 5-mm edges', CB / 'points_delta_fitted_e5', CB / 'points_delta_fitted_e5_timing_local',
      'points_delta_fitted_e5', 'mesh within delta of points'),
+    ('surface points + delta, 15-mm edges', CB / 'points_delta_fitted_e15', CB / 'points_delta_fitted_e15_timing_local',
+     'points_delta_fitted_e15', 'mesh within delta of points'),
+    ('surface points + delta, 20-mm edges', CB / 'points_delta_fitted_e20', CB / 'points_delta_fitted_e20_timing_local',
+     'points_delta_fitted_e20', 'mesh within delta of points'),
     ('capsule, 1 per link', CB / 'capsule_fitted_audit1', CB / 'capsule_fitted_timing_local', 'capsule_fitted',
      'enclosing capsules'),
     ('spheres, RDF centers (54)', CB / 'spheres_enclosing_fitted_audit1', CB / 'spheres_enclosing_fitted_timing_local',
@@ -89,13 +94,14 @@ def isolated(src):
 
 def table(rows):
     lines = ['| method | guarantee | primitives | valid starts | reached | collision trials | slack trials | '
-             'min / median gap [mm] | filter time med / p95 [ms] | max rows |', '|' + '---|' * 10]
+             'min / median gap [mm] | filter time med / p95 [ms] | 20-Hz budget | max rows |', '|' + '---|' * 11]
     for k, o in rows.items():
         t = (f"{o['t_median_ms']:.1f} / {o['t_p95_ms']:.1f}" if 't_median_ms' in o else 'pending')
+        ok = '-' if 't_p95_ms' not in o else ('yes' if o['t_p95_ms'] <= BUDGET_MS else 'no')
         done = '' if o['trials_done'] == 30 else f" ({o['trials_done']} of 30 done)"
         lines.append(f"| {k} | {o['guarantee']} | {o.get('primitives', '-')} | {o['valid_trials']}{done} | "
                      f"{o['reached']}/{o['valid_trials']} | {o['collision_trials']} | {o['slack_or_zero_trials']} | "
-                     f"{o['min_gap_mm']:.1f} / {o['median_min_gap_mm']:.1f} | {t} | {o['rows_max']} |")
+                     f"{o['min_gap_mm']:.1f} / {o['median_min_gap_mm']:.1f} | {t} | {ok} | {o['rows_max']} |")
     return '\n'.join(lines)
 
 
@@ -121,6 +127,8 @@ def collect(spec, validity):
 def main():
     validity = json.loads(VALID.read_text()) if VALID.exists() else {}
     fair, extra, ref = collect(FAIR, validity), collect(EXTRA, validity), collect(REFERENCE, validity)
+    within = {k: o for k, o in fair.items() if o.get('t_p95_ms', 1e9) <= BUDGET_MS}
+    over = {k: o for k, o in fair.items() if k not in within}
     (CB / 'summary.json').write_text(json.dumps(dict(fair=fair, extra=extra, reference=ref), indent=1))
     text = (
         '# Continuous-boundary baselines vs. ours (Franka, 30 fixed trials)\n\n'

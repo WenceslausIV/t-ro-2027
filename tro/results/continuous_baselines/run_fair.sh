@@ -21,6 +21,8 @@ outcomes() {
       echo "SUMMED_REFINE_DEPTH=1 python $CU --variant free --field 6mm --qp daqp --tag fixed_refine1 --trials $r"
       echo "python $CB --methods points_delta --obstacle fitted --audit-every 1 --tag _audit1 --trials $r"
       echo "python $CB --methods points_delta --obstacle fitted --edge-mm 5 --audit-every 1 --tag _e5 --trials $r"
+      echo "python $CB --methods points_delta --obstacle fitted --edge-mm 15 --audit-every 1 --tag _e15 --trials $r"
+      echo "python $CB --methods points_delta --obstacle fitted --edge-mm 20 --audit-every 1 --tag _e20 --trials $r"
       echo "python $CB --methods capsule --obstacle fitted --audit-every 1 --tag _audit1 --trials $r"
       echo "python $CB --methods spheres_enclosing --obstacle fitted --audit-every 1 --tag _audit1 --trials $r"
       echo "python $CB --methods spheres_kmeans --spheres 16 --obstacle fitted --audit-every 1 --tag _audit1 --trials $r"
@@ -48,6 +50,16 @@ timing() {
     python $CB --methods $m --obstacle exact --audit-every 0 --tag _timing_local
   done
   echo TIMING_DONE
+}
+
+timing2() {
+  # real-time sweep of the point baseline (coarser edges) and our refined variants, isolated as above
+  n=$(powershell -NoProfile -Command "@(Get-CimInstance Win32_Process | Where-Object { \$_.Name -like 'python*' -and \$_.CommandLine -match 'certificate_upgrades|continuous_baselines|patch_size_timing' }).Count")
+  if [ "${n//[^0-9]/}" != "0" ]; then echo "another experiment is running ($n); not timing"; exit 1; fi
+  for e in 15 20; do
+    python $CB --methods points_delta --obstacle fitted --edge-mm $e --audit-every 0 --tag _e${e}_timing_local
+  done
+  echo TIMING2_DONE
 }
 
 "$@"
