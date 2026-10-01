@@ -1,0 +1,30 @@
+{
+ "trial": 20,
+ "method": "spheres_enclosing",
+ "edge_mm": 10.0,
+ "audit_every": 10,
+ "spheres_per_link": null,
+ "primitives": 54,
+ "margin_mm": [
+  92.06740258873971,
+  92.06862473228749,
+  75.99751304020715,
+  77.76424905107906,
+  73.22330956589929,
+  76.10524045899302,
+  62.933510824098576,
+  44.37367341514713
+ ],
+ "metrics": {
+  "steps": 324,
+  "reached_s": 3.24,
+  "slack_steps": 0,
+  "min_gap_bound_mm": 7.239616497870288,
+  "final_gap_mm": 41.56973976070669,
+  "nonpositive_gap_states": 0,
+  "t_median_ms": 2.887008000129754,
+  "t_p95_ms": 5.301811049969272,
+  "t_max_ms": 6.21080000018992,
+  "rows_max": 4
+ }
+}
