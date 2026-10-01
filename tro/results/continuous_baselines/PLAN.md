@@ -66,3 +66,25 @@ Status 2026-10-01 (later):
    valid in 30/30 (h >= 0 at q0). Ours 6 mm sampled: 10/30, 3.8/10.4 mm; ours 12 mm sampled: 7/30, 12.2/20.9 mm.
 8. [running in run_final.sh] isolated timing of all baselines and ours, nothing else running.
 9. [todo] `python prototype_3d/continuous_baselines_report.py` (add points_delta_fitted row) and answer the user.
+
+## HANDOFF (2026-10-01, end of this session)
+State: all outcome runs done; isolated timing done for all baselines (*_timing/, 30/30 each).
+Table: results/continuous_baselines/README.md and summary.json (`python prototype_3d/continuous_baselines_report.py`).
+Not done / next steps for the next agent:
+a. Isolated timing of OURS (nothing else running): `python prototype_3d/patch_size_timing.py --fields 12mm 6mm`
+   (writes results/patch_size_timing/, picked up by the report). Our rows in the table still use parallel-load times.
+b. Fairness gap 1 (most important): the compared ours rows use the sampled-data certificate (extra caps and
+   tightening), baselines use rows at the samples only. Run ours 6 mm WITHOUT sampled data for a like-for-like row:
+   `python prototype_3d/certificate_upgrades.py --variant free --field 6mm --qp daqp --tag fixed --trials 0 30`
+   (12 mm free exists: results/certificate_upgrades/free, 8/30) and add both to METHODS in the report script.
+c. Fairness gap 2: baselines audited every 10th state (+ final), ours every state; baseline min gaps may be
+   slightly optimistic.
+d. Fairness gap 3: baseline parameters untuned (points edge 10 mm, 1 capsule/link, 16/64 spheres).
+e. Key finding to address in theory: fair comparison (same fitted obstacle fields, valid starts):
+   points+delta 22/30 reached (gap 9.2/12.8 mm, 48/77 ms isolated) vs ours 6 mm 10/30 (3.8/10.4 mm) and
+   12 mm 7/30. Hypothesis: our velocity-remainder rows penalize the whole link twist near obstacles
+   (direction-independent), so tangential sliding slows; point/sphere CBFs constrain only the normal component.
+   A direction-aware remainder bound is the candidate fix.
+Other agent's work: origin/main has tro/paper/concerns.md (non-smooth feedback from box activation); merged here.
+Also see results/certificate_upgrades/README.md (solver/cap bugs fixed and audit), results/mobile_patch_sweep/,
+results/native_patch_sizes/ (18/24-mm refits), prototype_3d/patch_size_timing.py.
