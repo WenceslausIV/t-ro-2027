@@ -91,3 +91,12 @@ results/native_patch_sizes/ (18/24-mm refits), prototype_3d/patch_size_timing.py
 
 Handoff steps a and b launched 2026-10-01 via `bash tro/results/continuous_baselines/run_handoff.sh` (restartable;
 results in results/patch_size_timing/ and results/certificate_upgrades/free_6mm_fixed/). Rerun the same command if it stopped.
+
+Diagnosis (2026-10-01, prototype_3d/stopped_state_ablation.py): at the final state of all 16 stopped trials of
+ours (12 mm, rows at the samples), the QP admits zero progress (speed toward the nominal 0.000 rad/s). Removing
+only the velocity remainder (T = 0) frees motion in all 16 (0.03-0.98 rad/s; > 0.1 in 12/16); raising only the
+constant terms by 5 cm also frees motion (0.10-0.49). Mechanism: near contact the constant term gamma*(value bound)
+is ~0, while every motion pays the direction-independent remainder -0.5 M3 r^2 (|V|+rho|Omega|); tangential sliding
+has ~0 normal gain but positive remainder cost, so only u = 0 is admissible: a zero-speed trap, not geometry.
+Candidate fixes: (1) refine only near-contact boxes (remainder ~ r^2), (2) a higher-order model of grad phi_B on the
+box (remainder ~ r^3), (3) bound the remainder with the normal and tangential twist parts separately.
