@@ -100,3 +100,8 @@ is ~0, while every motion pays the direction-independent remainder -0.5 M3 r^2 (
 has ~0 normal gain but positive remainder cost, so only u = 0 is admissible: a zero-speed trap, not geometry.
 Candidate fixes: (1) refine only near-contact boxes (remainder ~ r^2), (2) a higher-order model of grad phi_B on the
 box (remainder ~ r^3), (3) bound the remainder with the normal and tangential twist parts separately.
+Fix 1 check (same 16 states, existing online refinement, SUMMED_REFINE_DEPTH = 1): one halving of the near-contact
+boxes frees motion in all 16 (0.03-0.16 rad/s toward the nominal, about 2x rows, no slack); depth 2 gives the same
+(the refinement threshold stops after one level). So the trap is a box-size effect and refinement removes it
+(consistent with the historical subdivided runs reaching 17/30). Next: closed-loop 30-trial run with
+`SUMMED_REFINE_DEPTH=1` (12 mm and 6 mm, sampled-data, --qp daqp) and compare with points+delta (22/30).
