@@ -1,6 +1,7 @@
 {
  "method": "capsule",
  "edge_mm": 10.0,
+ "audit_every": 10,
  "spheres_per_link": null,
  "primitives": 208,
  "margin_mm": [
