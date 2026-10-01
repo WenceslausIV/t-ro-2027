@@ -7,9 +7,10 @@
   "min_gap_mm": 22.232676260018035,
   "median_min_gap_mm": 40.4791062887024,
   "rows_max": 58,
-  "t_median_ms": 3.541612999924837,
-  "t_p95_ms": 5.6940258000395225,
-  "timing": "outcome runs (parallel)",
+  "t_median_ms": 3.3844639999642823,
+  "t_p95_ms": 5.34285880007701,
+  "timing": "isolated (one process)",
+  "t_max_ms": 14.611186999900383,
   "guarantee": "enclosing capsules, exact d_O",
   "primitives": 208,
   "margin_mm_range": [
@@ -25,9 +26,10 @@
   "min_gap_mm": 5.164671703623754,
   "median_min_gap_mm": 12.92539399845812,
   "rows_max": 22,
-  "t_median_ms": 3.177540500075793,
-  "t_p95_ms": 5.207418500106089,
-  "timing": "outcome runs (parallel)",
+  "t_median_ms": 3.038163500036717,
+  "t_p95_ms": 4.7801434999883,
+  "timing": "isolated (one process)",
+  "t_max_ms": 20.78671200001736,
   "guarantee": "enclosing spheres, exact d_O",
   "primitives": 54,
   "margin_mm_range": [
@@ -43,9 +45,10 @@
   "min_gap_mm": 15.586557675746858,
   "median_min_gap_mm": 26.54928809320089,
   "rows_max": 21,
-  "t_median_ms": 3.2285365001030186,
-  "t_p95_ms": 5.040809749914388,
-  "timing": "outcome runs (parallel)",
+  "t_median_ms": 3.0991529999937484,
+  "t_p95_ms": 4.583276249945811,
+  "timing": "isolated (one process)",
+  "t_max_ms": 17.08804300005795,
   "guarantee": "enclosing spheres, exact d_O",
   "primitives": 128,
   "margin_mm_range": [
@@ -65,6 +68,96 @@
   "t_p95_ms": 5.380988500007788,
   "timing": "outcome runs (parallel)",
   "guarantee": "enclosing spheres, exact d_O",
+  "primitives": 512,
+  "margin_mm_range": [
+   25.3,
+   44.1
+  ]
+ },
+ "surface points + delta": {
+  "trials": 30,
+  "reached": 22,
+  "collision_trials": 0,
+  "slack_or_zero_trials": 0,
+  "min_gap_mm": 3.2246829799785335,
+  "median_min_gap_mm": 4.37149478282222,
+  "rows_max": 6874,
+  "t_median_ms": 23.03357750008672,
+  "t_p95_ms": 78.00636559986741,
+  "timing": "outcome runs (parallel)",
+  "guarantee": "mesh within delta of points, exact d_O",
+  "primitives": 97835,
+  "margin_mm_range": [
+   5.8,
+   5.8
+  ]
+ },
+ "capsule, fitted field": {
+  "trials": 30,
+  "reached": 10,
+  "collision_trials": 0,
+  "slack_or_zero_trials": 11,
+  "min_gap_mm": 32.40094893188202,
+  "median_min_gap_mm": 47.33436687470454,
+  "rows_max": 93,
+  "t_median_ms": 2.951895999899534,
+  "t_p95_ms": 6.415608199972649,
+  "timing": "outcome runs (parallel)",
+  "guarantee": "enclosing capsules, our fitted phi_O",
+  "primitives": 208,
+  "margin_mm_range": [
+   60.4,
+   113.9
+  ]
+ },
+ "spheres RDF, fitted field": {
+  "trials": 30,
+  "reached": 19,
+  "collision_trials": 0,
+  "slack_or_zero_trials": 2,
+  "min_gap_mm": 32.40094893188202,
+  "median_min_gap_mm": 47.33436687470454,
+  "rows_max": 25,
+  "t_median_ms": 3.0338115000176913,
+  "t_p95_ms": 4.770271649954339,
+  "timing": "outcome runs (parallel)",
+  "guarantee": "enclosing spheres, our fitted phi_O",
+  "primitives": 54,
+  "margin_mm_range": [
+   44.4,
+   92.1
+  ]
+ },
+ "spheres k-means 16, fitted field": {
+  "trials": 30,
+  "reached": 17,
+  "collision_trials": 0,
+  "slack_or_zero_trials": 1,
+  "min_gap_mm": 32.40094893188202,
+  "median_min_gap_mm": 47.33436687470454,
+  "rows_max": 18,
+  "t_median_ms": 3.159508999942773,
+  "t_p95_ms": 4.875688399988575,
+  "timing": "outcome runs (parallel)",
+  "guarantee": "enclosing spheres, our fitted phi_O",
+  "primitives": 128,
+  "margin_mm_range": [
+   40.1,
+   67.9
+  ]
+ },
+ "spheres k-means 64, fitted field": {
+  "trials": 30,
+  "reached": 21,
+  "collision_trials": 0,
+  "slack_or_zero_trials": 0,
+  "min_gap_mm": 32.40094893188202,
+  "median_min_gap_mm": 44.36342010430522,
+  "rows_max": 63,
+  "t_median_ms": 3.4497460001148283,
+  "t_p95_ms": 5.494580800086623,
+  "timing": "outcome runs (parallel)",
+  "guarantee": "enclosing spheres, our fitted phi_O",
   "primitives": 512,
   "margin_mm_range": [
    25.3,
