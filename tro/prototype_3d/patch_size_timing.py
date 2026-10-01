@@ -25,6 +25,7 @@ import summed3d as S3
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / 'results' / 'patch_size_timing'
 CACHES = {'6mm': ROOT / 'results' / 'fine_native_6mm_trial' / 'cache_franka_6mm.npz', '12mm': None,
+          '8mm': ROOT / 'results' / 'native_patch_sizes' / '8mm' / 'cache_franka_8mm.npz',
           '18mm': ROOT / 'results' / 'native_patch_sizes' / '18mm' / 'cache_franka_18mm.npz',
           '24mm': ROOT / 'results' / 'native_patch_sizes' / '24mm' / 'cache_franka_24mm.npz'}
 

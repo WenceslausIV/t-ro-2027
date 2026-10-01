@@ -101,9 +101,9 @@ def main():
     p.add_argument('--tag', default='', help='suffix of the output folder (default: the QP solver)')
     p.add_argument('--qp', choices=('nnls', 'clarabel', 'daqp'), default='nnls',
                    help='QP solver: dense least-distance NNLS, sparse interior point, or DAQP constraint generation')
-    p.add_argument('--field', choices=('12mm', '6mm', '18mm', '24mm'), default='12mm',
+    p.add_argument('--field', choices=('12mm', '6mm', '8mm', '18mm', '24mm'), default='12mm',
                    help='link SDF cells (= native patches); 6mm: results/fine_native_6mm_trial, '
-                        '18mm/24mm: results/native_patch_sizes (refit_native_fields.py)')
+                        '8mm/18mm/24mm: results/native_patch_sizes (refit_native_fields.py)')
     a = p.parse_args()
     configure(a.variant)
     S.QP_SOLVER = a.qp
@@ -113,7 +113,7 @@ def main():
     if a.field == '6mm':
         links, obst, info = F.build(cache_path=ROOT / 'results' / 'fine_native_6mm_trial' / 'cache_franka_6mm.npz')
         assert all(abs(L['side'] - .006) < 1e-12 for L in links)
-    elif a.field in ('18mm', '24mm'):
+    elif a.field in ('8mm', '18mm', '24mm'):
         mm = int(a.field[:-2])
         links, obst, info = F.build(cache_path=ROOT / 'results' / 'native_patch_sizes' / a.field / f'cache_franka_{mm}mm.npz')
         assert all(abs(L['side'] - mm / 1000) < 1e-12 for L in links)

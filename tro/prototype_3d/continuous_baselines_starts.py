@@ -61,7 +61,8 @@ def main():
         print(stem, 'outside', res[stem]['n_outside'], res[stem]['outside_trials'], flush=True)
         OUT.write_text(json.dumps(res, indent=1))
     for stem, cache in (('ours_12mm', None),
-                        ('ours_6mm', ROOT / 'results' / 'fine_native_6mm_trial' / 'cache_franka_6mm.npz')):
+                        ('ours_6mm', ROOT / 'results' / 'fine_native_6mm_trial' / 'cache_franka_6mm.npz'),
+                        ('ours_8mm', ROOT / 'results' / 'native_patch_sizes' / '8mm' / 'cache_franka_8mm.npz')):
         if stem in res:
             continue
         L2, O2, _ = F.build(cache_path=cache) if cache else F.build()
