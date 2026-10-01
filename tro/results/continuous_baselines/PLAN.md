@@ -38,3 +38,11 @@ Steps (status):
 3. [queued in run_all.sh] isolated timing of ours: `python prototype_3d/patch_size_timing.py --fields 12mm 6mm`; commit.
 4. [todo] report table (reached, collisions, min/median gap, stop gap, time median/p95, rows) in
    results/continuous_baselines/README.md; answer the user.
+
+Interim finding (2026-10-01, outcome runs, parallel timing): with the EXACT obstacle SDF, the certified
+enclosing capsule/sphere baselines reach 16-22/30 goals, collision-free, ~3 ms/step, against 7-10/30 for ours
+(fitted obstacle fields). The obstacle information differs (exact 1-Lipschitz SDF vs fitted field with level and
+gradient bound up to 2.68), so this is not apples-to-apples.
+5. [todo] fair variant: baselines on OUR fitted obstacle field, h = phi_O(x) - l_O - G_loc m
+   (`--obstacle fitted`, folders <method>_fitted). Run capsule, spheres_enclosing, spheres_kmeans 16/64.
+6. [todo] report: `python prototype_3d/continuous_baselines_report.py` (step 4 script, written).
