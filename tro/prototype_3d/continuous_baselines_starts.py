@@ -62,8 +62,10 @@ def main():
         OUT.write_text(json.dumps(res, indent=1))
     for stem, cache in (('ours_12mm', None),
                         ('ours_6mm', ROOT / 'results' / 'fine_native_6mm_trial' / 'cache_franka_6mm.npz'),
-                        ('ours_8mm', ROOT / 'results' / 'native_patch_sizes' / '8mm' / 'cache_franka_8mm.npz')):
-        if stem in res:
+                        ('ours_8mm', ROOT / 'results' / 'native_patch_sizes' / '8mm' / 'cache_franka_8mm.npz'),
+                        ('ours_5mm', ROOT / 'results' / 'native_patch_sizes' / '5mm' / 'cache_franka_5mm.npz'),
+                        ('ours_4mm', ROOT / 'results' / 'native_patch_sizes' / '4mm' / 'cache_franka_4mm.npz')):
+        if stem in res or (cache is not None and not cache.exists()):
             continue
         L2, O2, _ = F.build(cache_path=cache) if cache else F.build()
         S3.prep_all(L2, O2.values())
