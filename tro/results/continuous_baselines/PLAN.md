@@ -50,3 +50,18 @@ NOTE: run_all.sh step 2b (timing) started while run_fitted.sh was still running,
 step 3 may be contaminated by concurrent load. After everything finishes: check `pgrep -f continuous_baselines`
 is empty, delete results/continuous_baselines/*_timing and results/patch_size_timing, and rerun only the timing
 part of run_all.sh (the loops after "step 2b") alone.
+
+Status 2026-10-01 (later):
+- Steps 2a and 5 done (all outcome runs: 5 exact-SDF baselines, 4 fitted-field baselines).
+- Finding: fitted-field baselines never get closer than their start pose (min gap = initial gap), and several
+  baselines start OUTSIDE their certified set (h < 0 at q0, so their guarantee does not apply in those trials):
+  capsule exact 7/30, capsule fitted 12/30, spheres RDF fitted 8/30, spheres k-means64 fitted 3/30.
+  Valid from the start: spheres exact (RDF, k-means16, k-means64) and points_delta exact.
+- points_delta exact (PSF style) reaches 22/30 with min/median gap 3.2/4.4 mm: better than ours on both.
+  Likely cause on our side: the velocity remainder rows penalize the full twist |V|, |Omega| of a link near an
+  obstacle (direction-independent), so tangential sliding is slowed; the point/sphere CBFs only constrain the
+  normal component.
+- The old *_timing folders were deleted (overlapped with other runs).
+7. [running via `bash tro/results/continuous_baselines/run_final.sh`] points_delta on our fitted fields.
+8. [queued in run_final.sh] isolated timing of all baselines and ours, nothing else running.
+9. [todo] `python prototype_3d/continuous_baselines_report.py` (add points_delta_fitted row) and answer the user.
