@@ -75,6 +75,21 @@
    "guarantee": "surface cover, rows at samples",
    "outcome_folder": "results\\certificate_upgrades\\unit_6mm_fixed"
   },
+  "ours, 5-mm patches, vertex certificate (w = 1)": {
+   "trials_done": 30,
+   "valid_trials": 30,
+   "reached": 17,
+   "collision_trials": 0,
+   "slack_or_zero_trials": 0,
+   "min_gap_mm": 4.46552586719161,
+   "median_min_gap_mm": 18.151791209899457,
+   "rows_max": 12456,
+   "t_median_ms": 16.012199921533465,
+   "t_p95_ms": 34.21703996136784,
+   "t_max_ms": 191.55039987526834,
+   "guarantee": "surface cover, rows at samples",
+   "outcome_folder": "results\\certificate_upgrades\\unit_5mm_fixed"
+  },
   "ours, 12 mm + one near-contact halving": {
    "trials_done": 30,
    "valid_trials": 29,
