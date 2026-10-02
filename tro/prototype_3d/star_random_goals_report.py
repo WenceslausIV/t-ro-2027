@@ -12,6 +12,11 @@ import numpy as np
 ROOT = Path(__file__).resolve().parent.parent
 D = ROOT / 'results' / 'star_random_goals'
 BUDGET_MS = 50.
+REUSE_MM = 20.   # audit evaluates directly below this distance; larger bounds are certified but not tight
+
+
+def fmt(x):
+    return 'n/a' if not np.isfinite(x) else (f'>= {REUSE_MM:.0f}' if x >= REUSE_MM - 1e-9 else f'{x:.1f}')
 METHODS = [('ours: vertex certificate, box = 6-mm patch', 'ours'),
            ('spheres: 64/link, tube 256', 'spheres_L64_T256'),
            ('spheres: 64/link, tube 1024', 'spheres_L64_T1024'),
@@ -40,7 +45,7 @@ def main():
         rows[label] = o
         lines.append(f"| {label} | {o['invalid_starts']} | {o['reached']}/30 ({o['reached']}/{len(valid)}) | "
                      f"{o['collision_trials'] if audited else 'pending'} | {o['slack_trials']} | "
-                     f"{o['min_gap_mm']:.1f} / {o['median_gap_mm']:.1f} | {o['t_median_ms']:.1f} / {o['t_p95_ms']:.1f} | "
+                     f"{fmt(o['min_gap_mm'])} / {fmt(o['median_gap_mm'])} | {o['t_median_ms']:.1f} / {o['t_p95_ms']:.1f} | "
                      f"{'yes' if o['t_p95_ms'] <= BUDGET_MS else 'no'} | {o['rows_max']} |")
     (D / 'summary.json').write_text(json.dumps(rows, indent=1))
     text = ('# Star tube, 30 random goals: ours vs full sphere decomposition\n\n'

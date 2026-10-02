@@ -1,0 +1,50 @@
+{
+ "ours: vertex certificate, box = 6-mm patch": {
+  "trials": 30,
+  "invalid_starts": 0,
+  "reached": 14,
+  "collision_trials": 0,
+  "slack_trials": 0,
+  "min_gap_mm": 6.923810847521284,
+  "median_gap_mm": 15.582091807665417,
+  "t_median_ms": 22.903950070030987,
+  "t_p95_ms": 36.18725509149953,
+  "rows_max": 9222
+ },
+ "spheres: 64/link, tube 256": {
+  "trials": 30,
+  "invalid_starts": 30,
+  "reached": 0,
+  "collision_trials": 0,
+  "slack_trials": 0,
+  "min_gap_mm": NaN,
+  "median_gap_mm": NaN,
+  "t_median_ms": 5.14880008995533,
+  "t_p95_ms": 6.228995008859783,
+  "rows_max": 312
+ },
+ "spheres: 64/link, tube 1024": {
+  "trials": 30,
+  "invalid_starts": 0,
+  "reached": 8,
+  "collision_trials": 0,
+  "slack_trials": 0,
+  "min_gap_mm": 20.000684997823967,
+  "median_gap_mm": 20.00608261895578,
+  "t_median_ms": 18.89715006109327,
+  "t_p95_ms": 23.190750100184232,
+  "rows_max": 793
+ },
+ "spheres: 128/link, tube 1024": {
+  "trials": 30,
+  "invalid_starts": 0,
+  "reached": 10,
+  "collision_trials": 0,
+  "slack_trials": 0,
+  "min_gap_mm": 20.000222370720763,
+  "median_gap_mm": 20.004808051719504,
+  "t_median_ms": 41.57109989318997,
+  "t_p95_ms": 52.77506998972966,
+  "rows_max": 1025
+ }
+}

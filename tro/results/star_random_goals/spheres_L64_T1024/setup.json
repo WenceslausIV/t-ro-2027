@@ -1,0 +1,19 @@
+{
+ "method": "spheres",
+ "dt_s": 0.01,
+ "gamma": 5.0,
+ "eta_m": 0.03,
+ "steps": 1500,
+ "qp": "daqp, slack fallback",
+ "link_spheres": 512,
+ "tube_spheres": 1024,
+ "tube_radius_mm": [
+  15.042593795740888,
+  23.96804617077994
+ ],
+ "link_radius_mm": [
+  16.720848978447865,
+  45.90355787761441
+ ],
+ "voxel_mm": 5.0
+}

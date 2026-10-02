@@ -1,0 +1,18 @@
+{
+ "trial": 24,
+ "method": "ours",
+ "metrics": {
+  "steps": 1500,
+  "reached_s": null,
+  "slack_steps": 0,
+  "h0_mm": Infinity,
+  "rows_max": 7679,
+  "t_median_ms": 35.19614995457232,
+  "t_p95_ms": 40.72436494752765,
+  "t_max_ms": 53.62679995596409,
+  "min_gap_bound_mm": 16.988842958732906,
+  "collision_witness_states": 0,
+  "min_witness_sdf_mm": null,
+  "audit": "every state incl. final; certified lower bound, direct below 20 mm (link-bound reuse above), capped at 50 mm"
+ }
+}

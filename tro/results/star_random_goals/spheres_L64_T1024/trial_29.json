@@ -1,0 +1,18 @@
+{
+ "trial": 29,
+ "method": "spheres",
+ "metrics": {
+  "steps": 1500,
+  "reached_s": null,
+  "slack_steps": 0,
+  "h0_mm": 0.974219489752251,
+  "rows_max": 249,
+  "t_median_ms": 18.53234996087849,
+  "t_p95_ms": 22.714100079610944,
+  "t_max_ms": 31.008300138637424,
+  "min_gap_bound_mm": 20.00136575977003,
+  "collision_witness_states": 0,
+  "min_witness_sdf_mm": null,
+  "audit": "every state incl. final; certified lower bound, direct below 20 mm (link-bound reuse above), capped at 50 mm"
+ }
+}

@@ -1,0 +1,11 @@
+{
+ "method": "ours",
+ "dt_s": 0.01,
+ "gamma": 5.0,
+ "eta_m": 0.03,
+ "steps": 1500,
+ "qp": "daqp, slack fallback",
+ "certificate": "vertex, w = 1",
+ "patch_mm": 6,
+ "tube_level_mm": 1.586435640035534
+}
