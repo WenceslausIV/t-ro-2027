@@ -111,8 +111,9 @@ construction applies to planar and spatial, rigid and articulated bodies, with o
 It docked where bounding circles could not. In 30 Franka Panda trials whose unfiltered motions
 collide, margin-free sphere and surface-sample barriers collided in 13 and 15 trials, a
 closest-point barrier in 5; with 1-cm margins, the primitives avoided detected collisions and reached
-more goals. On 28 of these trials, the certified sampled-data controller with native 6-mm patches
-reached 13 goals at high cost, and subdivided covers without it 17.
+more goals. With native 6-mm patches and the vertex certificate, ours reached 17 of the 30 goals
+within a 20-Hz budget. Leaving a narrow star-shaped tube toward 30 random goals, it reached 14,
+against at most 8 for certified sphere decompositions of the arm and the tube within the same budget.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -774,6 +775,9 @@ implementation, with unit lifts and rows enforced at the 10-ms samples; its resu
 attributed to the default. Section~\ref{sec:native} evaluates native patches with optimized
 multipliers and the sampled-data certificate. Spatial and crowded planar runs include filter times
 above the 10-ms step, so the timings do not establish a hard 100-Hz real-time guarantee.
+Sections~\ref{sec:native} and~\ref{sec:exp-spheres} compare settings under one real-time criterion,
+a 20-Hz control loop as used by vision-language-action policies: a setting qualifies if its 95th
+percentile filter time, measured in one process with nothing else running, is at most 50~ms.
 
 \subsection{Planar Setup}
 Unless stated otherwise, control uses $SE(2)$ single integrators with $\gamma=5$,
@@ -1115,40 +1119,89 @@ constraints, and median filter times of 1.81 and 3.31~ms.
 \caption{Native Patches on the 30 Franka Trials}
 \label{tab:native}
 \centering\footnotesize
-\setlength{\tabcolsep}{2.2pt}
+\setlength{\tabcolsep}{1.8pt}
 \begin{tabular}{llcccc}
 \toprule
-fields & certificate & reached & infeasible & min.\ [mm] & rows\\
+cells & certificate & reached & gap [mm] & time [ms] & rows\\
 \midrule
-12~mm & unit lift, slack & 6 & 1497 (2) & 15.3 & 2064\\
-12~mm & optimized $w$, slack & 8 & 0 & 12.5 & 9045\\
-12~mm & optimized $w$, sampled & 7 & 0 & 12.3 & 16{,}857\\
-6~mm & optimized $w$, sampled & 13$^\ast$ & 0 & 4.3 & 70{,}425\\
+12~mm & optimized $w$ & 7/29 & 12.5/20.1 & 12.6/23.1 & 9045\\
+8~mm & optimized $w$ & 13 & 5.4/12.7 & 16.1/44.7 & 22{,}086\\
+8~mm & joint, $w=1$ & 14 & 7.0/20.1 & 13.2/22.0 & 16{,}281\\
+\textbf{6~mm} & \textbf{vertex}, $w=1$ & \textbf{17} & 6.0/18.1 & 14.1/26.2 & 8832\\
+5~mm & vertex, $w=1$ & 17 & 4.5/18.2 & 16.0/34.2 & 12{,}456\\
+6~mm & optimized $w$ & 16 & 4.2/11.6 & 27.7/\textit{77.8} & 35{,}694\\
+12~mm & opt.\ $w$, sampled & 6/29 & 12.2/20.3 & 19.1/38.7 & 7611\\
+6~mm & opt.\ $w$, sampled & 10 & 3.8/10.4 & 25.9/\textit{98.6} & 37{,}986\\
 \bottomrule
 \end{tabular}
 \\[3pt]
-\parbox{\columnwidth}{\footnotesize Native patches, no refinement; obstacle fields, controller, and
-trials as in Table~\ref{tab:franka}. Infeasible: steps with slack or zero input (trials). Min.:
-saved-state mesh-distance lower bound, final states included. Sampled: rows of
-Theorem~\ref{thm:sampled} with the zero-input fallback, certified between samples
-(Corollary~\ref{cor:sampled}). 6~mm: refitted link fields with 26{,}182 native patches.
-$^\ast$Of 28 trials (all but 16 and 19).}
+\parbox{\columnwidth}{\footnotesize Box = native patch of refitted link fields, no refinement; obstacle
+fields, controller, and trials as in Table~\ref{tab:franka}; rows at the samples unless ``sampled''
+(Theorem~\ref{thm:sampled}). Reached: of 30 trials; trial~18 starts with a negative certified bound for
+12-mm patches and is excluded (/29). Gap: minimum/median over trials of the saved-state mesh-distance
+lower bounds, every state audited; no trial collides or needs slack. Time: filter median/p95, one
+process, nothing else running; italic: over the 20-Hz budget.}
 \end{table}
 
-On the 30 Franka trials (Table~\ref{tab:native}), native 12-mm patches with unit lifts reach the goal
-in only 6 trials, and two trials need slack (1497 steps): in trial~18, the unit-lift bound of one
-box is negative at the initial pose, so not even stopping is certified. Optimized multipliers
-(Proposition~\ref{prop:second}; $w\in[0,1.02]$ was selected) remove every slack step and reach 8 goals,
-trial~18 in 5.0~s. Adding the rows of Theorem~\ref{thm:sampled} with the zero-input fallback certifies
-the executed held-input controller between samples (Corollary~\ref{cor:sampled}); it reaches 7 goals,
-and the QP was feasible at every step, so the fallback never acted. On trials 0--4, rerun on one
-machine, median/p95 filter time grows from 8.2/14.4~ms with unit lifts to 13.0/42.5~ms with optimized
-multipliers and 12.5/42.7~ms with sampled data. Refitting the link fields at 6~mm (levels
-0.95--1.66~mm) and using their cells as the cover, without a separate cover resolution, the certified
-controller reaches 13 of 28 goals, against 17 on the same trials for the subdivided covers of
-Table~\ref{tab:franka}, which lack the between-sample certificate, and never needs the fallback.
-Its cost is high, 29/734~ms median/p95 filter time with up to 2608 active boxes, almost entirely in
-our dense QP solver.
+On the 30 Franka trials (Table~\ref{tab:native}), native patches are compared at several cell sizes
+with the patch as the only discretization parameter. With 12-mm patches the arm stops in front of
+an obstacle in most trials: near contact the constant terms of the rows vanish while the remainder
+$\tfrac12M_Br^2(\norm{\mathbf V}_1+\rho\norm{\boldsymbol\Omega}_1)$ charges every motion, including
+tangential sliding, so only $\mathbf u=\mathbf0$ remains admissible. Since this remainder scales with
+$r^2$, smaller patches restore progress. The vertex certificate with unit lifts has 8 rows per patch
+instead of 27, so it reaches the finest cells within the budget: 6-mm patches reach 17 goals at
+14.1/26.2~ms, the same success as the subdivided covers of Table~\ref{tab:franka} at lower tail cost,
+and 5-mm patches add nothing. Joint and optimized-multiplier certificates qualify only at 8~mm, where
+they reach 14 and 13 goals; at 6~mm their row counts exceed the budget. We therefore use the vertex
+certificate on the smallest native patches within the budget as the default. The sampled-data rows
+certify the motion between samples at the price of fewer goals (10 at 6~mm, over the budget).
+
+\subsection{Narrow Passage: Certified Sphere Decompositions}\label{sec:exp-spheres}
+The arm starts threaded through the rounded star tube of Fig.~\ref{fig:star} and leaves toward 30
+random goals, drawn as in Sec.~\ref{sec:exp-franka} (80\% of the joint ranges, hand above 0.1~m,
+at least 3~cm mesh clearance) and kept, in seeded order, when the unfiltered joint-space motion hits
+the tube (negative analytic distance at a mesh point); 30 of the first 102 candidates qualify. The
+baseline decomposes both bodies into certified enclosing spheres: k-means centers of the remeshed
+link vertices, with radius the farthest assigned vertex plus the remeshing distance, and for the
+tube the voxels of side $s$ that may meet the solid (exact distance at the center at most
+$\sqrt3s/2$), clustered by k-means, with radius covering the assigned voxels. Each sphere pair
+within $\eta$ gives one CBF $h=\norm{\mathbf x_a-\mathbf c_b}-r_a-r_b$. Ours uses the vertex
+certificate on 6-mm patches against the tube's fitted field. Nominal controller, $\gamma$, input
+bounds, 15-s horizon, activation, and QP are shared; every saved state is audited against the
+analytic tube with a certified mesh-distance lower bound (exact below 20~mm), and filter times are
+measured in isolation. A trial whose start lies outside the method's certified set counts as failed.
+
+\begin{table}[t]
+\caption{Leaving the Star Tube: 30 Random Goals}
+\label{tab:spheres}
+\centering\footnotesize
+\setlength{\tabcolsep}{2pt}
+\begin{tabular}{lcccc}
+\toprule
+method & invalid & reached & gap [mm] & time [ms]\\
+\midrule
+\textbf{ours}, vertex, 6-mm patches & 0 & \textbf{14} & 6.9/15.6 & 22.9/36.2\\
+ours, joint $w=1$, 8-mm patches & 0 & 12 & 9.8/16.7 & 22.9/41.6\\
+spheres $64/$link, tube 256 & 30 & 0 & -- & 5.1/6.2\\
+spheres $64/$link, tube 1024 & 0 & 8 & $\ge20$/$\ge20$ & 18.9/23.2\\
+spheres $128/$link, tube 1024 & 0 & 10 & $\ge20$/$\ge20$ & 41.6/\textit{52.8}\\
+\bottomrule
+\end{tabular}
+\\[3pt]
+\parbox{\columnwidth}{\footnotesize Invalid: starts outside the certified set (counted as failures).
+Reached: of 30. Gap: minimum/median over valid trials of the saved-state mesh-distance lower bounds.
+Time: filter median/p95, one process, nothing else running; italic: over the 20-Hz budget. No trial
+collides or needs slack. Tube spheres: radii 27--38~mm (256, 10-mm voxels) and 15--24~mm (1024, 5-mm
+voxels); link spheres: radii 17--46~mm.}
+\end{table}
+
+With 256 tube spheres, the spheres of the arm and the tube already overlap at the start in all 30
+trials (Table~\ref{tab:spheres}). With 1024 tube spheres the starts are certified, but the
+decomposition thickens the walls by up to the sphere radii: the arm never comes within 2~cm of the
+tube and reaches 8 goals within the budget, and 10 with twice as many link spheres, which exceeds it.
+Ours reaches 14 within the budget and passes within 6.9~mm of the tube. In the open Franka scene of
+Table~\ref{tab:franka}, round surrogates lose little; in this narrow passage, certifying the
+non-convex surfaces themselves decides how many goals are reachable.
 
 % -----------------------------------------------------------------------------
 \subsection{Comparison of Finite Certificates}\label{sec:cert-comparison}
@@ -1236,8 +1289,9 @@ one field per body. Optimized multipliers make the enforcement loss quadratic in
 a curvature tightening that vanishes at rest, together with a zero-input fallback, certifies the
 executed sampled-data controller without feasibility assumptions. The construction never collided in
 the planar experiments, unlike a closest-point barrier, docked where bounding circles cannot, and
-certified a Franka Panda's motion between samples while reaching 13 of 28 goals with native 6-mm
-patches. Faster enforcement near contact, deadlock resolution, and hardware validation are the next
+certified a Franka Panda's motion between samples. Within a 20-Hz budget, native 6-mm patches with
+the vertex certificate reached 17 of 30 Franka goals and 14 of 30 goals out of a narrow star-shaped
+tube, where certified sphere decompositions reached at most 8. Faster enforcement near contact, deadlock resolution, and hardware validation are the next
 steps.
 
 \bibliographystyle{IEEEtran}
