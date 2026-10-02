@@ -18,6 +18,8 @@ REUSE_MM = 20.   # audit evaluates directly below this distance; larger bounds a
 def fmt(x):
     return 'n/a' if not np.isfinite(x) else (f'>= {REUSE_MM:.0f}' if x >= REUSE_MM - 1e-9 else f'{x:.1f}')
 METHODS = [('ours: vertex certificate, box = 6-mm patch', 'ours'),
+           ('ours: joint Bernstein (w = 1), box = 6-mm patch', 'ours_joint_6mm'),
+           ('ours: joint Bernstein (w = 1), box = 8-mm patch', 'ours_joint_8mm'),
            ('spheres: 64/link, tube 256', 'spheres_L64_T256'),
            ('spheres: 64/link, tube 1024', 'spheres_L64_T1024'),
            ('spheres: 128/link, tube 1024', 'spheres_L128_T1024')]

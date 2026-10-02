@@ -26,4 +26,14 @@ audits() {
 
 report() { python prototype_3d/star_random_goals_report.py && echo STAR_REPORT_DONE; }
 
+joint() {
+  # joint Bernstein certificate (w = 1), box = patch at 6 and 8 mm: isolated sims, then audits and report
+  n=$(powershell -NoProfile -Command "@(Get-CimInstance Win32_Process | Where-Object { \$_.Name -like 'python*' -and \$_.CommandLine -match 'star_random_goals|certificate_upgrades|continuous_baselines|patch_size_timing' }).Count")
+  [ "${n//[^0-9]/}" = "0" ] || { echo "another experiment is running; not timing"; exit 1; }
+  for f in 6mm 8mm; do python -u $P run ours --variant joint --field $f --no-audit --tag _joint_$f; done
+  for f in 6mm 8mm; do python -u $P audit --folder ours_joint_$f --workers 12; done
+  report
+  echo STAR_JOINT_DONE
+}
+
 "$@"

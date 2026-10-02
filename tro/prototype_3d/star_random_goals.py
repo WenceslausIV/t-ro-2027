@@ -46,15 +46,16 @@ ROOT = Path(HERE).parent
 OUT = ROOT / 'results' / 'star_random_goals'
 SETUP = Path(HERE) / 'interactive' / 'setups' / 'setup_20260928_171837.json'
 CACHE_6MM = ROOT / 'results' / 'fine_native_6mm_trial' / 'cache_franka_6mm.npz'
+FIELDS = {'6mm': CACHE_6MM, '8mm': ROOT / 'results' / 'native_patch_sizes' / '8mm' / 'cache_franka_8mm.npz', '12mm': None}
 STEPS, N_GOALS, CLEAR, SEED = 1500, 30, .03, 0
 UMAX7 = np.full(F.DOF, F.QD_MAX)
 
 
-def scene():
+def scene(field='6mm'):
     d = json.load(open(SETUP))
     o = d['objects'][0]
-    links, _, _ = F.build(cache_path=CACHE_6MM)
-    assert all(abs(L['side'] - .006) < 1e-12 for L in links)
+    links, _, _ = F.build(cache_path=FIELDS[field]) if FIELDS[field] else F.build()
+    assert all(abs(L['side'] - int(field[:-2]) / 1000) < 1e-12 for L in links)
     B = SV.build_objects()['star tube (rounded)']
     return np.array(d['q1'], float), links, B, np.array(o['R'], float), np.array(o['p'], float)
 
@@ -206,18 +207,19 @@ def sphere_rows(q, links, prim, Cw, rw):
     return np.vstack(A), np.concatenate(Cc), hmin
 
 
-def run(method, trials, audit, tag, n_link, n_tube, voxel):
-    q0, links, B, RB, pB = scene()
+def run(method, trials, audit, tag, n_link, n_tube, voxel, variant='unit', field='6mm'):
+    q0, links, B, RB, pB = scene(field)
     goals = json.loads((OUT / 'goals.json').read_text())
     assert np.allclose(goals['q_start'], q0)
     SM.QP_SOLVER = 'daqp'
     info = dict(method=method, dt_s=F.DT, gamma=F.GAMMA, eta_m=F.ACT, steps=STEPS, qp='daqp, slack fallback')
     if method == 'ours':
-        CU.configure('unit')                            # vertex certificate, unit lift, no refinement
+        CU.configure(variant)                           # unit: vertex certificate; joint: joint Bernstein; w = 1
         for A in links:
             S3.prep_link(A)
         S3.prep_field(B, max(A['side'] * np.sqrt(3) / 2 for A in links))
-        info.update(certificate='vertex, w = 1', patch_mm=6, tube_level_mm=1e3 * float(B['l']))
+        info.update(certificate=('vertex' if variant == 'unit' else 'joint Bernstein') + ', w = 1',
+                    patch_mm=int(field[:-2]), tube_level_mm=1e3 * float(B['l']))
     else:
         prim = CBL.primitives(links, 'spheres_kmeans', .01, n_link)
         Ct, rt = tube_spheres(B, voxel, n_tube)
@@ -312,6 +314,8 @@ def main():
     p.add_argument('--trials', nargs=2, type=int, default=[0, N_GOALS])
     p.add_argument('--no-audit', action='store_true')
     p.add_argument('--tag', default='')
+    p.add_argument('--variant', choices=('unit', 'joint'), default='unit')
+    p.add_argument('--field', choices=tuple(FIELDS), default='6mm')
     p.add_argument('--link-spheres', type=int, default=64)
     p.add_argument('--tube-spheres', type=int, default=128)
     p.add_argument('--voxel-mm', type=float, default=10.)
@@ -321,7 +325,8 @@ def main():
     elif a.cmd == 'audit':
         audit_folder(a.folder, a.reuse_mm / 1000, a.workers)
     else:
-        run(a.method, a.trials, not a.no_audit, a.tag, a.link_spheres, a.tube_spheres, a.voxel_mm / 1000)
+        run(a.method, a.trials, not a.no_audit, a.tag, a.link_spheres, a.tube_spheres, a.voxel_mm / 1000,
+            a.variant, a.field)
 
 
 if __name__ == '__main__':
