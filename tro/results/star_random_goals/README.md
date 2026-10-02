@@ -1,6 +1,6 @@
 # Star tube, 30 random goals: ours vs full sphere decomposition
 
-The arm starts threaded in the rounded star tube and leaves to 30 random goals whose unfiltered motion hits the tube (goals.json). Spheres: links AND tube decomposed into certified enclosing spheres. Same nominal, dt, gamma, input bounds, horizon (15 s), activation, QP (DAQP, slack fallback). Reached counts are out of 30; a start outside the certified set (h0 < 0) is a failure. Gaps: certified mesh-distance lower bounds at every state over valid trials. Times: isolated simulation runs, filter only.
+The arm starts threaded in the rounded star tube and leaves to 30 random goals whose unfiltered motion hits the tube (goals.json). Spheres: links AND tube decomposed into certified enclosing spheres. Same nominal, dt, gamma, input bounds, horizon (15 s), activation, QP (DAQP, slack fallback). Reached counts are out of 30; a start outside the certified set (h0 < 0) is a failure. Gaps: certified mesh-distance lower bounds at every state over valid trials; the audit is exact below 20 mm, so larger values are shown as >= 20. Times: isolated simulation runs, filter only.
 
 | method | invalid starts | reached (valid) | collision trials | slack trials | min / median gap [mm] | filter time med / p95 [ms] | 20-Hz budget | max rows |
 |---|---|---|---|---|---|---|---|---|
